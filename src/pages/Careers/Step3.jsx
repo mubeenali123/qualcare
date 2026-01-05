@@ -103,107 +103,55 @@ const Step3 = ({ onNext, onPrevious, onBack, goToStep }) => {
         <form onSubmit={handleSubmit}>
           
           {/* Availability Days */}
-          <div className="form-section">
-            <div className="availability-grid">
-              {/* Monday */}
-              <div className="availability-day">
-                <h4 className="day-label">Monday</h4>
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    name="mondayAvailable" 
-                    checked={formData.mondayAvailable} 
-                    onChange={handleInputChange} 
-                  />
-                  <span>Available</span>
-                </label>
-              </div>
+<div className="form-section">
+  <div className="availability-grid">
+{["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => (
+  <div key={day} className="mb-3">
+    {/* Day label */}
+    <h4 className="day-label">{day.charAt(0).toUpperCase() + day.slice(1)}</h4>
 
-              {/* Tuesday */}
-              <div className="availability-day">
-                <h4 className="day-label">Tuesday</h4>
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    name="tuesdayAvailable" 
-                    checked={formData.tuesdayAvailable} 
-                    onChange={handleInputChange} 
-                  />
-                  <span>Available</span>
-                </label>
-              </div>
+    {/* Checkbox + conditional time inputs */}
+    <div className="availability-day d-flex align-items-center justify-content-start gap-3">
+      {/* Checkbox with label */}
+      <label className="checkbox-label d-flex align-items-center gap-1 mb-0">
+        <input
+          type="checkbox"
+          name={`${day}Available`}
+          checked={formData[`${day}Available`]}
+          onChange={handleInputChange}
+        />
+        <span>Available</span>
+      </label>
 
-              {/* Wednesday */}
-              <div className="availability-day">
-                <h4 className="day-label">Wednesday</h4>
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    name="wednesdayAvailable" 
-                    checked={formData.wednesdayAvailable} 
-                    onChange={handleInputChange} 
-                  />
-                  <span>Available</span>
-                </label>
-              </div>
+      {/* Conditional start/end time inputs, inline to the right */}
+      {formData[`${day}Available`] && (
+        <div className="time-inputs d-flex align-items-center gap-1">
+          <input
+            type="time"
+            name={`${day}StartTime`}
+            value={formData[`${day}StartTime`] || ""}
+            onChange={handleInputChange}
+            className="form-control form-control-sm"
+            style={{ width: "100px" }}
+          />
+          <span>/</span>
+          <input
+            type="time"
+            name={`${day}EndTime`}
+            value={formData[`${day}EndTime`] || ""}
+            onChange={handleInputChange}
+            className="form-control form-control-sm"
+            style={{ width: "100px" }}
+          />
+        </div>
+      )}
+    </div>
+  </div>
+))}
 
-              {/* Thursday */}
-              <div className="availability-day">
-                <h4 className="day-label">Thursday</h4>
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    name="thursdayAvailable" 
-                    checked={formData.thursdayAvailable} 
-                    onChange={handleInputChange} 
-                  />
-                  <span>Available</span>
-                </label>
-              </div>
+  </div>
+</div>
 
-              {/* Friday */}
-              <div className="availability-day">
-                <h4 className="day-label">Friday</h4>
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    name="fridayAvailable" 
-                    checked={formData.fridayAvailable} 
-                    onChange={handleInputChange} 
-                  />
-                  <span>Available</span>
-                </label>
-              </div>
-
-              {/* Saturday */}
-              <div className="availability-day">
-                <h4 className="day-label">Saturday</h4>
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    name="saturdayAvailable" 
-                    checked={formData.saturdayAvailable} 
-                    onChange={handleInputChange} 
-                  />
-                  <span>Available</span>
-                </label>
-              </div>
-
-              {/* Sunday */}
-              <div className="availability-day">
-                <h4 className="day-label">Sunday</h4>
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    name="sundayAvailable" 
-                    checked={formData.sundayAvailable} 
-                    onChange={handleInputChange} 
-                  />
-                  <span>Available</span>
-                </label>
-              </div>
-            </div>
-          </div>
 
           {/* Total Hours */}
           <div className="form-section">
