@@ -1,8 +1,51 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './ApplicationForm.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 const FinalApplicationForm = ({ onBack, onNext, goToStep }) => {
+const capitalizeLabelsInFinalApplication = () => {
+  const container = document.querySelector(".final-application");
+
+  if (!container) return;
+
+  // 1️⃣ Handle section-labels with a specific condition
+  const sectionLabels = container.querySelectorAll(".section-label");
+  sectionLabels.forEach(label => {
+    // Example condition: only convert if label has no inner span OR ignore "*"
+    const requiredSpan = label.querySelector(".required");
+    let text = label.textContent.replace("*", "").trim();
+
+    // Your specific condition: only capitalize if length > 0
+    if (text.length > 0) {
+      text = text
+        .toLowerCase()
+        .replace(/\b\w/g, char => char.toUpperCase());
+
+      label.innerHTML = text;
+
+      if (requiredSpan) label.appendChild(requiredSpan);
+    }
+  });
+
+  // 2️⃣ Handle labels with spans inside (like radios, checkboxes)
+  const labelSpans = container.querySelectorAll("label span");
+  labelSpans.forEach(span => {
+    if (!span.classList.contains("required")) {
+      let text = span.textContent.trim();
+      if (text.length > 0) {
+        text = text
+          .toLowerCase()
+          .replace(/\b\w/g, char => char.toUpperCase());
+        span.textContent = text;
+      }
+    }
+  });
+};
+
+// Run once after component mounts
+useEffect(() => {
+  capitalizeLabelsInFinalApplication();
+}, []);
+
     const [formData, setFormData] = useState({
         // Personal Information
         lastName: '',
@@ -194,7 +237,7 @@ const FinalApplicationForm = ({ onBack, onNext, goToStep }) => {
     };
 
     return (
-        <div className="application-page">
+        <div className="application-page final-application">
             {/* Header */}
             <header className="header">
                 <div className="header-container">
@@ -217,48 +260,74 @@ const FinalApplicationForm = ({ onBack, onNext, goToStep }) => {
             <div className="form-container">
                 {/* Progress Steps */}
                 <div className="progress-steps">
-                    <div className="step active" onClick={() => goToStep(1)}>
+                    <div className="step active">
                         <div className="step-number">1</div>
-                        <span className="step-label">Personal Information</span>
+                        <span className="step-label">Employee Application #1</span>
                     </div>
-                    <div className="step" onClick={() => goToStep(2)}>
+                    <div className="step">
                         <div className="step-number">2</div>
-                        <span className="step-label">Background Documentation</span>
+                        <span className="step-label">Employee Application #2</span>
                     </div>
-                    <div className="step" onClick={() => goToStep(3)}>
+                    <div className="step">
                         <div className="step-number">3</div>
+                        <span className="step-label">Reference Check</span>
+                    </div>
+                    <div className="step">
+                        <div className="step-number">4</div>
+                        <span className="step-label">PayCheck Policy</span>
+                    </div>
+                    <div className="step">
+                        <div className="step-number">5</div>
+                        <span className="step-label">Company Disciplinary</span>
+                    </div>
+                    <div className="step">
+                        <div className="step-number">6</div>
+                        <span className="step-label">Safety Policy</span>
+                    </div>
+                    <div className="step">
+                        <div className="step-number">7</div>
+                        <span className="step-label">Patient Abandonment</span>
+                    </div>
+                    <div className="step">
+                        <div className="step-number">8</div>
+                        <span className="step-label">Confidentiality</span>
+                    </div>
+                    <div className="step">
+                        <div className="step-number">9</div>
                         <span className="step-label">Contractor Agreement</span>
                     </div>
-                    <div className="step" onClick={() => goToStep(4)}>
-                        <div className="step-number">4</div>
-                        <span className="step-label">License & Certification</span>
+                    <div className="step">
+                        <div className="step-number">10</div>
+                        <span className="step-label">Non Discrimination Policy</span>
                     </div>
-                    <div className="step" onClick={() => goToStep(5)}>
-                        <div className="step-number">5</div>
-                        <span className="step-label">Training Certificates</span>
+                    <div className="step">
+                        <div className="step-number">11</div>
+                        <span className="step-label">Company Disciplinary</span>
                     </div>
-                    <div className="step" onClick={() => goToStep(6)}>
-                        <div className="step-number">6</div>
-                        <span className="step-label">Health Documentation</span>
+                    <div className="step">
+                        <div className="step-number">12</div>
+                        <span className="step-label">Infection Control</span>
+                    </div>
+                    <div className="step">
+                        <div className="step-number">13</div>
+                        <span className="step-label">Policy Statement</span>
                     </div>
                 </div>
 
                 {/* Progress Bar */}
                 <div className="progress-bar">
-                    <div className="progress-text">Step 1 of 6</div>
+                    <div className="progress-text">Step 1 of 13</div>
                     <div className="progress-track">
-                        <div className="progress-fill" style={{ width: '16.67%' }}></div>
+                        <div className="progress-fill" style={{ width: '7.69%' }}></div>
                     </div>
                 </div>
 
                 <p className="required-note"><span className="required">*</span> indicates required fields</p>
 
-                <h1 className="form-title">INDEPENDENT CONTRACTOR EMPLOYMENT APPLICATION - PAGE 1 OF 2</h1>
-
                 <form onSubmit={handleNext}>
                     {/* 1. PERSONAL INFORMATION */}
                     <div className="form-section">
-                        <h2 className="section-title">1. PERSONAL INFORMATION:</h2>
+                        <h1 className="form-title">PERSONAL INFORMATION:</h1>
 
                         <div className="row">
                             <div className="form-field col-md-3">
@@ -444,7 +513,7 @@ const FinalApplicationForm = ({ onBack, onNext, goToStep }) => {
 
                     {/* 2. CONTRACT POSITION DESIRED */}
                     <div className="form-section">
-                        <h2 className="section-title">2. CONTRACT POSITION DESIRED:</h2>
+                        <h1 className="form-title">CONTRACT POSITION DESIRED:</h1>
 
                         <div className="mb-3">
                             <label className="form-check form-check-inline">
@@ -744,7 +813,7 @@ const FinalApplicationForm = ({ onBack, onNext, goToStep }) => {
 
                     {/* 3. IN CASE OF EMERGENCY */}
                     <div className="form-section">
-                        <h2 className="section-title">3. IN CASE OF EMERGENCY, PLEASE NOTIFY:</h2>
+                        <h1 className="form-title">IN CASE OF EMERGENCY, PLEASE NOTIFY:</h1>
 
                         <div className="form-row">
                             <div className="form-field">
@@ -804,7 +873,7 @@ const FinalApplicationForm = ({ onBack, onNext, goToStep }) => {
 
                     {/* 4. EXPERIENCE */}
                     <div className="form-section">
-                        <h2 className="section-title">4. EXPERIENCE: (CHECK ALL THAT APPLY)</h2>
+                        <h1 className="form-title">EXPERIENCE: (CHECK ALL THAT APPLY)</h1>
 
                         <div className="row">
                             {/* Row 1 */}
@@ -1034,245 +1103,320 @@ const FinalApplicationForm = ({ onBack, onNext, goToStep }) => {
 
 
                     </div>
-             <div className="form-section">
-                    <h2 className="section-title">5. WORK AVAILABILITY: (CHECK ALL THAT APPLY)</h2>
-                    
-                    <div className="mb-3">
-                        <label className="form-check form-check-inline">
-                            <input
-                                type="checkbox"
-                                name="fullTime"
-                                checked={formData.fullTime}
-                                onChange={handleInputChange}
-                                className='form-check-input'
-                            />
-                            <span>F/T</span>
-                        </label>
-                        <label className="form-check form-check-inline">
-                            <input
-                                type="checkbox"
-                                name="partTime"
-                                checked={formData.partTime}
-                                onChange={handleInputChange}
-                                className='form-check-input'
-                            />
-                            <span>P/T</span>
-                        </label>
-                        <label className="form-check form-check-inline">
-                            <input
-                                type="checkbox"
-                                name="days"
-                                checked={formData.days}
-                                onChange={handleInputChange}
-                                className='form-check-input'
-                            />
-                            <span>DAYS</span>
-                        </label>
-                        <label className="form-check form-check-inline">
-                            <input
-                                type="checkbox"
-                                name="nights"
-                                checked={formData.nights}
-                                onChange={handleInputChange}
-                                className='form-check-input'
-                            />
-                            <span>NIGHTS</span>
-                        </label>
-                    </div>
+                    <div className="form-section">
+                        <h1 className="form-title">WORK AVAILABILITY: (CHECK ALL THAT APPLY)</h1>
 
-                    <div className="form-row">
-                        <div className="form-field">
-                            <label className="section-label">WEEKDAYS</label>
-                            <div className="radio-group">
-                                <label className="radio-label">
+
+                        <div className="form-row d-flex align-items-center gap-5">
+
+                            {/* Weekdays */}
+                            <div className="d-flex align-items-center gap-3">
+                                <strong>Weekdays:</strong>
+
+                                <label className="radio-label d-flex align-items-center gap-1">
                                     <input
                                         type="radio"
                                         name="weekdaysAvailability"
-                                        value="liveIn"
                                         checked={formData.liveInWeekdays}
-                                        onChange={(e) => setFormData({...formData, liveInWeekdays: true, liveOutWeekdays: false})}
+                                        onChange={() =>
+                                            setFormData({ ...formData, liveInWeekdays: true, liveOutWeekdays: false })
+                                        }
                                     />
-                                    <span>LIVE IN</span>
+                                    <span>Live In</span>
                                 </label>
-                                <label className="radio-label">
+
+                                <label className="radio-label d-flex align-items-center gap-1">
                                     <input
                                         type="radio"
                                         name="weekdaysAvailability"
-                                        value="liveOut"
                                         checked={formData.liveOutWeekdays}
-                                        onChange={(e) => setFormData({...formData, liveInWeekdays: false, liveOutWeekdays: true})}
+                                        onChange={() =>
+                                            setFormData({ ...formData, liveInWeekdays: false, liveOutWeekdays: true })
+                                        }
                                     />
-                                    <span>LIVE OUT</span>
+                                    <span>Live Out</span>
                                 </label>
                             </div>
-                        </div>
-                        <div className="form-field">
-                            <label className="section-label">WEEKENDS</label>
-                            <div className="radio-group">
-                                <label className="radio-label">
+
+                            {/* Weekends */}
+                            <div className="d-flex align-items-center gap-3">
+                                <strong>Weekends:</strong>
+
+                                <label className="radio-label d-flex align-items-center gap-1">
                                     <input
                                         type="radio"
                                         name="weekendsAvailability"
-                                        value="liveIn"
                                         checked={formData.liveInWeekends}
-                                        onChange={(e) => setFormData({...formData, liveInWeekends: true, liveOutWeekends: false})}
+                                        onChange={() =>
+                                            setFormData({ ...formData, liveInWeekends: true, liveOutWeekends: false })
+                                        }
                                     />
-                                    <span>LIVE IN</span>
+                                    <span>Live In</span>
                                 </label>
-                                <label className="radio-label">
+
+                                <label className="radio-label d-flex align-items-center gap-1">
                                     <input
                                         type="radio"
                                         name="weekendsAvailability"
-                                        value="liveOut"
                                         checked={formData.liveOutWeekends}
-                                        onChange={(e) => setFormData({...formData, liveInWeekends: false, liveOutWeekends: true})}
+                                        onChange={() =>
+                                            setFormData({ ...formData, liveInWeekends: false, liveOutWeekends: true })
+                                        }
                                     />
-                                    <span>LIVE OUT</span>
+                                    <span>Live Out</span>
                                 </label>
                             </div>
-                        </div>
-                    </div>
 
-                    <div className="form-row">
-                        <div className="form-field">
-                            <label className="section-label">DRIVER'S LICENSE</label>
-                            <div className="radio-group">
-                                <label className="radio-label">
-                                    <input
-                                        type="radio"
-                                        name="driversLicense"
-                                        value="yes"
-                                        checked={formData.driversLicense === 'yes'}
-                                        onChange={handleInputChange}
-                                    />
-                                    <span>YES</span>
-                                </label>
-                                <label className="radio-label">
-                                    <input
-                                        type="radio"
-                                        name="driversLicense"
-                                        value="no"
-                                        checked={formData.driversLicense === 'no'}
-                                        onChange={handleInputChange}
-                                    />
-                                    <span>NO</span>
-                                </label>
-                            </div>
                         </div>
-                        <div className="form-field">
-                            <label className="section-label">OWN CAR</label>
-                            <div className="radio-group">
-                                <label className="radio-label">
-                                    <input
-                                        type="radio"
-                                        name="ownCar"
-                                        value="yes"
-                                        checked={formData.ownCar === 'yes'}
-                                        onChange={handleInputChange}
-                                    />
-                                    <span>YES</span>
-                                </label>
-                                <label className="radio-label">
-                                    <input
-                                        type="radio"
-                                        name="ownCar"
-                                        value="no"
-                                        checked={formData.ownCar === 'no'}
-                                        onChange={handleInputChange}
-                                    />
-                                    <span>NO</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div className="form-field">
-                        <label className="section-label">WHAT LANGUAGES CAN YOU SPEAK FLUENTLY:</label>
-                        <div className="checkbox-group">
-                            <label className="checkbox-label">
+
+
+                        <div className="form-row mb-3">
+
+                            <div className="form-field col-md-4">
+                                <label className="section-label">Driver’s License</label>
+
+                                <div className="d-flex gap-3">
+                                    <label className="radio-label">
+                                        <input
+                                            type="radio"
+                                            name="driversLicense"
+                                            value="yes"
+                                            checked={formData.driversLicense === "yes"}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span>YES</span>
+                                    </label>
+
+                                    <label className="radio-label">
+                                        <input
+                                            type="radio"
+                                            name="driversLicense"
+                                            value="no"
+                                            checked={formData.driversLicense === "no"}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span>NO</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="form-field col-md-8">
+                                <label className="section-label">
+                                    Do you have any physical disabilities that will prevent you from performing the job you are applying for?
+                                </label>
+
+                                <div className="d-flex gap-3">
+                                    <label className="radio-label">
+                                        <input
+                                            type="radio"
+                                            name="physicalDisability"
+                                            value="yes"
+                                            checked={formData.physicalDisability === "yes"}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span>YES</span>
+                                    </label>
+
+                                    <label className="radio-label">
+                                        <input
+                                            type="radio"
+                                            name="physicalDisability"
+                                            value="no"
+                                            checked={formData.physicalDisability === "no"}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span>NO</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+                        <div className="form-row mb-3">
+
+                            <div className="form-field col-md-4">
+                                <label className="section-label">Own Car</label>
+
+                                <div className="d-flex gap-3">
+                                    <label className="radio-label">
+                                        <input
+                                            type="radio"
+                                            name="ownCar"
+                                            value="yes"
+                                            checked={formData.ownCar === "yes"}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span>YES</span>
+                                    </label>
+
+                                    <label className="radio-label">
+                                        <input
+                                            type="radio"
+                                            name="ownCar"
+                                            value="no"
+                                            checked={formData.ownCar === "no"}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span>NO</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="form-field col-md-8">
+                                <label className="section-label">Have you ever been injured?</label>
+
+                                <div className="d-flex gap-3">
+                                    <label className="radio-label">
+                                        <input
+                                            type="radio"
+                                            name="injuredBefore"
+                                            value="yes"
+                                            checked={formData.injuredBefore === "yes"}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span>YES</span>
+                                    </label>
+
+                                    <label className="radio-label">
+                                        <input
+                                            type="radio"
+                                            name="injuredBefore"
+                                            value="no"
+                                            checked={formData.injuredBefore === "no"}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span>NO</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div className="mb-3">
+                            <label className="section-label">Availability Schedule</label>
+
+                            <div className="form-check form-check-inline">
                                 <input
+                                    className="form-check-input"
                                     type="checkbox"
-                                    name="languageEnglish"
-                                    checked={formData.languageEnglish}
+                                    name="fullTime"
+                                    checked={formData.fullTime}
                                     onChange={handleInputChange}
                                 />
-                                <span>ENGLISH</span>
-                            </label>
-                            <label className="checkbox-label">
+                                <span className="form-check-label">F/T</span>
+                            </div>
+
+                            <div className="form-check form-check-inline">
                                 <input
+                                    className="form-check-input"
                                     type="checkbox"
-                                    name="languageSpanish"
-                                    checked={formData.languageSpanish}
+                                    name="partTime"
+                                    checked={formData.partTime}
                                     onChange={handleInputChange}
                                 />
-                                <span>SPANISH</span>
-                            </label>
-                        </div>
-                        <input
-                            type="text"
-                            name="languageOther"
-                            value={formData.languageOther}
-                            onChange={handleInputChange}
-                            placeholder="OTHER:"
-                        />
-                    </div>
+                                <span className="form-check-label">P/T</span>
+                            </div>
 
-                    <h3 className="subsection-title">AVAILABILITY SCHEDULE:</h3>
-                    <table className="availability-table">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>FROM (Time)</th>
-                                <th>TO (Time)</th>
-                                <th>Overnight? (Yes/No?)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>MONDAY</td>
-                                <td><input type="time" name="mondayFrom" value={formData.mondayFrom} onChange={handleInputChange} /></td>
-                                <td><input type="time" name="mondayTo" value={formData.mondayTo} onChange={handleInputChange} /></td>
-                                <td><input type="text" name="mondayOvernight" value={formData.mondayOvernight} onChange={handleInputChange} /></td>
-                            </tr>
-                            <tr>
-                                <td>TUESDAY</td>
-                                <td><input type="time" name="tuesdayFrom" value={formData.tuesdayFrom} onChange={handleInputChange} /></td>
-                                <td><input type="time" name="tuesdayTo" value={formData.tuesdayTo} onChange={handleInputChange} /></td>
-                                <td><input type="text" name="tuesdayOvernight" value={formData.tuesdayOvernight} onChange={handleInputChange} /></td>
-                            </tr>
-                            <tr>
-                                <td>WEDNESDAY</td>
-                                <td><input type="time" name="wednesdayFrom" value={formData.wednesdayFrom} onChange={handleInputChange} /></td>
-                                <td><input type="time" name="wednesdayTo" value={formData.wednesdayTo} onChange={handleInputChange} /></td>
-                                <td><input type="text" name="wednesdayOvernight" value={formData.wednesdayOvernight} onChange={handleInputChange} /></td>
-                            </tr>
-                            <tr>
-                                <td>THURSDAY</td>
-                                <td><input type="time" name="thursdayFrom" value={formData.thursdayFrom} onChange={handleInputChange} /></td>
-                                <td><input type="time" name="thursdayTo" value={formData.thursdayTo} onChange={handleInputChange} /></td>
-                                <td><input type="text" name="thursdayOvernight" value={formData.thursdayOvernight} onChange={handleInputChange} /></td>
-                            </tr>
-                            <tr>
-                                <td>FRIDAY</td>
-                                <td><input type="time" name="fridayFrom" value={formData.fridayFrom} onChange={handleInputChange} /></td>
-                                <td><input type="time" name="fridayTo" value={formData.fridayTo} onChange={handleInputChange} /></td>
-                                <td><input type="text" name="fridayOvernight" value={formData.fridayOvernight} onChange={handleInputChange} /></td>
-                            </tr>
-                            <tr>
-                                <td>SATURDAY</td>
-                                <td><input type="time" name="saturdayFrom" value={formData.saturdayFrom} onChange={handleInputChange} /></td>
-                                <td><input type="time" name="saturdayTo" value={formData.saturdayTo} onChange={handleInputChange} /></td>
-                                <td><input type="text" name="saturdayOvernight" value={formData.saturdayOvernight} onChange={handleInputChange} /></td>
-                            </tr>
-                            <tr>
-                                <td>SUNDAY</td>
-                                <td><input type="time" name="sundayFrom" value={formData.sundayFrom} onChange={handleInputChange} /></td>
-                                <td><input type="time" name="sundayTo" value={formData.sundayTo} onChange={handleInputChange} /></td>
-                                <td><input type="text" name="sundayOvernight" value={formData.sundayOvernight} onChange={handleInputChange} /></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            <div className="form-check form-check-inline">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    name="days"
+                                    checked={formData.days}
+                                    onChange={handleInputChange}
+                                />
+                                <span className="form-check-label">DAYS</span>
+                            </div>
+
+                            <div className="form-check form-check-inline">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    name="nights"
+                                    checked={formData.nights}
+                                    onChange={handleInputChange}
+                                />
+                                <span className="form-check-label">NIGHTS</span>
+                            </div>
+
+
+                        </div>
+                        
+
+
+                    </div>
+                    <div className="form-section">
+                            <h1 className="form-title">
+                                REFERENCES - PERSONAL: <small>(LIST 3 PERSONS NOT RELATED TO YOU THAT YOU HAVE KNOWN AT LEAST ONE YEAR)</small>
+                            </h1>
+
+                            {/* Header Row */}
+                            <div className="row mb-2">
+                                <div className="col-md-3"><h1 className='section-label'>Name</h1></div>
+                                <div className="col-md-3"><h1 className='section-label'>Address</h1></div>
+                                <div className="col-md-2"><h1 className='section-label'>Phone</h1></div>
+                                <div className="col-md-2"><h1 className='section-label'>Business</h1></div>
+                                <div className="col-md-2"><h1 className='section-label'>Yrs Known</h1></div>
+                            </div>
+
+                            {/* Loop over 3 references */}
+                            {[0, 1, 2].map((i) => (
+                                <div className="row mb-2" key={i}>
+                                    <div className="form-field col-md-3">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name={`ref${i + 1}Name`}
+                                            value={formData[`ref${i + 1}Name`]}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="form-field col-md-3">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name={`ref${i + 1}Address`}
+                                            value={formData[`ref${i + 1}Address`]}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="form-field col-md-2">
+                                        <input
+                                            type="tel"
+                                            className="form-control"
+                                            name={`ref${i + 1}Phone`}
+                                            value={formData[`ref${i + 1}Phone`]}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="form-field col-md-2">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name={`ref${i + 1}Business`}
+                                            value={formData[`ref${i + 1}Business`]}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="form-field col-md-2">
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            name={`ref${i + 1}Years`}
+                                            value={formData[`ref${i + 1}Years`]}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                                   {/* Submit Buttons */}
+            <div className="form-actions">
+                <button type="button" className="btn-save">Save</button>
+                <button type="submit" className="btn-next">Save and Next</button>
+            </div>
                 </form>
             </div>
         </div>

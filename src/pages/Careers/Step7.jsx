@@ -2,9 +2,11 @@ import React, { useState, useRef } from 'react';
 import './ApplicationForm.css';
 
 const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
+  const today = new Date().toISOString().split("T")[0];
+
   const [formData, setFormData] = useState({
     agreeStatements: false,
-    signatureDate: ''
+    signatureDate: today,
   });
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef(null);
@@ -222,7 +224,8 @@ const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
               <input 
                 type="date" 
                 name="signatureDate" 
-                value={formData.signatureDate} 
+                value={formData.signatureDate}
+                disabled
                 onChange={handleInputChange}
                 required
               />

@@ -871,3 +871,7 @@
 .step:hover .step-number {
   box-shadow: 0 4px 15px rgba(9, 74, 135, 0.3);
 }
+
+.final-application .form-title{
+  text-align: left;
+}
