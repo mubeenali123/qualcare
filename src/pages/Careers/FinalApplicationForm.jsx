@@ -4,8 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const FinalApplicationForm = ({ }) => {
     const steps = [
         "HR Folder Checklist",
-        "Employee Application #1",
-        "Employee Application #2",
+        "Employee Application",
+        "Employee Application",
         "Reference Check",
         "PayCheck Policy",
         "Company Disciplinary",
