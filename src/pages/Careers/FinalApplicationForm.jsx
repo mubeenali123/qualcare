@@ -9,11 +9,11 @@ const FinalApplicationForm = ({ }) => {
         "Reference Check",
         "PayCheck Policy",
         "Company Disciplinary",
-        "Safety Policy",
+        "Safety And Policy",
         "Patient Abandonment",
-        "Confidentiality",
+        "Confidentiality Statement",
         "Contractor Agreement",
-        "Non Discrimination Policy",
+        "Discrimination Policy",
         "Company Disciplinary",
         "Infection Control",
         "Policy Statement"
@@ -339,21 +339,24 @@ const FinalApplicationForm = ({ }) => {
             {/* Form Content */}
             <div className="form-container">
                 {/* Progress Steps */}
-                <div className="progress-steps">
-                    {steps.map((label, index) => {
-                        const stepNumber = index + 1;
+<div className="progress-steps">
+  {steps.map((label, index) => {
+    const stepNumber = index + 1;
 
-                        return (
-                            <div
-                                key={stepNumber}
-                                className={`step ${stepNumber === currentStep ? "active" : ""}`}
-                            >
-                                <div className="step-number">{stepNumber}</div>
-                                <span className="step-label">{label}</span>
-                            </div>
-                        );
-                    })}
-                </div>
+    return (
+      <div
+        key={stepNumber}
+        className={`step ${stepNumber === currentStep ? "active" : ""}`}
+        onClick={() => setCurrentStep(stepNumber)}
+        role="button"
+      >
+        <div className="step-number">{stepNumber}</div>
+        <span className="step-label">{label}</span>
+      </div>
+    );
+  })}
+</div>
+
 
 
                 {/* Progress Bar */}
