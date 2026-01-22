@@ -6,7 +6,7 @@ const FinalApplicationForm4 = ({ handleFileChange, canvasRef, startDrawing, draw
     // Steps for each doc (7), Guidelines (1), and Final Signature (1)
     const steps = [
         "License / Certification",
-        "CPR",
+        "CPR Certification",
         "Driver's License",
         "Social Security Card",
         "Proof of U.S. Residency",

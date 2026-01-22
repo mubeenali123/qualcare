@@ -4,6 +4,7 @@ import FinalApplicationForm from "./pages/Careers/FinalApplicationForm";
 import FinalApplicationForm2 from "./pages/Careers/FinalApplicationForm2";
 import FinalApplicationForm3 from "./pages/Careers/FinalApplicationForm3";
 import FinalApplicationForm4 from "./pages/Careers/FinalApplicationForm4";
+import FinalApplicationForm6 from "./pages/Careers/FinalApplicationForm6";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/final-form-2" element={<FinalApplicationForm2 />} />
         <Route path="/final-form-3" element={<FinalApplicationForm3 />} />
         <Route path="/final-form-4" element={<FinalApplicationForm4 />} />
+        <Route path="/final-form-6" element={<FinalApplicationForm6 />} />
       </Routes>
     </BrowserRouter>
   );
