@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import './ApplicationForm.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 const FinalApplicationForm = ({ }) => {
+const today = new Date().toISOString().split("T")[0];
     const steps = [
         "HR Folder Checklist",
         "Employee Application",
@@ -52,7 +53,6 @@ const FinalApplicationForm = ({ }) => {
     };
     const onBack = () => {
         setCurrentStep(prev => Math.max(prev - 1, 1));
-
     };
     const startDrawing = (e) => setIsDrawing(true);
     const stopDrawing = (e) => setIsDrawing(false);
@@ -302,7 +302,23 @@ const FinalApplicationForm = ({ }) => {
         employer4Name: '',
         employer4Earnings: '',
         employer4Position: '',
-        employer4Reason: ''
+        employer4Reason: '',
+        dateSignature:today,
+        authDate:today,
+        paycheckPolicyDate:today,
+        referenceDate:today,
+        disciplinaryDate:today,
+        safetyPolicyDate:today,
+        dressCodeDate:today,
+        confidentialityStatementDate:today,
+        contractorAgreementDate:today,
+        nonDiscriminationDate:today,
+        healthDate:today,
+        infectionControlDate:today,
+        policyDate:today
+
+
+
     });
 
     const handleInputChange = (e) => {
@@ -1801,7 +1817,7 @@ const FinalApplicationForm = ({ }) => {
                                         <input
                                             type="date"
                                             name="date"
-                                            value={formData.date}
+                                            value={formData.referenceDate}
                                             onChange={handleInputChange}
                                         />
                                     </div>
@@ -2574,7 +2590,7 @@ const FinalApplicationForm = ({ }) => {
                                         <input
                                             type="date"
                                             name="dressCodeDate"
-                                            value={formData.dressCodeDate}
+                                            value={formData.confidentialityStatementDate}
                                             onChange={handleInputChange}
                                         />
                                     </div>
@@ -2654,7 +2670,7 @@ const FinalApplicationForm = ({ }) => {
                                     <input
                                         type="date"
                                         name="dressCodeDate"
-                                        value={formData.dressCodeDate}
+                                        value={formData.contractorAgreementDate}
                                         onChange={handleInputChange}
                                     />
                                 </div>
@@ -2717,7 +2733,7 @@ const FinalApplicationForm = ({ }) => {
                                         <input
                                             type="date"
                                             name="dressCodeDate"
-                                            value={formData.dressCodeDate}
+                                            value={formData.nonDiscriminationDate}
                                             onChange={handleInputChange}
                                         />
                                     </div>

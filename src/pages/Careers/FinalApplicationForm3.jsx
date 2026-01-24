@@ -3,6 +3,8 @@ import './ApplicationForm.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const FinalApplicationForm3 = ({ }) => {
+      const today = new Date().toISOString().split("T")[0];
+
     const steps = [
         "Contractor Agreement",
         "Background Screening",
@@ -295,7 +297,12 @@ const FinalApplicationForm3 = ({ }) => {
         employer4Name: '',
         employer4Earnings: '',
         employer4Position: '',
-        employer4Reason: ''
+        employer4Reason: '',
+        contractorDate:today,
+        registryDate:today,
+        witnessDate:today,
+        finalContractorDate:today,
+        date:today
     });
 
     const handleInputChange = (e) => {

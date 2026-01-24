@@ -3,6 +3,8 @@ import './ApplicationForm.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const FinalApplicationForm6 = ({ handleFileChange, canvasRef, startDrawing, draw, stopDrawing, clearSignature }) => {
+        const today = new Date().toISOString().split("T")[0];
+
     // Steps for each doc (7), Guidelines (1), and Final Signature (1)
     const steps = [
         "Employement Health Release",
@@ -16,7 +18,9 @@ const FinalApplicationForm6 = ({ handleFileChange, canvasRef, startDrawing, draw
         date: '',
         registryPrintedName: '',
         registryTitle: '',
-        registryDate: ''
+        registryDate: '',
+        noticeDate:today,
+        date:today
     });
 
     const progressWidth = (currentStep / steps.length) * 100;
@@ -150,7 +154,7 @@ const FinalApplicationForm6 = ({ handleFileChange, canvasRef, startDrawing, draw
             </div>
             <div className="form-field col-md-6">
                 <label className="section-label">DATE</label>
-                <input type="date" name="noticeDate" onChange={handleInputChange} />
+                <input type="date" name="noticeDate" value={formData.noticeDate} onChange={handleInputChange} />
             </div>
         </div>
     </div>
@@ -281,7 +285,7 @@ const FinalApplicationForm6 = ({ handleFileChange, canvasRef, startDrawing, draw
 
   <div className="form-field col-md-6">
     <label className="section-label">Date</label>
-    <input type="date" />
+    <input type="date" value={formData.date}/>
   </div>
                                 </div>
 </div>

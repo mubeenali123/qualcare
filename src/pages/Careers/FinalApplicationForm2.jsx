@@ -3,6 +3,7 @@ import './ApplicationForm.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const FinalApplicationForm2 = ({ }) => {
+    const today = new Date().toISOString().split("T")[0];
     const steps = [
         "Eligibility Verification",
         "Taxpayer Identification",
@@ -302,7 +303,15 @@ const FinalApplicationForm2 = ({ }) => {
         employer4Name: '',
         employer4Earnings: '',
         employer4Position: '',
-        employer4Reason: ''
+        employer4Reason: '',
+        employerTodayDate:today,
+        signatureDate:today,
+        w9SignDate:today,
+        finalAttestDate:today,
+        privacyDate:today,
+        doeaAttestationDate:today,
+        backgroundDate:today
+
     });
 
     const handleInputChange = (e) => {

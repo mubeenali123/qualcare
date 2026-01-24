@@ -629,3 +629,24 @@ button.btn-primary {
 .header .home-btn:hover {
   background: #27ae60;
 }
+
+.expiry-popup {
+  background-color: #fff9c4;
+  padding: 10px;
+  margin: 5px 0 15px 20px;
+  border-left: 4px solid #fbc02d;
+  animation: slideDown 0.3s ease-out;
+}
+
+.warning-box {
+  background-color: #ffebee;
+  border: 1px solid #ef9a9a;
+  padding: 15px;
+  color: #c62828;
+  border-radius: 4px;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
