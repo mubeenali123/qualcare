@@ -61,7 +61,7 @@ const handleExpiryChange = (e) => {
 };
 
 const FileUpload = React.memo(
-  ({ label, name, expiryName, formData, onFileChange, onExpiryChange }) => {
+  ({ label, name, expiryName, formData, onFileChange, onExpiryChange, useCamera }) => {
     return (
       <div className="file-upload-section">
         <label className="section-label">{label}</label>
@@ -72,6 +72,7 @@ const FileUpload = React.memo(
             name={name}
             onChange={onFileChange}
             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            {...(useCamera ? { capture: "environment" } : {})} // Enable camera capture if useCamera is true
           />
         </div>
 
@@ -103,6 +104,7 @@ const FileUpload = React.memo(
 );
 
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Step 6 Data:', formData);
@@ -131,6 +133,7 @@ const FileUpload = React.memo(
     formData={formData}
     onFileChange={handleFileChange}
     onExpiryChange={handleExpiryChange}
+    useCamera={true}
   />
 
   <FileUpload
@@ -140,6 +143,7 @@ const FileUpload = React.memo(
     formData={formData}
     onFileChange={handleFileChange}
     onExpiryChange={handleExpiryChange}
+    useCamera={true}
   />
 
   <FileUpload
@@ -149,6 +153,7 @@ const FileUpload = React.memo(
     formData={formData}
     onFileChange={handleFileChange}
     onExpiryChange={handleExpiryChange}
+    useCamera={true}
   />
 
   <FileUpload
@@ -158,6 +163,7 @@ const FileUpload = React.memo(
     formData={formData}
     onFileChange={handleFileChange}
     onExpiryChange={handleExpiryChange}
+    useCamera={true}
   />
 
   <FileUpload
@@ -167,6 +173,7 @@ const FileUpload = React.memo(
     formData={formData}
     onFileChange={handleFileChange}
     onExpiryChange={handleExpiryChange}
+    useCamera={true}
   />
 
   <FileUpload
@@ -176,6 +183,7 @@ const FileUpload = React.memo(
     formData={formData}
     onFileChange={handleFileChange}
     onExpiryChange={handleExpiryChange}
+    useCamera={true}
   />
 
   <FileUpload
@@ -185,6 +193,7 @@ const FileUpload = React.memo(
     formData={formData}
     onFileChange={handleFileChange}
     onExpiryChange={handleExpiryChange}
+    useCamera={true}
   />
 
   <FileUpload
@@ -194,6 +203,7 @@ const FileUpload = React.memo(
     formData={formData}
     onFileChange={handleFileChange}
     onExpiryChange={handleExpiryChange}
+    useCamera={true}
   />
 
   <FileUpload
@@ -203,22 +213,23 @@ const FileUpload = React.memo(
     formData={formData}
     onFileChange={handleFileChange}
     onExpiryChange={handleExpiryChange}
+    useCamera={true}
   />
 
   {/* NO EXPIRY DOCS */}
 
-  <FileUpload label="HIV/AIDS Certificate" name="hivCertificate" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="Domestic Violence Certificate" name="domesticViolence" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="Alzheimer/Dementia Certificate" name="alzheimersCertificate" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="1 Hour Alzheimer Training" name="alzheimersTraining" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="HIPAA Update" name="hipaa" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="OSHA Update" name="osha" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="Self Administered Medication Certificate" name="medicationCertificate" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="Communicating with Cognitively Impaired Patients" name="communicationTraining" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="Patient Rights" name="patientRights" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="Medical Records Documentation" name="medicalRecords" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="Medical Errors Update" name="medicalErrors" formData={formData} onFileChange={handleFileChange} />
-  <FileUpload label="Florida Laws & Rules" name="floridaLaws" formData={formData} onFileChange={handleFileChange} />
+  <FileUpload label="HIV/AIDS Certificate" name="hivCertificate" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="Domestic Violence Certificate" name="domesticViolence" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="Alzheimer/Dementia Certificate" name="alzheimersCertificate" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="1 Hour Alzheimer Training" name="alzheimersTraining" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="HIPAA Update" name="hipaa" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="OSHA Update" name="osha" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="Self Administered Medication Certificate" name="medicationCertificate" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="Communicating with Cognitively Impaired Patients" name="communicationTraining" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="Patient Rights" name="patientRights" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="Medical Records Documentation" name="medicalRecords" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="Medical Errors Update" name="medicalErrors" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
+  <FileUpload label="Florida Laws & Rules" name="floridaLaws" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
 
   <div className="form-actions">
     <button type="button" className="btn-previous" onClick={onPrevious}>
