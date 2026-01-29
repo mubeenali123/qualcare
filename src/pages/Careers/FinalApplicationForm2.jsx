@@ -1,11 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './ApplicationForm.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NutrientViewer from "@nutrient-sdk/viewer";
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 
+import WebViewer from '@pdftron/webviewer';
 
 const FinalApplicationForm2 = ({ }) => {
     const today = new Date().toISOString().split("T")[0];
+  const viewerRef = useRef(null);
+  const instanceRef = useRef(null);
    const steps = [
         "Eligibility Verification",
         "Taxpayer Identification",
@@ -324,9 +329,66 @@ const FinalApplicationForm2 = ({ }) => {
         });
     };
 
+useEffect(() => {
+    // Prevent double initialization
+    if (currentStep !== 1) return;
+    if (!viewerRef.current) return;
+    if (instanceRef.current) return; // Already initialized
 
+    WebViewer(
+      {
+        path: '/webviewer',
+        initialDoc: '/forms/section-2-page-1.pdf',
+        disabledElements: [
+          'header',
+          'toolsHeader',
+          'searchPanel',
+          'leftPanel',
+          'leftPanelButton',
+          'ribbons',
+          'toggleNotesButton',
+          'searchButton',
+          'menuButton',
+          'viewControlsButton',
+          'selectToolButton',
+          'panToolButton',
+          'zoomInButton',
+          'zoomOutButton',
+        ],
+      },
+      viewerRef.current
+    ).then(instance => {
+      instanceRef.current = instance;
+      
+      // Additional hiding
+      instance.UI.disableElements(['header', 'toolsHeader']);
+      
+      const { documentViewer, annotationManager } = instance.Core;
 
+      documentViewer.addEventListener('documentLoaded', () => {
+        console.log('PDF loaded and editable!');
+        annotationManager.enableReadOnlyMode(false);
+      });
+    }).catch(err => {
+      console.error('WebViewer error:', err);
+    });
 
+    // Cleanup function
+    return () => {
+      if (instanceRef.current) {
+        instanceRef.current.UI.dispose();
+        instanceRef.current = null;
+      }
+    };
+  }, [currentStep]); // Only re-run when currentStep changes
+
+useEffect(() => {
+  // Clean up when leaving step 1
+  if (currentStep !== 1 && instanceRef.current) {
+    instanceRef.current.UI.dispose();
+    instanceRef.current = null;
+  }
+}, [currentStep]);
     return (
         <div className="application-page final-application">
             {/* Header */}
@@ -385,16 +447,16 @@ const FinalApplicationForm2 = ({ }) => {
 
                 <form onSubmit={handleSubmit}>
 {currentStep === 1 && (
-  <iframe
-    src="/forms/section-2-page-1.pdf"
-    style={{
-      width: "100%",
-      height: "80vh",
-      border: "1px solid #ccc"
-    }}
-    title="Editable PDF"
+  <div 
+    ref={viewerRef} 
+    style={{ height: '100vh', width: '100%' }} 
+    key="pdf-viewer" // Add key to prevent remounting
   />
 )}
+
+
+
+
 
 
                     {currentStep === 2 && (

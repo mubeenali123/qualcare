@@ -875,3 +875,43 @@
 .final-application .form-title{
   text-align: left;
 }
+
+/* Hide the entire top header navigation */
+nav[aria-label="Top Header"],
+[data-element="default-top-header"],
+.ModularHeader.TopHeader,
+.TopHeader {
+  display: none !important;
+  height: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Hide all header elements */
+.Header,
+.ToolsHeader,
+[data-element="header"],
+[data-element="toolsHeader"],
+[data-element="ribbons"],
+[data-element="viewControlsOverlay"],
+.HeaderToolsContainer {
+  display: none !important;
+}
+
+/* Make document container fill the entire space */
+.DocumentContainer {
+  top: 0 !important;
+  height: 100% !important;
+}
+
+.App {
+  top: 0 !important;
+}
+
+/* Hide any leftover UI elements */
+[data-element="view-controls-toggle-button"],
+[data-element="zoom-container"],
+[data-element="searchPanelToggle"],
+[data-element="notesPanelToggle"],
+[data-element="default-ribbon-group"] {
+  display: none !important;
+}
