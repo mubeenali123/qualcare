@@ -329,66 +329,6 @@ const FinalApplicationForm2 = ({ }) => {
         });
     };
 
-useEffect(() => {
-    // Prevent double initialization
-    if (currentStep !== 1) return;
-    if (!viewerRef.current) return;
-    if (instanceRef.current) return; // Already initialized
-
-    WebViewer(
-      {
-        path: '/webviewer',
-        initialDoc: '/forms/section-2-page-1.pdf',
-        disabledElements: [
-          'header',
-          'toolsHeader',
-          'searchPanel',
-          'leftPanel',
-          'leftPanelButton',
-          'ribbons',
-          'toggleNotesButton',
-          'searchButton',
-          'menuButton',
-          'viewControlsButton',
-          'selectToolButton',
-          'panToolButton',
-          'zoomInButton',
-          'zoomOutButton',
-        ],
-      },
-      viewerRef.current
-    ).then(instance => {
-      instanceRef.current = instance;
-      
-      // Additional hiding
-      instance.UI.disableElements(['header', 'toolsHeader']);
-      
-      const { documentViewer, annotationManager } = instance.Core;
-
-      documentViewer.addEventListener('documentLoaded', () => {
-        console.log('PDF loaded and editable!');
-        annotationManager.enableReadOnlyMode(false);
-      });
-    }).catch(err => {
-      console.error('WebViewer error:', err);
-    });
-
-    // Cleanup function
-    return () => {
-      if (instanceRef.current) {
-        instanceRef.current.UI.dispose();
-        instanceRef.current = null;
-      }
-    };
-  }, [currentStep]); // Only re-run when currentStep changes
-
-useEffect(() => {
-  // Clean up when leaving step 1
-  if (currentStep !== 1 && instanceRef.current) {
-    instanceRef.current.UI.dispose();
-    instanceRef.current = null;
-  }
-}, [currentStep]);
     return (
         <div className="application-page final-application">
             {/* Header */}
@@ -447,11 +387,27 @@ useEffect(() => {
 
                 <form onSubmit={handleSubmit}>
 {currentStep === 1 && (
-  <div 
-    ref={viewerRef} 
-    style={{ height: '100vh', width: '100%' }} 
-    key="pdf-viewer" // Add key to prevent remounting
-  />
+  <div style={{ 
+    height: '100vh', 
+    width: '100%', 
+    backgroundColor: '#ffffff', // White background
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    overflow: 'auto'
+  }}>
+    <iframe
+      src="/forms/section-2-page-1.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH"
+      style={{ 
+        height: '100%', 
+        width: '100%',
+        maxWidth: '1200px', // Limit max width
+        border: 'none',
+        backgroundColor: 'white'
+      }}
+      title="PDF Form"
+    />
+  </div>
 )}
 
 
