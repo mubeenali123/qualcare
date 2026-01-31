@@ -397,7 +397,7 @@ const FinalApplicationForm2 = ({ }) => {
     overflow: 'auto'
   }}>
     <iframe
-      src="/forms/section-2-page-1.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH"
+      src="/forms/section-2-page-1.pdf#toolbar=1&navpanes=1"
       style={{ 
         height: '100%', 
         width: '100%',
