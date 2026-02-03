@@ -915,3 +915,118 @@ nav[aria-label="Top Header"],
 [data-element="default-ribbon-group"] {
   display: none !important;
 }
+
+/* 1. Make the whole page a flex column */
+.login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Full viewport height */
+}
+
+/* 2. Make this container grow to fill all available space */
+.login-container {
+  flex: 1; 
+  display: flex;
+  justify-content: center; /* Horizontal center */
+  align-items: center;     /* Vertical center */
+  padding: 2rem 0;         /* Vertical padding for breathing room */
+}
+
+/* 3. The form itself stays compact */
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  /* Added these for extra spacing control */
+  margin-top: 2rem; 
+  margin-bottom: 2rem;
+}
+
+/* Centering the entire layout */
+.profile-wrapper {
+  display: flex;
+  justify-content: center;
+  flex: 1; /* Fills space between header and footer */
+  padding: 0 20px;
+}
+
+.profile-container {
+  display: flex;
+  width: 100%;
+  max-width: 1000px; /* Limits how wide the "dashboard" gets */
+  gap: 2rem;         /* Space between sidebar and content */
+  align-items: flex-start; /* Prevents sidebar from stretching weirdly */
+}
+
+/* Sidebar "Card" Styling */
+.sidebar-card {
+  width: 250px;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav li {
+  padding: 12px 15px;
+  cursor: pointer;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  transition: 0.3s;
+  font-weight: 500;
+  color: #555;
+}
+
+.sidebar-nav li:hover {
+  background-color: #f0f4f8;
+  color: #007bff;
+}
+
+.sidebar-nav li.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Content "Card" Styling */
+.profile-content-card {
+  flex: 1; /* Takes up remaining space */
+  background: #fff;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+/* Form Grid for two-column inputs */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns */
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Make sure buttons look like buttons */
+.btn-save, .btn-upload {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  display: block;
+}

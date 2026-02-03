@@ -5,6 +5,10 @@ import FinalApplicationForm2 from "./pages/Careers/FinalApplicationForm2";
 import FinalApplicationForm3 from "./pages/Careers/FinalApplicationForm3";
 import FinalApplicationForm4 from "./pages/Careers/FinalApplicationForm4";
 import FinalApplicationForm6 from "./pages/Careers/FinalApplicationForm6";
+import LoginPage from "./pages/Careers/LoginPage";
+import ProfilePage from "./pages/Careers/ProfilePage";
+import ApplicationsPage from "./pages/Careers/ApplicationsPage";
+import ChangePasswordPage from "./pages/Careers/ChangePasswordPage";
 
 function App() {
   return (
@@ -16,6 +20,10 @@ function App() {
         <Route path="/final-form-3" element={<FinalApplicationForm3 />} />
         <Route path="/final-form-4" element={<FinalApplicationForm4 />} />
         <Route path="/final-form-6" element={<FinalApplicationForm6 />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/my-applications" element={<ApplicationsPage />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
       </Routes>
     </BrowserRouter>
   );

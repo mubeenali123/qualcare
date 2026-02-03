@@ -114,15 +114,60 @@ const FileUpload = React.memo(
   return (
     <div className="application-page">
       <header className="header">
-        <div className="header-container">
-          <div className="logo">
-            <img src="/logo.png.png" alt="QualCare Logo" />
+  <div className="header-container">
+    <div className="logo">
+      <img src="/logo.png.png" alt="QualCare Logo" />
+    </div>
+    <button className="home-btn" onClick={onBack}>Home</button>
+    <div className="header-right">
+      <div className="social-icons">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook-f"></i></a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-twitter"></i></a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i></a>
+            </div>
           </div>
-          <button className="home-btn" onClick={onBack}>Home</button>
         </div>
       </header>
 
       <div className="form-container">
+             <div className="progress-steps">
+  <div className="step completed" onClick={() => goToStep(1)}>
+    <div className="step-number">✓</div>
+    <span className="step-label">Pre-Employment</span>
+  </div>
+  <div className="step completed" onClick={() => goToStep(2)}>
+    <div className="step-number">✓</div>
+    <span className="step-label">Education</span>
+  </div>
+  <div className="step completed" onClick={() => goToStep(3)}>
+    <div className="step-number">✓</div>
+    <span className="step-label">Experience</span>
+  </div>
+  <div className="step completed" onClick={() => goToStep(4)}>
+    <div className="step-number">✓</div>
+    <span className="step-label">References</span>
+  </div>
+  <div className="step completed" onClick={() => goToStep(5)}>
+    <div className="step-number">5</div>
+    <span className="step-label">Skills</span>
+  </div>
+  <div className="step active" onClick={() => goToStep(6)}>
+    <div className="step-number">6</div>
+    <span className="step-label">Documents</span>
+  </div>
+  <div className="step" onClick={() => goToStep(7)}>
+    <div className="step-number">7</div>
+    <span className="step-label">Review</span>
+  </div>
+</div>
+
+        <div className="progress-bar">
+          <div className="progress-text">Step 6 of 7</div>
+          <div className="progress-track">
+            <div className="progress-fill" style={{ width: '71.42%' }}></div>
+          </div>
+        </div>
         <h1 className="form-title">DOCUMENT UPLOADS</h1>
 
 <form onSubmit={handleSubmit}>

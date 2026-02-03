@@ -31,22 +31,22 @@ const ApplicationForm = ({ onBack, onNext, goToStep }) => {
   };
 
   const handleNext = (e) => {
-  e.preventDefault();
-  console.log('Form Data:', formData);
-  onNext();
-};
+    e.preventDefault();
+    console.log('Form Data:', formData);
+    onNext();
+  };
 
   return (
     <div className="application-page">
       {/* Header */}
       <header className="header">
-  <div className="header-container">
-    <div className="logo">
-      <img src="/logo.png.png" alt="QualCare Logo" />
-    </div>
-    <button className="home-btn" onClick={onBack}>Home</button>
-    <div className="header-right">
-      <div className="social-icons">
+        <div className="header-container">
+          <div className="logo">
+            <img src="/logo.png.png" alt="QualCare Logo" />
+          </div>
+          <button className="home-btn" onClick={onBack}>Home</button>
+          <div className="header-right">
+            <div className="social-icons">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook-f"></i></a>
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></a>
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-twitter"></i></a>
@@ -59,52 +59,52 @@ const ApplicationForm = ({ onBack, onNext, goToStep }) => {
 
       {/* Form Content */}
       {/* Form Content */}
-<div className="form-container">
+      <div className="form-container">
 
-{/* Progress Steps */}
-<div className="progress-steps">
-  <div className="step active" onClick={() => goToStep(1)}>
-    <div className="step-number">1</div>
-    <span className="step-label">Pre-Employment</span>
-  </div>
-  <div className="step" onClick={() => goToStep(2)}>
-    <div className="step-number">2</div>
-    <span className="step-label">Education</span>
-  </div>
-  <div className="step" onClick={() => goToStep(3)}>
-    <div className="step-number">3</div>
-    <span className="step-label">Experience</span>
-  </div>
-  <div className="step" onClick={() => goToStep(4)}>
-    <div className="step-number">4</div>
-    <span className="step-label">References</span>
-  </div>
-  <div className="step" onClick={() => goToStep(5)}>
-    <div className="step-number">5</div>
-    <span className="step-label">Skills</span>
-  </div>
-  <div className="step" onClick={() => goToStep(6)}>
-    <div className="step-number">6</div>
-    <span className="step-label">Documents</span>
-  </div>
-  <div className="step" onClick={() => goToStep(7)}>
-    <div className="step-number">7</div>
-    <span className="step-label">Review</span>
-  </div>
-</div>
+        {/* Progress Steps */}
+        <div className="progress-steps">
+          <div className="step active" onClick={() => goToStep(1)}>
+            <div className="step-number">1</div>
+            <span className="step-label">Pre-Employment</span>
+          </div>
+          <div className="step" onClick={() => goToStep(2)}>
+            <div className="step-number">2</div>
+            <span className="step-label">Education</span>
+          </div>
+          <div className="step" onClick={() => goToStep(3)}>
+            <div className="step-number">3</div>
+            <span className="step-label">Experience</span>
+          </div>
+          <div className="step" onClick={() => goToStep(4)}>
+            <div className="step-number">4</div>
+            <span className="step-label">References</span>
+          </div>
+          <div className="step" onClick={() => goToStep(5)}>
+            <div className="step-number">5</div>
+            <span className="step-label">Skills</span>
+          </div>
+          <div className="step" onClick={() => goToStep(6)}>
+            <div className="step-number">6</div>
+            <span className="step-label">Documents</span>
+          </div>
+          <div className="step" onClick={() => goToStep(7)}>
+            <div className="step-number">7</div>
+            <span className="step-label">Review</span>
+          </div>
+        </div>
 
-{/* Progress Bar */}
-<div className="progress-bar">
-  <div className="progress-text">Step 1 of 7</div>
-  <div className="progress-track">
-    <div className="progress-fill" style={{ width: '14.28%' }}></div>
-  </div>
-</div>
+        {/* Progress Bar */}
+        <div className="progress-bar">
+          <div className="progress-text">Step 1 of 7</div>
+          <div className="progress-track">
+            <div className="progress-fill" style={{ width: '14.28%' }}></div>
+          </div>
+        </div>
 
-<p className="required-note"><span className="required">*</span> indicates required fields</p>
+        <p className="required-note"><span className="required">*</span> indicates required fields</p>
 
-<h1 className="form-title">PRE-EMPLOYMENT REQUIREMENTS</h1>
-        
+        <h1 className="form-title">PRE-EMPLOYMENT REQUIREMENTS</h1>
+
         <form onSubmit={handleNext}>
           {/* Name Fields */}
           <div className="form-section">
@@ -364,11 +364,11 @@ const ApplicationForm = ({ onBack, onNext, goToStep }) => {
             <p className="form-note">If under 18 years of age, you will be required to submit a birth certificate and signed parental consent form as required by the Department of Labor.</p>
           </div>
 
-           {/* Submit Buttons */}
-            <div className="form-actions">
-                <button type="button" className="btn-save">Save</button>
-                <button type="submit" className="btn-next">Save and Next</button>
-            </div>
+          {/* Submit Buttons */}
+          <div className="form-actions">
+            <button type="button" className="btn-save">Save</button>
+            <button type="submit" className="btn-next">Save and Next</button>
+          </div>
         </form>
       </div>
 
