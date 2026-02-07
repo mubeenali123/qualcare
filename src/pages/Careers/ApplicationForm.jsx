@@ -87,15 +87,19 @@ const ApplicationForm = ({ onBack, onNext, goToStep }) => {
             <div className="step-number">6</div>
             <span className="step-label">Documents</span>
           </div>
-          <div className="step" onClick={() => goToStep(7)}>
+                    <div className="step" onClick={() => goToStep(8)}>
             <div className="step-number">7</div>
+            <span className="step-label">Certification Upload</span>
+          </div>
+          <div className="step" onClick={() => goToStep(7)}>
+            <div className="step-number">8</div>
             <span className="step-label">Review</span>
           </div>
         </div>
 
         {/* Progress Bar */}
         <div className="progress-bar">
-          <div className="progress-text">Step 1 of 7</div>
+          <div className="progress-text">Step 1 of 8</div>
           <div className="progress-track">
             <div className="progress-fill" style={{ width: '14.28%' }}></div>
           </div>

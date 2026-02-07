@@ -9,6 +9,7 @@ import LoginPage from "./pages/Careers/LoginPage";
 import ProfilePage from "./pages/Careers/ProfilePage";
 import ApplicationsPage from "./pages/Careers/ApplicationsPage";
 import ChangePasswordPage from "./pages/Careers/ChangePasswordPage";
+import ExpirationChecklist from "./pages/Careers/ExpirationChecklist";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/my-applications" element={<ApplicationsPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
+        <Route path="/expiration-checklist" element={<ExpirationChecklist />} />
       </Routes>
     </BrowserRouter>
   );

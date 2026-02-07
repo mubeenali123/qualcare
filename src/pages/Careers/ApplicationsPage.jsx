@@ -23,17 +23,23 @@ const ApplicationsPage = ({ onBack }) => {
 
       {/* Main Layout Container */}
       <div className="profile-wrapper mt-5 mb-5">
-        <div className="profile-container">
-          
+        <div className="container">
+          <div className="row">
+
           {/* Left Sidebar Card */}
+          <div className="col-md-3">
+
           <aside className="sidebar-card">
             <ul className="sidebar-nav">
               <li>Account</li>
               <li className="active">Applications</li>
               <li>Change Password</li>
+              <li>Expiration Checklist</li>
               <li className="logout-item">Logout</li>
             </ul>
           </aside>
+          </div>
+<div className="col-md-9">
 
           {/* Right Content Card */}
           <main className="profile-content-card">
@@ -66,6 +72,8 @@ const ApplicationsPage = ({ onBack }) => {
               </button>
             </div>
           </main>
+</div>
+          </div>
           
         </div>
       </div>

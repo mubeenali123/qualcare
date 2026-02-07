@@ -23,17 +23,22 @@ const ChangePasswordPage = ({ onBack }) => {
 
       {/* Main Layout Container */}
       <div className="profile-wrapper mt-5 mb-5">
-        <div className="profile-container">
-          
+        <div className="container">
+          <div className="row">
+<div className="col-md-3">
+
           {/* Left Sidebar Card */}
           <aside className="sidebar-card">
             <ul className="sidebar-nav">
               <li>Account</li>
               <li>Applications</li>
               <li className="active">Change Password</li>
+              <li>Expiration Checklist</li>
               <li className="logout-item">Logout</li>
             </ul>
           </aside>
+</div>
+<div className="col-md-9">
 
           {/* Right Content Card */}
           <main className="profile-content-card">
@@ -73,6 +78,9 @@ const ChangePasswordPage = ({ onBack }) => {
               Update Password
             </button>
           </main>
+</div>
+
+          </div>
           
         </div>
       </div>

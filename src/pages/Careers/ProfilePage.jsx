@@ -18,17 +18,24 @@ const ProfilePage = ({ onBack }) => {
 
       {/* Main Layout Container */}
       <div className="profile-wrapper mt-5 mb-5">
-        <div className="profile-container">
-          
+        <div className="container">
+          <div className="row">
+
           {/* Left Sidebar Card */}
+          <div className="col-md-3">
+
           <aside className="sidebar-card">
             <ul className="sidebar-nav">
               <li className="active">Account</li>
               <li>Applications</li>
               <li>Change Password</li>
+              <li>Expiration Checklist</li>
               <li className="logout-item">Logout</li>
             </ul>
           </aside>
+          </div>
+
+<div className="col-md-9">
 
           {/* Right Content Card */}
           <main className="profile-content-card">
@@ -63,6 +70,9 @@ const ProfilePage = ({ onBack }) => {
               Save Changes
             </button>
           </main>
+</div>
+
+          </div>
           
         </div>
       </div>

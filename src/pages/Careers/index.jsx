@@ -11,6 +11,7 @@ import Step5 from './Step5';
 import Step6 from './Step6';
 import Step7 from './Step7';
 import ThankYou from './ThankYou';
+import Step8 from './Step8';
 
 const Careers = () => {
   const [showApplicationForm, setShowApplicationForm] = useState(false);
@@ -87,7 +88,10 @@ if (showApplicationForm) {
   if (currentStep === 7) {
     return <Step7 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(6)} onNext={() => setCurrentStep(8)} goToStep={goToStep} />;
   }
-  if (currentStep === 8) {
+    if (currentStep === 8) {
+    return <Step8 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(9)} onNext={() => setCurrentStep(9)} goToStep={goToStep} />;
+  }
+  if (currentStep === 9) {
     return <ThankYou onBack={() => { setShowApplicationForm(false); setCurrentStep(1); }} />;
   }
 }

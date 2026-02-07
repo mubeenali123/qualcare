@@ -260,8 +260,12 @@ const Step5 = ({ onNext, onPrevious, onBack, goToStep }) => {
     <div className="step-number">6</div>
     <span className="step-label">Documents</span>
   </div>
+            <div className="step" onClick={() => goToStep(8)}>
+            <div className="step-number">7</div>
+            <span className="step-label">Certifications Upload</span>
+          </div>
   <div className="step" onClick={() => goToStep(7)}>
-    <div className="step-number">7</div>
+    <div className="step-number">8</div>
     <span className="step-label">Review</span>
   </div>
 </div>

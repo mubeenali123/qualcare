@@ -963,7 +963,6 @@ nav[aria-label="Top Header"],
 
 /* Sidebar "Card" Styling */
 .sidebar-card {
-  width: 250px;
   background: #fff;
   padding: 1.5rem;
   border-radius: 12px;

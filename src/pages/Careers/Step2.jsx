@@ -86,15 +86,19 @@ const Step2 = ({ onNext, onPrevious, onBack, goToStep }) => {
     <div className="step-number">6</div>
     <span className="step-label">Documents</span>
   </div>
+          <div className="step" onClick={() => goToStep(8)}>
+            <div className="step-number">7</div>
+            <span className="step-label">Certifications Upload</span>
+          </div>
   <div className="step" onClick={() => goToStep(7)}>
-    <div className="step-number">7</div>
+    <div className="step-number">8</div>
     <span className="step-label">Review</span>
   </div>
 </div>
 
         {/* Progress Bar */}
         <div className="progress-bar">
-          <div className="progress-text">Step 2 of 7</div>
+          <div className="progress-text">Step 2 of 8</div>
           <div className="progress-track">
             <div className="progress-fill" style={{ width: '28.5%' }}></div>
           </div>
