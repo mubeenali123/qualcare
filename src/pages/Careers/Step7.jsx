@@ -1,8 +1,12 @@
 import React, { useState, useRef } from 'react';
 import './ApplicationForm.css';
+import { useDispatch, useSelector } from "react-redux";
 
 const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
   const today = new Date().toISOString().split("T")[0];
+  const dispatch = useDispatch();
+  
+  const referenceId = localStorage.getItem('applicationReferenceId');
 
   const [formData, setFormData] = useState({
     agreeStatements: false,
@@ -73,29 +77,55 @@ const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  const handleSubmit = (e) => {
+const handleSubmit = (e) => {
   e.preventDefault();
-  
+
   if (!formData.agreeStatements) {
     alert('Please agree to the statements before submitting.');
     return;
   }
-  
+
   if (!formData.signatureDate) {
     alert('Please enter the date.');
     return;
   }
 
+  if (!referenceId) {
+    alert("Application session expired. Please restart.");
+    return;
+  }
+
   const canvas = canvasRef.current;
-  const signatureData = canvas.toDataURL();
-  
-  console.log('Final Submission:', {
-    ...formData,
-    signature: signatureData
+  const signatureData = canvas.toDataURL("image/png");
+
+  // Prepare FormData for submission
+  const submissionData = new FormData();
+  submissionData.append("referenceId", referenceId);
+  submissionData.append("step", "review"); // for backend tracking
+  submissionData.append("signatureDate", formData.signatureDate);
+  submissionData.append("agreeStatements", formData.agreeStatements);
+  submissionData.append("signature", dataURLtoFile(signatureData, "signature.png"));
+
+  // Dispatch action
+  dispatch({
+    type: "SUBMIT_APPLICATION_REQUEST",
+    payload: submissionData
   });
-  
-  onNext();
+
+   goToStep(9);
 };
+
+function dataURLtoFile(dataurl, filename) {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while(n--){
+      u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+}
 
   return (
     <div className="application-page">
@@ -121,7 +151,7 @@ const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
       <div className="form-container">
 
         {/* Progress Steps */}
-<div className="progress-steps">
+       <div className="progress-steps">
   <div className="step completed" onClick={() => goToStep(1)}>
     <div className="step-number">✓</div>
     <span className="step-label">Pre-Employment</span>
@@ -139,19 +169,19 @@ const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
     <span className="step-label">References</span>
   </div>
   <div className="step completed" onClick={() => goToStep(5)}>
-    <div className="step-number">✓</div>
+    <div className="step-number">5</div>
     <span className="step-label">Skills</span>
   </div>
   <div className="step completed" onClick={() => goToStep(6)}>
-    <div className="step-number">✓</div>
+    <div className="step-number">6</div>
     <span className="step-label">Documents</span>
   </div>
             <div className="step completed" onClick={() => goToStep(8)}>
-            <div className="step-number">✓</div>
+            <div className="step-number">7</div>
             <span className="step-label">Certifications Upload</span>
           </div>
   <div className="step active" onClick={() => goToStep(7)}>
-    <div className="step-number">7</div>
+    <div className="step-number">8</div>
     <span className="step-label">Review</span>
   </div>
 </div>

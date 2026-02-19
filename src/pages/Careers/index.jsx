@@ -88,9 +88,15 @@ if (showApplicationForm) {
   if (currentStep === 7) {
     return <Step7 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(6)} onNext={() => setCurrentStep(8)} goToStep={goToStep} />;
   }
-    if (currentStep === 8) {
-    return <Step8 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(9)} onNext={() => setCurrentStep(9)} goToStep={goToStep} />;
-  }
+if (currentStep === 8) {
+  return <Step8 
+    onBack={() => setShowApplicationForm(false)} 
+    onPrevious={() => setCurrentStep(7)}  // ✅ FIXED
+    onNext={() => setCurrentStep(9)} 
+    goToStep={goToStep} 
+  />;
+}
+
   if (currentStep === 9) {
     return <ThankYou onBack={() => { setShowApplicationForm(false); setCurrentStep(1); }} />;
   }

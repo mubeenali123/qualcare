@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import './ApplicationForm.css';
+import { useDispatch, useSelector } from "react-redux";
+import * as types from '../../redux/type';
 
 const Step4 = ({ onNext, onPrevious, onBack, goToStep }) => {
+  const dispatch = useDispatch();
+  const referenceId = localStorage.getItem('applicationReferenceId');
+
+
   const [formData, setFormData] = useState({
     // Employer 1
     employer1Name: '',
@@ -31,28 +37,69 @@ const Step4 = ({ onNext, onPrevious, onBack, goToStep }) => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Step 4 Data:', formData);
-    onNext();
-  };
+const handleSubmit = (e) => {
+  e.preventDefault();
 
-  const handleSave = () => {
-    console.log('Step 4 Saved:', formData);
-    alert('Progress saved!');
-  };
+  if (!referenceId) {
+    alert("Application session expired. Please restart.");
+    return;
+  }
+
+  dispatch({
+    type: types.SAVE_REFERENCES,
+    payload: formData
+  });
+
+  dispatch({
+    type: types.SUBMIT_APPLICATION_REQUEST,
+    payload: {
+      referenceId,
+      step: "references",
+      data: formData
+    }
+  });
+
+  onNext();
+};
+
+
+
+const handleSave = () => {
+  if (!referenceId) {
+    alert("Application session expired. Please restart.");
+    return;
+  }
+
+  dispatch({
+    type: types.SAVE_REFERENCES,
+    payload: formData
+  });
+
+  dispatch({
+    type: types.SUBMIT_APPLICATION_REQUEST,
+    payload: {
+      referenceId,
+      step: "references",
+      data: formData
+    }
+  });
+
+  alert("Progress saved!");
+};
+
+
 
   return (
     <div className="application-page">
       {/* Header */}
       <header className="header">
-  <div className="header-container">
-    <div className="logo">
-      <img src="/logo.png.png" alt="QualCare Logo" />
-    </div>
-    <button className="home-btn" onClick={onBack}>Home</button>
-    <div className="header-right">
-      <div className="social-icons">
+        <div className="header-container">
+          <div className="logo">
+            <img src="/logo.png" alt="QualCare Logo" />
+          </div>
+          <button className="home-btn" onClick={onBack}>Home</button>
+          <div className="header-right">
+            <div className="social-icons">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook-f"></i></a>
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></a>
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-twitter"></i></a>
@@ -66,40 +113,40 @@ const Step4 = ({ onNext, onPrevious, onBack, goToStep }) => {
       <div className="form-container">
 
         {/* Progress Steps */}
-<div className="progress-steps">
-  <div className="step completed" onClick={() => goToStep(1)}>
-    <div className="step-number">✓</div>
-    <span className="step-label">Pre-Employment</span>
-  </div>
-  <div className="step completed" onClick={() => goToStep(2)}>
-    <div className="step-number">✓</div>
-    <span className="step-label">Education</span>
-  </div>
-  <div className="step completed" onClick={() => goToStep(3)}>
-    <div className="step-number">✓</div>
-    <span className="step-label">Experience</span>
-  </div>
-  <div className="step active" onClick={() => goToStep(4)}>
-    <div className="step-number">4</div>
-    <span className="step-label">References</span>
-  </div>
-  <div className="step" onClick={() => goToStep(5)}>
-    <div className="step-number">5</div>
-    <span className="step-label">Skills</span>
-  </div>
-  <div className="step" onClick={() => goToStep(6)}>
-    <div className="step-number">6</div>
-    <span className="step-label">Documents</span>
-  </div>
+        <div className="progress-steps">
+          <div className="step completed" onClick={() => goToStep(1)}>
+            <div className="step-number">✓</div>
+            <span className="step-label">Pre-Employment</span>
+          </div>
+          <div className="step completed" onClick={() => goToStep(2)}>
+            <div className="step-number">✓</div>
+            <span className="step-label">Education</span>
+          </div>
+          <div className="step completed" onClick={() => goToStep(3)}>
+            <div className="step-number">✓</div>
+            <span className="step-label">Experience</span>
+          </div>
+          <div className="step active" onClick={() => goToStep(4)}>
+            <div className="step-number">4</div>
+            <span className="step-label">References</span>
+          </div>
+          <div className="step" onClick={() => goToStep(5)}>
+            <div className="step-number">5</div>
+            <span className="step-label">Skills</span>
+          </div>
+          <div className="step" onClick={() => goToStep(6)}>
+            <div className="step-number">6</div>
+            <span className="step-label">Documents</span>
+          </div>
           <div className="step" onClick={() => goToStep(8)}>
             <div className="step-number">7</div>
             <span className="step-label">Certifications Upload</span>
           </div>
-  <div className="step" onClick={() => goToStep(7)}>
-    <div className="step-number">8</div>
-    <span className="step-label">Review</span>
-  </div>
-</div>
+          <div className="step" onClick={() => goToStep(7)}>
+            <div className="step-number">8</div>
+            <span className="step-label">Review</span>
+          </div>
+        </div>
 
         {/* Progress Bar */}
         <div className="progress-bar">
@@ -114,201 +161,73 @@ const Step4 = ({ onNext, onPrevious, onBack, goToStep }) => {
         <h1 className="form-title">GIVE THREE REFERENCES WHO ARE NOT FORMER EMPLOYERS WHO WE MAY CONTACT</h1>
 
         <form onSubmit={handleSubmit}>
-          
-          {/* Employer 1 */}
-          <div className="employer-section">
-            <h2 className="employer-number">1</h2>
-            
-            <div className="form-section">
-              <label className="section-label">Name</label>
-              <div className="address-grid">
-                <div className="form-field">
-                  <input 
-                    type="text" 
-                    name="employer1Name" 
-                    value={formData.employer1Name} 
-                    onChange={handleInputChange} 
-                  />
-                  <span className="field-label">First</span>
+
+          {/* Employer Sections 1–3 */}
+          {[1, 2, 3].map(num => (
+            <div className="employer-section" key={num}>
+              <h2 className="employer-number">{num}</h2>
+
+              <div className="form-section">
+                <label className="section-label">Name</label>
+                <div className="address-grid">
+                  <div className="form-field">
+                    <input
+                      type="text"
+                      name={`employer${num}Name`}
+                      value={formData[`employer${num}Name`]}
+                      onChange={handleInputChange}
+                    />
+                    <span className="field-label">First</span>
+                  </div>
+                  <div className="form-field">
+                    <input
+                      type="text"
+                      name={`employer${num}Last`}
+                      value={formData[`employer${num}Last`]}
+                      onChange={handleInputChange}
+                    />
+                    <span className="field-label">Last</span>
+                  </div>
                 </div>
-                <div className="form-field">
-                  <input 
-                    type="text" 
-                    name="employer1Last" 
-                    value={formData.employer1Last} 
-                    onChange={handleInputChange} 
+              </div>
+
+              <div className="form-section">
+                <label className="section-label">City/State</label>
+                <div className="form-field full-width">
+                  <input
+                    type="text"
+                    name={`employer${num}City`}
+                    value={formData[`employer${num}City`]}
+                    onChange={handleInputChange}
                   />
-                  <span className="field-label">Last</span>
                 </div>
               </div>
-            </div>
 
-            <div className="form-section">
-              <label className="section-label">City/State</label>
-              <div className="form-field full-width">
-                <input 
-                  type="text" 
-                  name="employer1City" 
-                  value={formData.employer1City} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-
-            <div className="form-section">
-              <label className="section-label">How do you know them, and for how long?</label>
-              <div className="form-field full-width">
-                <input 
-                  type="text" 
-                  name="employer1Worked" 
-                  value={formData.employer1Worked} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-
-            <div className="form-section">
-              <label className="section-label">Phone Number</label>
-              <div className="form-field full-width">
-                <input 
-                  type="tel" 
-                  name="employer1Phone" 
-                  value={formData.employer1Phone} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Employer 2 */}
-          <div className="employer-section">
-            <h2 className="employer-number">2</h2>
-            
-            <div className="form-section">
-              <label className="section-label">Name</label>
-              <div className="address-grid">
-                <div className="form-field">
-                  <input 
-                    type="text" 
-                    name="employer2Name" 
-                    value={formData.employer2Name} 
-                    onChange={handleInputChange} 
+              <div className="form-section">
+                <label className="section-label">How do you know them, and for how long?</label>
+                <div className="form-field full-width">
+                  <input
+                    type="text"
+                    name={`employer${num}Worked`}
+                    value={formData[`employer${num}Worked`]}
+                    onChange={handleInputChange}
                   />
-                  <span className="field-label">First</span>
                 </div>
-                <div className="form-field">
-                  <input 
-                    type="text" 
-                    name="employer2Last" 
-                    value={formData.employer2Last} 
-                    onChange={handleInputChange} 
+              </div>
+
+              <div className="form-section">
+                <label className="section-label">Phone Number</label>
+                <div className="form-field full-width">
+                  <input
+                    type="tel"
+                    name={`employer${num}Phone`}
+                    value={formData[`employer${num}Phone`]}
+                    onChange={handleInputChange}
                   />
-                  <span className="field-label">Last</span>
                 </div>
               </div>
             </div>
-
-            <div className="form-section">
-              <label className="section-label">City/State</label>
-              <div className="form-field full-width">
-                <input 
-                  type="text" 
-                  name="employer2City" 
-                  value={formData.employer2City} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-
-            <div className="form-section">
-              <label className="section-label">How do you know them, and for how long?</label>
-              <div className="form-field full-width">
-                <input 
-                  type="text" 
-                  name="employer2Worked" 
-                  value={formData.employer2Worked} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-
-            <div className="form-section">
-              <label className="section-label">Phone Number</label>
-              <div className="form-field full-width">
-                <input 
-                  type="tel" 
-                  name="employer2Phone" 
-                  value={formData.employer2Phone} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Employer 3 */}
-          <div className="employer-section">
-            <h2 className="employer-number">3</h2>
-            
-            <div className="form-section">
-              <label className="section-label">Name</label>
-              <div className="address-grid">
-                <div className="form-field">
-                  <input 
-                    type="text" 
-                    name="employer3Name" 
-                    value={formData.employer3Name} 
-                    onChange={handleInputChange} 
-                  />
-                  <span className="field-label">First</span>
-                </div>
-                <div className="form-field">
-                  <input 
-                    type="text" 
-                    name="employer3Last" 
-                    value={formData.employer3Last} 
-                    onChange={handleInputChange} 
-                  />
-                  <span className="field-label">Last</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="form-section">
-              <label className="section-label">City/State</label>
-              <div className="form-field full-width">
-                <input 
-                  type="text" 
-                  name="employer3City" 
-                  value={formData.employer3City} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-
-            <div className="form-section">
-              <label className="section-label">How do you know them, and for how long?</label>
-              <div className="form-field full-width">
-                <input 
-                  type="text" 
-                  name="employer3Worked" 
-                  value={formData.employer3Worked} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-
-            <div className="form-section">
-              <label className="section-label">Phone Number</label>
-              <div className="form-field full-width">
-                <input 
-                  type="tel" 
-                  name="employer3Phone" 
-                  value={formData.employer3Phone} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-          </div>
+          ))}
 
           {/* Submit Buttons */}
           <div className="form-actions">

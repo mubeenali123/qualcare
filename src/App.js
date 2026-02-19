@@ -10,6 +10,13 @@ import ProfilePage from "./pages/Careers/ProfilePage";
 import ApplicationsPage from "./pages/Careers/ApplicationsPage";
 import ChangePasswordPage from "./pages/Careers/ChangePasswordPage";
 import ExpirationChecklist from "./pages/Careers/ExpirationChecklist";
+import AdminLogin from "./pages/Careers/admin/AdminLogin";
+import AdminLayout from "./pages/Careers/admin/AdminLayout";
+import AdminDashboard from "./pages/Careers/admin/AdminDashboard";
+import AdminApplicants from "./pages/Careers/admin/AdminApplicants";
+import AdminApplications from "./pages/Careers/admin/AdminApplications";
+import AdminProtectedRoute from "./pages/Careers/admin/AdminProtectedRoute";
+import ApplicationDetail from "./pages/Careers/admin/ApplicationDetail";
 
 function App() {
   return (
@@ -26,6 +33,20 @@ function App() {
         <Route path="/my-applications" element={<ApplicationsPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
         <Route path="/expiration-checklist" element={<ExpirationChecklist />} />
+<Route path="/admin" element={<AdminLayout />}>
+
+  <Route path="login" element={<AdminLogin />} />
+
+  {/* Protected Routes */}
+  <Route element={<AdminProtectedRoute />}>
+    <Route path="dashboard" element={<AdminDashboard />} />
+    <Route path="applicants" element={<AdminApplicants />} />
+    <Route path="applications" element={<AdminApplications />} />
+    <Route path="application" element={<ApplicationDetail />} />
+  </Route>
+
+</Route>
+
       </Routes>
     </BrowserRouter>
   );

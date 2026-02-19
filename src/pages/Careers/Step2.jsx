@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import './ApplicationForm.css';
-
+import { useDispatch, useSelector } from 'react-redux';
+import * as types from '../../redux/type';
 const Step2 = ({ onNext, onPrevious, onBack, goToStep }) => {
+  const dispatch = useDispatch();
+  const referenceId = localStorage.getItem('applicationReferenceId');
+
   const [formData, setFormData] = useState({
     highSchoolName: '',
     highSchoolCity: '',
@@ -26,11 +30,26 @@ const Step2 = ({ onNext, onPrevious, onBack, goToStep }) => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Step 2 Data:', formData);
-    onNext();
-  };
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  dispatch({
+    type: types.SAVE_EDUCATION,
+    payload: formData
+  });
+
+  dispatch({
+    type: types.SUBMIT_APPLICATION_REQUEST,
+    payload: {
+      referenceId,
+      step: "education",
+      data: formData
+    }
+  });
+
+  onNext();
+};
+
 
   const handleSave = () => {
     console.log('Step 2 Saved:', formData);

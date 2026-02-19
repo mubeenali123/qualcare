@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import './ApplicationForm.css';
+import { useDispatch, useSelector } from "react-redux";
 
 const Step8 = ({ onNext, onPrevious, onBack, goToStep }) => {
+  const dispatch = useDispatch();
+  const referenceId = localStorage.getItem('applicationReferenceId');
+
   const [formData, setFormData] = useState({
-    // Certifications WITH expiration dates
     domesticViolence: null,
     domesticViolenceExpiry: '',
     alzheimersDementia: null,
@@ -93,11 +96,30 @@ const Step8 = ({ onNext, onPrevious, onBack, goToStep }) => {
     }
   );
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Step 8 Data:', formData);
-    onNext();
-  };
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  if (!referenceId) {
+    alert("Application session expired. Please restart.");
+    return;
+  }
+
+  const submissionData = new FormData();
+  submissionData.append("referenceId", referenceId);
+  submissionData.append("step", "certifications");
+
+  Object.entries(formData).forEach(([key, value]) => {
+    if (value) submissionData.append(key, value);
+  });
+
+  dispatch({
+    type: "SUBMIT_APPLICATION_REQUEST",
+    payload: submissionData
+  });
+
+   goToStep(7);
+};
+
 
   return (
     <div className="application-page">

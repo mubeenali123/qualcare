@@ -1,26 +1,25 @@
 import React, { useState } from 'react';
 import './ApplicationForm.css';
-
+import { useDispatch, useSelector } from "react-redux";
+import * as types from '../../redux/type';
 const Step6 = ({ onNext, onPrevious, onBack, goToStep }) => {
+const dispatch = useDispatch();
+  const referenceId = localStorage.getItem('applicationReferenceId');
+
+
   const [formData, setFormData] = useState({
-    resume: null,
     physicalExam: null,
     physicalExamExpiry: '',
-    tbTest: null,
     cprCard: null,
     cprExpiry: '',
     driversLicense: null,
     driversLicenseExpiry: '',
-    socialSecurity: null,
     professionalLicense: null,
     professionalLicenseExpiry: '',
     liabilityInsurance: null,
     liabilityInsuranceExpiry: '',
     autoInsurance: null,
     autoInsuranceExpiry: '',
-    autoRegistration: null,
-    voidedCheck: null,
-
     workAuthorization: null,
     workAuthorizationExpiry: '',
     backgroundScreening: null,
@@ -105,11 +104,39 @@ const FileUpload = React.memo(
 
 
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Step 6 Data:', formData);
-    onNext();
-  };
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  if (!referenceId) {
+    alert("Application session expired. Please restart.");
+    return;
+  }
+
+  dispatch({
+    type: types.SAVE_DOCUMENTS,
+    payload: formData
+  });
+
+  const submissionData = new FormData();
+
+  submissionData.append("referenceId", referenceId);
+  submissionData.append("step", "documents");
+
+  Object.keys(formData).forEach(key => {
+    if (formData[key] !== null && formData[key] !== "") {
+      submissionData.append(key, formData[key]);
+    }
+  });
+
+  dispatch({
+    type: types.SUBMIT_APPLICATION_REQUEST,
+    payload: submissionData
+  });
+
+   goToStep(8);
+};
+
+
 
   return (
     <div className="application-page">
@@ -284,6 +311,7 @@ const FileUpload = React.memo(
     <button type="button" className="btn-previous" onClick={onPrevious}>
       Previous
     </button>
+    <button type="button" className="btn-save" onClick={handleSubmit}>Save</button>
     <button type="submit" className="btn-next">
       Save and Next
     </button>

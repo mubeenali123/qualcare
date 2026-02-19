@@ -1,120 +1,109 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import './ApplicationForm.css';
-import { useDispatch, useSelector } from "react-redux";
-import * as types from '../../redux/type';
 
 const Step5 = ({ onNext, onPrevious, onBack, goToStep }) => {
-  const dispatch = useDispatch();
-  const referenceId = localStorage.getItem('applicationReferenceId');
-
-
   const [formData, setFormData] = useState({
     // First Employer
-    emp1FirstName: '', emp1MiddleName: '', emp1LastName: '',
-    emp1JobTitle: '', emp1Duties: '', emp1Address: '', emp1City: '',
-    emp1State: '', emp1Zip: '', emp1StartDate: '', emp1EndDate: '',
-    emp1SupervisorFirst: '', emp1SupervisorMiddle: '', emp1SupervisorLast: '',
-    emp1StartingPay: '', emp1EndingPay: '', emp1Phone: '', emp1Leaving: '',
+    emp1FirstName: '',
+    emp1MiddleName: '',
+    emp1LastName: '',
+    emp1JobTitle: '',
+    emp1Duties: '',
+    emp1Address: '',
+    emp1City: '',
+    emp1State: '',
+    emp1Zip: '',
+    emp1StartDate: '',
+    emp1EndDate: '',
+    emp1SupervisorFirst: '',
+    emp1SupervisorMiddle: '',
+    emp1SupervisorLast: '',
+    emp1StartingPay: '',
+    emp1EndingPay: '',
+    emp1Phone: '',
+    emp1Leaving: '',
     // Second Employer
-    emp2FirstName: '', emp2MiddleName: '', emp2LastName: '',
-    emp2JobTitle: '', emp2Duties: '', emp2Address: '', emp2City: '',
-    emp2State: '', emp2Zip: '', emp2StartDate: '', emp2EndDate: '',
-    emp2SupervisorFirst: '', emp2SupervisorMiddle: '', emp2SupervisorLast: '',
-    emp2StartingPay: '', emp2EndingPay: '', emp2Phone: '', emp2Leaving: '',
+    emp2FirstName: '',
+    emp2MiddleName: '',
+    emp2LastName: '',
+    emp2JobTitle: '',
+    emp2Duties: '',
+    emp2Address: '',
+    emp2City: '',
+    emp2State: '',
+    emp2Zip: '',
+    emp2StartDate: '',
+    emp2EndDate: '',
+    emp2SupervisorFirst: '',
+    emp2SupervisorMiddle: '',
+    emp2SupervisorLast: '',
+    emp2StartingPay: '',
+    emp2EndingPay: '',
+    emp2Phone: '',
+    emp2Leaving: '',
     // Third Employer
-    emp3FirstName: '', emp3MiddleName: '', emp3LastName: '',
-    emp3JobTitle: '', emp3Duties: '', emp3Address: '', emp3City: '',
-    emp3State: '', emp3Zip: '', emp3StartDate: '', emp3EndDate: '',
-    emp3SupervisorFirst: '', emp3SupervisorMiddle: '', emp3SupervisorLast: '',
-    emp3StartingPay: '', emp3EndingPay: '', emp3Phone: '', emp3Leaving: ''
+    emp3FirstName: '',
+    emp3MiddleName: '',
+    emp3LastName: '',
+    emp3JobTitle: '',
+    emp3Duties: '',
+    emp3Address: '',
+    emp3City: '',
+    emp3State: '',
+    emp3Zip: '',
+    emp3StartDate: '',
+    emp3EndDate: '',
+    emp3SupervisorFirst: '',
+    emp3SupervisorMiddle: '',
+    emp3SupervisorLast: '',
+    emp3StartingPay: '',
+    emp3EndingPay: '',
+    emp3Phone: '',
+    emp3Leaving: ''
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [name]: value
-    }));
+    });
   };
 
-const handleSubmit = (e) => {
-  e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Step 5 Data:', formData);
+    onNext();
+  };
 
-  if (!referenceId) {
-    alert("Application session expired. Please restart.");
-    return;
-  }
-
-  // Save locally in Redux
-  dispatch({
-    type: types.SAVE_EXPERIENCE,
-    payload: formData
-  });
-
-  // Send to backend
-  dispatch({
-    type: types.SUBMIT_APPLICATION_REQUEST,
-    payload: {
-      referenceId,
-      step: "experience",
-      data: formData
-    }
-  });
-
-  onNext();
-};
-
-
-
-const handleSave = () => {
-  if (!referenceId) {
-    alert("Application session expired. Please restart.");
-    return;
-  }
-
-  dispatch({
-    type: types.SAVE_EXPERIENCE,
-    payload: formData
-  });
-
-  dispatch({
-    type: types.SUBMIT_APPLICATION_REQUEST,
-    payload: {
-      referenceId,
-      step: "experience",
-      data: formData
-    }
-  });
-
-  alert("Progress saved!");
-};
-
+  const handleSave = () => {
+    console.log('Step 5 Saved:', formData);
+    alert('Progress saved!');
+  };
 
   // Employer Form Component
   const EmployerForm = ({ prefix, title }) => (
     <div className="employer-section">
       <h2 className="employer-title">{title}</h2>
-
-      {/* Employer Name */}
+      
       <div className="form-section">
         <label className="section-label">Name of Employer</label>
         <div className="name-grid">
-{['First', 'Middle', 'Last'].map(part => (
-  <div className="form-field" key={part}>
-    <input
-      type="text"
-      name={`${prefix}${part}Name`}
-      value={formData[`${prefix}${part}Name`]}
-      onChange={handleInputChange}
-    />
-    <span className="field-label">{part}</span>
-  </div>
-))}
-
+          <div className="form-field">
+            <input type="text" name={`${prefix}FirstName`} value={formData[`${prefix}FirstName`]} onChange={handleInputChange} />
+            <span className="field-label">First</span>
+          </div>
+          <div className="form-field">
+            <input type="text" name={`${prefix}MiddleName`} value={formData[`${prefix}MiddleName`]} onChange={handleInputChange} />
+            <span className="field-label">Middle</span>
+          </div>
+          <div className="form-field">
+            <input type="text" name={`${prefix}LastName`} value={formData[`${prefix}LastName`]} onChange={handleInputChange} />
+            <span className="field-label">Last</span>
+          </div>
         </div>
       </div>
 
-      {/* Job Title */}
       <div className="form-section">
         <label className="section-label">Job Title</label>
         <div className="form-field full-width">
@@ -122,7 +111,6 @@ const handleSave = () => {
         </div>
       </div>
 
-      {/* Duties */}
       <div className="form-section">
         <label className="section-label">Duties</label>
         <div className="form-field full-width">
@@ -130,14 +118,13 @@ const handleSave = () => {
         </div>
       </div>
 
-      {/* Address */}
       <div className="form-section">
         <label className="section-label">Address</label>
         <div className="form-field full-width">
           <input type="text" name={`${prefix}Address`} value={formData[`${prefix}Address`]} onChange={handleInputChange} />
           <span className="field-label">Street Address</span>
         </div>
-        <div className="address-grid" style={{ marginTop: '15px' }}>
+        <div className="address-grid" style={{marginTop: '15px'}}>
           <div className="form-field">
             <input type="text" name={`${prefix}City`} value={formData[`${prefix}City`]} onChange={handleInputChange} />
             <span className="field-label">City</span>
@@ -147,13 +134,12 @@ const handleSave = () => {
             <span className="field-label">State / Province / Region</span>
           </div>
         </div>
-        <div className="form-field half-width" style={{ marginTop: '15px' }}>
+        <div className="form-field half-width" style={{marginTop: '15px'}}>
           <input type="text" name={`${prefix}Zip`} value={formData[`${prefix}Zip`]} onChange={handleInputChange} />
           <span className="field-label">ZIP / Postal Code</span>
         </div>
       </div>
 
-      {/* Dates of Employment */}
       <div className="form-row">
         <div className="form-field">
           <label className="section-label">Dates of Employment</label>
@@ -167,42 +153,52 @@ const handleSave = () => {
         </div>
       </div>
 
-      {/* Supervisor */}
       <div className="form-section">
         <label className="section-label">Supervisor's Name</label>
         <div className="name-grid">
-          {['First', 'Middle', 'Last'].map(part => (
-            <div className="form-field" key={part}>
-              <input
-                type="text"
-                name={`${prefix}Supervisor${part}`}
-                value={formData[`${prefix}Supervisor${part}`]}
-                onChange={handleInputChange}
-              />
-              <span className="field-label">{part}</span>
-            </div>
-          ))}
+          <div className="form-field">
+            <input type="text" name={`${prefix}SupervisorFirst`} value={formData[`${prefix}SupervisorFirst`]} onChange={handleInputChange} />
+            <span className="field-label">First</span>
+          </div>
+          <div className="form-field">
+            <input type="text" name={`${prefix}SupervisorMiddle`} value={formData[`${prefix}SupervisorMiddle`]} onChange={handleInputChange} />
+            <span className="field-label">Middle</span>
+          </div>
+          <div className="form-field">
+            <input type="text" name={`${prefix}SupervisorLast`} value={formData[`${prefix}SupervisorLast`]} onChange={handleInputChange} />
+            <span className="field-label">Last</span>
+          </div>
         </div>
       </div>
 
-      {/* Pay */}
-      {['StartingPay', 'EndingPay'].map(payType => (
-        <div className="form-section" key={payType}>
-          <label className="section-label">Hourly pay or salary</label>
-          <div className="form-field full-width">
-            <select name={`${prefix}${payType}`} value={formData[`${prefix}${payType}`]} onChange={handleInputChange}>
-              <option value="">Select {payType}</option>
-              <option value="10-15">$10 - $15/hr</option>
-              <option value="15-20">$15 - $20/hr</option>
-              <option value="20-25">$20 - $25/hr</option>
-              <option value="25-30">$25 - $30/hr</option>
-              <option value="30+">$30+/hr</option>
-            </select>
-          </div>
+      <div className="form-section">
+        <label className="section-label">Hourly pay or salary</label>
+        <div className="form-field full-width">
+          <select name={`${prefix}StartingPay`} value={formData[`${prefix}StartingPay`]} onChange={handleInputChange}>
+            <option value="">Starting Pay</option>
+            <option value="10-15">$10 - $15/hr</option>
+            <option value="15-20">$15 - $20/hr</option>
+            <option value="20-25">$20 - $25/hr</option>
+            <option value="25-30">$25 - $30/hr</option>
+            <option value="30+">$30+/hr</option>
+          </select>
         </div>
-      ))}
+      </div>
 
-      {/* Phone */}
+      <div className="form-section">
+        <label className="section-label">Hourly pay or salary</label>
+        <div className="form-field full-width">
+          <select name={`${prefix}EndingPay`} value={formData[`${prefix}EndingPay`]} onChange={handleInputChange}>
+            <option value="">Ending Pay</option>
+            <option value="10-15">$10 - $15/hr</option>
+            <option value="15-20">$15 - $20/hr</option>
+            <option value="20-25">$20 - $25/hr</option>
+            <option value="25-30">$25 - $30/hr</option>
+            <option value="30+">$30+/hr</option>
+          </select>
+        </div>
+      </div>
+
       <div className="form-section">
         <label className="section-label">Telephone Number</label>
         <div className="form-field full-width">
@@ -210,7 +206,6 @@ const handleSave = () => {
         </div>
       </div>
 
-      {/* Leaving Reason */}
       <div className="form-section">
         <label className="section-label">Reason for leaving</label>
         <div className="form-field full-width">
@@ -223,13 +218,13 @@ const handleSave = () => {
   return (
     <div className="application-page">
       <header className="header">
-        <div className="header-container">
-          <div className="logo">
-            <img src="/logo.png" alt="QualCare Logo" />
-          </div>
-          <button className="home-btn" onClick={onBack}>Home</button>
-          <div className="header-right">
-            <div className="social-icons">
+  <div className="header-container">
+    <div className="logo">
+      <img src="/logo.png.png" alt="QualCare Logo" />
+    </div>
+    <button className="home-btn" onClick={onBack}>Home</button>
+    <div className="header-right">
+      <div className="social-icons">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook-f"></i></a>
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></a>
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-twitter"></i></a>
@@ -240,8 +235,7 @@ const handleSave = () => {
       </header>
 
       <div className="form-container">
-        {/* Progress Steps */}
-             <div className="progress-steps">
+        <div className="progress-steps">
   <div className="step completed" onClick={() => goToStep(1)}>
     <div className="step-number">✓</div>
     <span className="step-label">Pre-Employment</span>
@@ -276,7 +270,6 @@ const handleSave = () => {
   </div>
 </div>
 
-        {/* Progress Bar */}
         <div className="progress-bar">
           <div className="progress-text">Step 5 of 7</div>
           <div className="progress-track">
@@ -287,9 +280,7 @@ const handleSave = () => {
         <p className="required-note"><span className="required">*</span> indicates required fields</p>
 
         <h1 className="form-title">EMPLOYMENT HISTORY</h1>
-        <p className="form-description">
-          List the names of employers with present or last employer listed first. Please note that we may not contact your present employer until after you have been offered an assignment. Application must account for periods of more than one month break in employment.
-        </p>
+        <p className="form-description">List the names of employers with present or last employer listed first. Please note that we may not contact your present employer until after you have been offered an assignment. Application must account for periods of more than one month break in employment.</p>
 
         <form onSubmit={handleSubmit}>
           <EmployerForm prefix="emp1" title="First Employer" />

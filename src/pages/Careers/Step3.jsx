@@ -1,37 +1,117 @@
 import React, { useState } from 'react';
 import './ApplicationForm.css';
+import * as types from '../../redux/type';
+import { useDispatch, useSelector } from "react-redux";
 
 const Step3 = ({ onNext, onPrevious, onBack, goToStep }) => {
-  const [formData, setFormData] = useState({
-    mondayAvailable: false,
-    tuesdayAvailable: false,
-    wednesdayAvailable: false,
-    thursdayAvailable: false,
-    fridayAvailable: false,
-    saturdayAvailable: false,
-    sundayAvailable: false,
-    totalHours: '',
-    specialRequests: ''
+  const dispatch = useDispatch();
+  const referenceId = localStorage.getItem('applicationReferenceId');
+
+
+const [formData, setFormData] = useState({
+  mondayAvailable: false,
+  mondayStartTime: '',
+  mondayEndTime: '',
+
+  tuesdayAvailable: false,
+  tuesdayStartTime: '',
+  tuesdayEndTime: '',
+
+  wednesdayAvailable: false,
+  wednesdayStartTime: '',
+  wednesdayEndTime: '',
+
+  thursdayAvailable: false,
+  thursdayStartTime: '',
+  thursdayEndTime: '',
+
+  fridayAvailable: false,
+  fridayStartTime: '',
+  fridayEndTime: '',
+
+  saturdayAvailable: false,
+  saturdayStartTime: '',
+  saturdayEndTime: '',
+
+  sundayAvailable: false,
+  sundayStartTime: '',
+  sundayEndTime: '',
+
+  totalHours: '',
+  specialRequests: ''
+});
+
+
+const handleInputChange = (e) => {
+  const { name, value, type, checked } = e.target;
+
+  if (type === 'checkbox') {
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked,
+      ...(checked === false && {
+        [`${name.replace('Available', 'StartTime')}`]: '',
+        [`${name.replace('Available', 'EndTime')}`]: ''
+      })
+    }));
+  } else {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+};
+
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  if (!referenceId) {
+    alert("Application session expired. Please restart.");
+    return;
+  }
+
+  dispatch({
+    type: types.SAVE_AVAILABILITY,
+    payload: formData
   });
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
-  };
+  dispatch({
+    type: types.SUBMIT_APPLICATION_REQUEST,
+    payload: {
+      referenceId,
+      step: "availability",
+      data: formData
+    }
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Step 3 Data:', formData);
-    onNext();
-  };
+  onNext();
+};
 
-  const handleSave = () => {
-    console.log('Step 3 Saved:', formData);
-    alert('Progress saved!');
-  };
+
+
+const handleSave = () => {
+  if (!referenceId) {
+    alert("Application session expired. Please restart.");
+    return;
+  }
+
+  dispatch({
+    type: types.SAVE_AVAILABILITY,
+    payload: formData
+  });
+
+  dispatch({
+    type: types.SUBMIT_APPLICATION_REQUEST,
+    payload: {
+      referenceId,
+      step: "availability",
+      data: formData
+    }
+  });
+};
+
+
 
   return (
     <div className="application-page">
@@ -39,7 +119,7 @@ const Step3 = ({ onNext, onPrevious, onBack, goToStep }) => {
       <header className="header">
   <div className="header-container">
     <div className="logo">
-      <img src="/logo.png.png" alt="QualCare Logo" />
+      <img src="/logo.png" alt="QualCare Logo" />
     </div>
     <button className="home-btn" onClick={onBack}>Home</button>
     <div className="header-right">

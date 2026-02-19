@@ -66,10 +66,6 @@ const ApplicationsPage = ({ onBack }) => {
               <button type="button" className="btn-next">
                 Application Five
               </button>
-              
-              <button type="button" className="btn-next">
-                Application Six
-              </button>
             </div>
           </main>
 </div>

@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './ApplicationForm.css';
-
+import { useDispatch } from "react-redux";
+import * as types from '../../redux/type';
 const ApplicationForm = ({ onBack, onNext, goToStep }) => {
+    const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     firstName: '',
     middleName: '',
@@ -30,11 +33,25 @@ const ApplicationForm = ({ onBack, onNext, goToStep }) => {
     });
   };
 
-  const handleNext = (e) => {
-    e.preventDefault();
-    console.log('Form Data:', formData);
-    onNext();
-  };
+const handleNext = (e) => {
+  e.preventDefault();
+
+  dispatch({
+    type: types.SAVE_PRE_EMPLOYMENT,
+    payload: formData
+  });
+
+  dispatch({
+    type: types.SUBMIT_APPLICATION_REQUEST,
+    payload: {
+      step: "pre_employment",
+      data: formData
+    }
+  });
+
+  onNext();
+};
+
 
   return (
     <div className="application-page">
