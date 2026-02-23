@@ -83,9 +83,137 @@ function* deleteAdminApplication(action) {
   }
 }
 
+function* fetchApplicationDetail(action) {
+  try {
+    const response = yield call(() => axios.get(`${base_url}/admin/applications/${action.payload}`));
+    yield put({
+      type: types.FETCH_APPLICATION_DETAIL_SUCCESS,
+      payload: response.data,
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_APPLICATION_DETAIL_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+function* approveApplication(action) {
+  try {
+    const response = yield call(() => 
+      axios.put(`${base_url}/admin/applications/${action.payload}/approve`)
+    );
+    yield put({
+      type: types.APPROVE_APPLICATION_SUCCESS,
+      payload: response.data,
+    });
+    // Optionally refetch the application details
+    yield put({
+      type: types.FETCH_APPLICATION_DETAIL_REQUEST,
+      payload: action.payload
+    });
+  } catch (error) {
+    yield put({
+      type: types.APPROVE_APPLICATION_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+
+function* rejectApplication(action) {
+  try {
+    const response = yield call(() => 
+      axios.put(`${base_url}/admin/applications/${action.payload}/reject`)
+    );
+    yield put({
+      type: types.REJECT_APPLICATION_SUCCESS,
+      payload: response.data,
+    });
+    // Optionally refetch the application details
+    yield put({
+      type: types.FETCH_APPLICATION_DETAIL_REQUEST,
+      payload: action.payload
+    });
+  } catch (error) {
+    yield put({
+      type: types.REJECT_APPLICATION_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+
+function* fetchApplicationNotes(action) {
+  try {
+    const response = yield call(() => 
+      axios.get(`${base_url}/admin/applications/${action.payload}/notes`)
+    );
+    yield put({
+      type: types.FETCH_APPLICATION_NOTES_SUCCESS,
+      payload: response.data,
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_APPLICATION_NOTES_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+
+function* addApplicationNote(action) {
+  try {
+    const response = yield call(() => 
+      axios.post(`${base_url}/admin/applications/${action.payload.applicationId}/notes`, {
+        note: action.payload.note,
+        admin_user: action.payload.admin_user
+      })
+    );
+    yield put({
+      type: types.ADD_APPLICATION_NOTE_SUCCESS,
+      payload: response.data,
+    });
+    // Refetch notes after adding
+    yield put({
+      type: types.FETCH_APPLICATION_NOTES_REQUEST,
+      payload: action.payload.applicationId
+    });
+  } catch (error) {
+    yield put({
+      type: types.ADD_APPLICATION_NOTE_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+
+function* deleteApplicationNote(action) {
+  try {
+    yield call(() => 
+      axios.delete(`${base_url}/admin/applications/notes/${action.payload.noteId}`)
+    );
+    yield put({
+      type: types.DELETE_APPLICATION_NOTE_SUCCESS,
+      payload: action.payload.noteId,
+    });
+    // Refetch notes after deleting
+    yield put({
+      type: types.FETCH_APPLICATION_NOTES_REQUEST,
+      payload: action.payload.applicationId
+    });
+  } catch (error) {
+    yield put({
+      type: types.DELETE_APPLICATION_NOTE_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
 // Watcher
 export function* watchApplicationActions() {
   yield takeLatest(types.SUBMIT_APPLICATION_REQUEST, submitApplication);
   yield takeLatest(types.FETCH_ADMIN_APPS_REQUEST, fetchAdminApplications);
   yield takeLatest(types.DELETE_ADMIN_APP_REQUEST, deleteAdminApplication);
+    yield takeLatest(types.FETCH_APPLICATION_DETAIL_REQUEST, fetchApplicationDetail);
+    yield takeLatest(types.APPROVE_APPLICATION_REQUEST, approveApplication);
+  yield takeLatest(types.REJECT_APPLICATION_REQUEST, rejectApplication);
+    yield takeLatest(types.FETCH_APPLICATION_NOTES_REQUEST, fetchApplicationNotes);
+  yield takeLatest(types.ADD_APPLICATION_NOTE_REQUEST, addApplicationNote);
+  yield takeLatest(types.DELETE_APPLICATION_NOTE_REQUEST, deleteApplicationNote);
+
 }

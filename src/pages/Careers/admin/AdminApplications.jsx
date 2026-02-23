@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as types from '../../../redux/type';
+import { useNavigate } from 'react-router-dom';
 
 const AdminApplications = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // 1. Pull dynamic data and loading status from Redux
 const { applications, loading } = useSelector((state) => state.applicationReducer || {});
@@ -22,7 +24,7 @@ const filteredApplications = safeApps.filter(app =>
 
   const handleView = (id) => {
     console.log('Viewing application:', id);
-    // Logic: dispatch fetch single application and navigate
+    navigate(`/admin/applications/${id}`);
   };
 
   const handleDelete = (id) => {

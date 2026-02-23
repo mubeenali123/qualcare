@@ -9,9 +9,9 @@ const initialState = {
   skills: [],
   documents: [],
   certification: [],
-  
+
   // Admin Data
-  applications: [], 
+  applications: [],
   loading: false,
   error: null,
 };
@@ -92,6 +92,67 @@ const applicationReducer = (state = initialState, action) => {
         loading: false,
       };
 
+    case types.APPROVE_APPLICATION_REQUEST:
+    case types.REJECT_APPLICATION_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case types.APPROVE_APPLICATION_SUCCESS:
+    case types.REJECT_APPLICATION_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+      };
+
+    case types.APPROVE_APPLICATION_FAILURE:
+    case types.REJECT_APPLICATION_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+    case types.FETCH_APPLICATION_NOTES_REQUEST:
+    case types.ADD_APPLICATION_NOTE_REQUEST:
+    case types.DELETE_APPLICATION_NOTE_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+        noteSuccess: null
+      };
+
+    case types.FETCH_APPLICATION_NOTES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        notes: action.payload,
+      };
+
+    case types.ADD_APPLICATION_NOTE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        noteSuccess: action.payload.message
+      };
+
+    case types.DELETE_APPLICATION_NOTE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        notes: state.notes.filter(note => note.id !== action.payload),
+      };
+
+    case types.FETCH_APPLICATION_NOTES_FAILURE:
+    case types.ADD_APPLICATION_NOTE_FAILURE:
+    case types.DELETE_APPLICATION_NOTE_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
     default:
       return state;
   }

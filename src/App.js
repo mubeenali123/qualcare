@@ -42,7 +42,7 @@ function App() {
     <Route path="dashboard" element={<AdminDashboard />} />
     <Route path="applicants" element={<AdminApplicants />} />
     <Route path="applications" element={<AdminApplications />} />
-    <Route path="application" element={<ApplicationDetail />} />
+<Route path="applications/:id" element={<ApplicationDetail />} />
   </Route>
 
 </Route>
