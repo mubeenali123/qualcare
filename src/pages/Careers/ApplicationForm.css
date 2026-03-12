@@ -969,13 +969,13 @@ nav[aria-label="Top Header"],
   box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
 
-.sidebar-nav {
+.sidebar-nav-profile {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.sidebar-nav li {
+.sidebar-nav-profile li {
   padding: 12px 15px;
   cursor: pointer;
   border-radius: 8px;
@@ -985,16 +985,16 @@ nav[aria-label="Top Header"],
   color: #555;
 }
 
-.sidebar-nav li:hover {
+.sidebar-nav-profile li:hover {
   background-color: #f0f4f8;
   color: #007bff;
 }
 
-.sidebar-nav li.active {
+.sidebar-nav-profile li.active {
   background: #094A87;
   color: #fff;
-  padding: 16px 40px;
-  border: 2px solid #094A87;
+  /* padding: 16px 40px; */
+  /* border: 2px solid #094A87; */
   border-radius: 50px;
   font-size: 16px;
   font-weight: 600;
@@ -1035,4 +1035,192 @@ nav[aria-label="Top Header"],
   border-radius: 50%;
   margin-bottom: 1rem;
   display: block;
+}
+
+/* Sidebar Card */
+.sidebar-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+/* Sidebar Profile Section */
+.sidebar-profile {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.profile-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.profile-name {
+  color: #ffffff;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.profile-email {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav-profile {
+  list-style: none;
+  padding: 0.5rem 0;
+  margin: 0;
+}
+
+.sidebar-nav-profile li {
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  color: #374151;
+  text-decoration: none;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  background: transparent;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.sidebar-link:hover {
+  background: #f9fafb;
+  color: #3b82f6;
+}
+
+.sidebar-nav-profile li.active .sidebar-link {
+  background: #eff6ff;
+  color: #3b82f6;
+  border-left-color: #3b82f6;
+  font-weight: 600;
+}
+
+.link-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 8px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.sidebar-link:hover .link-icon {
+  background: #dbeafe;
+  color: #3b82f6;
+}
+
+.sidebar-nav-profile li.active .link-icon {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.link-icon i {
+  font-size: 1.125rem;
+}
+
+.link-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.link-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.link-description {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  line-height: 1.2;
+}
+
+.active-indicator {
+  color: #3b82f6;
+  font-size: 0.875rem;
+}
+
+/* Logout Item */
+.logout-item {
+  margin-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 0.5rem;
+}
+
+.logout-btn {
+  border: none;
+  outline: none;
+}
+
+.logout-item .sidebar-link:hover {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.logout-item .sidebar-link:hover .link-icon {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar-card {
+    margin-bottom: 1.5rem;
+  }
+
+  .link-description {
+    display: none;
+  }
+
+  .sidebar-link {
+    padding: 0.875rem 1rem;
+  }
+
+  .link-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.25rem;
+  }
 }
