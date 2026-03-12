@@ -1,6 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import ProfileSidebar from './ProfileSidebar';
+import * as types from "../../redux/type";
 
 const ChangePasswordPage = ({ onBack }) => {
+  const dispatch = useDispatch();
+  
+  // Pulling loading and status from auth reducer
+  const { loading, error, successMessage } = useSelector(state => state.auth);
+
+  const [formData, setFormData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdate = () => {
+    // Client-side validation
+    if (!formData.currentPassword || !formData.newPassword) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    if (formData.newPassword !== formData.confirmPassword) {
+      alert("New passwords do not match!");
+      return;
+    }
+    
+    // Dispatch the request to the Saga
+    dispatch({
+      type: types.CHANGE_PASSWORD_REQUEST,
+      payload: {
+        current_password: formData.currentPassword,
+        new_password: formData.newPassword
+      }
+    });
+
+    // Optional: Clear fields on success logic would usually happen in a useEffect
+  };
+
   return (
     <div className="login-page">
       {/* Header */}
@@ -25,63 +67,69 @@ const ChangePasswordPage = ({ onBack }) => {
       <div className="profile-wrapper mt-5 mb-5">
         <div className="container">
           <div className="row">
-<div className="col-md-3">
-
-          {/* Left Sidebar Card */}
-          <aside className="sidebar-card">
-            <ul className="sidebar-nav">
-              <li>Account</li>
-              <li>Applications</li>
-              <li className="active">Change Password</li>
-              <li>Expiration Checklist</li>
-              <li className="logout-item">Logout</li>
-            </ul>
-          </aside>
-</div>
-<div className="col-md-9">
-
-          {/* Right Content Card */}
-          <main className="profile-content-card">
-            <h2>Change Password</h2>
-            <hr />
-
-            <div className="form-grid">
-              <div className="form-field">
-                <label className="section-label">Current Password</label>
-                <input
-                  type="password"
-                  name="currentPassword"
-                  placeholder="Enter current password"
-                />
-              </div>
-
-              <div className="form-field">
-                <label className="section-label">New Password</label>
-                <input
-                  type="password"
-                  name="newPassword"
-                  placeholder="Enter new password"
-                />
-              </div>
-
-              <div className="form-field">
-                <label className="section-label">Confirm New Password</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="Confirm new password"
-                />
-              </div>
+            <div className="col-md-3">
+              <ProfileSidebar />
             </div>
+            
+            <div className="col-md-9">
+              {/* Right Content Card */}
+              <main className="profile-content-card">
+                <h2>Change Password</h2>
+                <hr />
 
-            <button type="button" className="btn-save mt-4">
-              Update Password
-            </button>
-          </main>
-</div>
+                {/* Feedback Alerts */}
+                {error && <div className="alert alert-danger">{error}</div>}
+                {successMessage && <div className="alert alert-success">{successMessage}</div>}
 
+                <div className="form-grid">
+                  <div className="form-field">
+                    <label className="section-label">Current Password</label>
+                    <input
+                      type="password"
+                      name="currentPassword"
+                      value={formData.currentPassword}
+                      onChange={handleChange}
+                      placeholder="Enter current password"
+                      className="form-control"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="section-label">New Password</label>
+                    <input
+                      type="password"
+                      name="newPassword"
+                      value={formData.newPassword}
+                      onChange={handleChange}
+                      placeholder="Enter new password"
+                      className="form-control"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="section-label">Confirm New Password</label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      placeholder="Confirm new password"
+                      className="form-control"
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  type="button" 
+                  className="btn-save mt-4"
+                  onClick={handleUpdate}
+                  disabled={loading}
+                >
+                  {loading ? "Updating..." : "Update Password"}
+                </button>
+              </main>
+            </div>
           </div>
-          
         </div>
       </div>
 

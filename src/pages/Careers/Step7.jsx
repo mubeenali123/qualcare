@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
 import './ApplicationForm.css';
 import { useDispatch, useSelector } from "react-redux";
-
+import { useEffect } from 'react';
 const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
   const today = new Date().toISOString().split("T")[0];
+  const { loading, error } = useSelector(state => state.applicationReducer);
+  const [submitted, setSubmitted] = useState(false);
   const dispatch = useDispatch();
   
   const referenceId = localStorage.getItem('applicationReferenceId');
@@ -113,8 +115,14 @@ const handleSubmit = (e) => {
   });
 
    goToStep(9);
-};
+       setSubmitted(true);
 
+};
+useEffect(() => {
+    if (submitted && !loading && !error) {
+      onNext();
+    }
+  }, [loading, error, submitted]);
 function dataURLtoFile(dataurl, filename) {
   const arr = dataurl.split(',');
   const mime = arr[0].match(/:(.*?);/)[1];
@@ -269,7 +277,7 @@ function dataURLtoFile(dataurl, filename) {
           {/* Submit Buttons */}
           <div className="form-actions">
             <button type="button" className="btn-previous" onClick={onPrevious}>Previous</button>
-            <button type="submit" className="btn-submit">Submit</button>
+            <button type="submit" className="btn-submit">{loading ? 'Saving...' : 'Submit'}</button>
           </div>
         </form>
       </div>

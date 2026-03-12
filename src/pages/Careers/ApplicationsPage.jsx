@@ -1,4 +1,5 @@
 import React from 'react';
+import ProfileSidebar from './ProfileSidebar';
 
 const ApplicationsPage = ({ onBack }) => {
   return (
@@ -26,51 +27,19 @@ const ApplicationsPage = ({ onBack }) => {
         <div className="container">
           <div className="row">
 
-          {/* Left Sidebar Card */}
-          <div className="col-md-3">
-
-          <aside className="sidebar-card">
-            <ul className="sidebar-nav">
-              <li>Account</li>
-              <li className="active">Applications</li>
-              <li>Change Password</li>
-              <li>Expiration Checklist</li>
-              <li className="logout-item">Logout</li>
-            </ul>
-          </aside>
-          </div>
-<div className="col-md-9">
-
-          {/* Right Content Card */}
-          <main className="profile-content-card">
-            <h2>Applications</h2>
-            <hr />
-
-            <div className="applications-grid">
-              <button type="button" className="btn-next">
-                Application One
-              </button>
-              
-              <button type="button" className="btn-next">
-                Application Two
-              </button>
-              
-              <button type="button" className="btn-next">
-                Application Three
-              </button>
-              
-              <button type="button" className="btn-next">
-                Application Four
-              </button>
-              
-              <button type="button" className="btn-next">
-                Application Five
-              </button>
+            {/* Left Sidebar Card */}
+            <div className="col-md-3">
+              <ProfileSidebar />
             </div>
-          </main>
-</div>
+            <div className="col-md-9">
+
+              {/* Right Content Card */}
+              <main className="profile-content-card">
+                <div class="final-application-section"><h2 class="section-title">Final Application Forms</h2><p class="section-description">Select a final application form to view</p><div class="final-app-buttons"><button class="final-app-button"><div class="button-icon"><i class="fas fa-file-contract"></i></div><div class="button-content"><h3>Final Application 1</h3><p>View form details</p></div><i class="fas fa-chevron-right"></i></button><button class="final-app-button"><div class="button-icon"><i class="fas fa-file-contract"></i></div><div class="button-content"><h3>Final Application 2</h3><p>View form details</p></div><i class="fas fa-chevron-right"></i></button><button class="final-app-button"><div class="button-icon"><i class="fas fa-file-contract"></i></div><div class="button-content"><h3>Final Application 3</h3><p>View form details</p></div><i class="fas fa-chevron-right"></i></button><button class="final-app-button"><div class="button-icon"><i class="fas fa-file-contract"></i></div><div class="button-content"><h3>Final Application 4</h3><p>View form details</p></div><i class="fas fa-chevron-right"></i></button><button class="final-app-button"><div class="button-icon"><i class="fas fa-file-contract"></i></div><div class="button-content"><h3>Final Application 5</h3><p>View form details</p></div><i class="fas fa-chevron-right"></i></button><button class="final-app-button"><div class="button-icon"><i class="fas fa-file-contract"></i></div><div class="button-content"><h3>Final Application 6</h3><p>View form details</p></div><i class="fas fa-chevron-right"></i></button></div></div>
+              </main>
+            </div>
           </div>
-          
+
         </div>
       </div>
 

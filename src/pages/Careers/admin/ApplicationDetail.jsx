@@ -6,8 +6,16 @@ import { base_url } from '../../../components/config';
 import * as types from '../../../redux/type';
 
 const ApplicationDetail = () => {
+  const isExpired = (date) => new Date(date) < new Date();
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const handlePreview = (sharepointUrl) => {
+    // Office viewer requires the URL to be public-facing or accessible via a sharing link
+    const encodedUrl = encodeURIComponent(sharepointUrl);
+    const officeViewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodedUrl}`;
+    setPreviewUrl(officeViewerUrl);
+  };
   const { id } = useParams();
-    const handleApprove = () => {
+  const handleApprove = () => {
     if (window.confirm('Are you sure you want to approve this application?')) {
       dispatch({
         type: types.APPROVE_APPLICATION_REQUEST,
@@ -26,17 +34,26 @@ const ApplicationDetail = () => {
   };
   const dispatch = useDispatch();
   const [viewMode, setViewMode] = useState('initial');
-    const [newNote, setNewNote] = useState('');
-  
-const notes = useSelector(state => state.application?.notes || []);
-const noteSuccess = useSelector(state => state.application?.noteSuccess || null);
+  const [newNote, setNewNote] = useState('');
+
+  const notes = useSelector(state => state.applicationReducer?.notes || []);
+  const noteSuccess = useSelector(state => state.applicationReducer?.noteSuccess || null);
   const [activeStep, setActiveStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [applicationData, setApplicationData] = useState(null);
+const statusLogs = useSelector(state => state.applicationReducer?.statusLogs || []);
 
+useEffect(() => {
+  if (viewMode === 'logs') {
+    dispatch({
+      type: types.FETCH_STATUS_LOGS_REQUEST,
+      payload: id
+    });
+  }
+}, [viewMode, id]);
   useEffect(() => {
     fetchApplicationDetails();
-        if (viewMode === 'notes') {
+    if (viewMode === 'notes') {
       dispatch({
         type: types.FETCH_APPLICATION_NOTES_REQUEST,
         payload: id
@@ -82,7 +99,7 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
     try {
       setLoading(true);
       const response = await axios.get(`${base_url}/admin/applications/${id}`);
-      
+
       // Format the data from backend
       const formattedData = {
         details: response.data.details,
@@ -94,7 +111,7 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
         documents: response.data.steps.documents || {},
         review: response.data.steps.review?.data || {}
       };
-      
+
       setApplicationData(formattedData);
       setLoading(false);
     } catch (error) {
@@ -125,43 +142,111 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
       </div>
     );
   }
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'approved':
+      return 'status-approved';
+    case 'rejected':
+      return 'status-rejected';
+    case 'pending':
+      return 'status-pending';
+    case 'under review':
+      return 'status-review';
+    default:
+      return 'status-default';
+  }
+};
 
+const getStatusIcon = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'approved':
+      return 'fas fa-check-circle';
+    case 'rejected':
+      return 'fas fa-times-circle';
+    case 'pending':
+      return 'fas fa-clock';
+    case 'under review':
+      return 'fas fa-eye';
+    default:
+      return 'fas fa-circle';
+  }
+};
+
+const getStatusBadgeClass = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'approved':
+      return 'status-approved';
+    case 'rejected':
+      return 'status-rejected';
+    case 'pending':
+      return 'status-pending';
+    case 'under review':
+      return 'status-review';
+    default:
+      return '';
+  }
+};
   return (
     <>
-<div className="page-header">
+      <div className="page-header">
         <div>
           <h2>Application Details - #{id?.padStart(4, '0')}</h2>
           <p>View complete application submission</p>
         </div>
         <div className="action-buttons-header">
-          <button className="btn-approve" onClick={handleApprove}>
-            <i className="fas fa-check-circle"></i> Approve
-          </button>
-          <button className="btn-reject" onClick={handleReject}>
-            <i className="fas fa-times-circle"></i> Reject
-          </button>
+
+          {applicationData?.details?.status === "pending" && (
+            <>
+              <button className="btn-approve" onClick={handleApprove}>
+                <i className="fas fa-check-circle"></i> Approve
+              </button>
+
+              <button className="btn-reject" onClick={handleReject}>
+                <i className="fas fa-times-circle"></i> Reject
+              </button>
+            </>
+          )}
+
+          {applicationData?.details?.status === "approved" && (
+            <button className="btn-approve" disabled>
+              <i className="fas fa-check-circle"></i> Approved
+            </button>
+          )}
+
+          {applicationData?.details?.status === "rejected" && (
+            <button className="btn-rejecte" disabled>
+              <i className="fas fa-times-circle"></i> Rejected
+            </button>
+          )}
+
         </div>
       </div>
       {/* View Mode Tabs */}
       <div className="view-mode-tabs">
-        <button 
+        <button
           className={`tab-button ${viewMode === 'initial' ? 'active' : ''}`}
           onClick={() => setViewMode('initial')}
         >
           <i className="fas fa-file-alt"></i> View Initial Form
         </button>
-        <button 
+        <button
           className={`tab-button ${viewMode === 'final' ? 'active' : ''}`}
           onClick={() => setViewMode('final')}
         >
           <i className="fas fa-file-contract"></i> View Final Application
         </button>
-              <button 
+        <button
           className={`tab-button ${viewMode === 'notes' ? 'active' : ''}`}
           onClick={() => setViewMode('notes')}
         >
           <i className="fas fa-sticky-note"></i> Internal Notes & Comments
         </button>
+        <button 
+  className={`tab-button ${viewMode === 'logs' ? 'active' : ''}`}
+  onClick={() => setViewMode('logs')}
+>
+  <i className="fas fa-history"></i> Status History
+</button>
       </div>
 
       {/* INITIAL FORM VIEW */}
@@ -637,9 +722,9 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                 <div className="form-section">
                   <label className="section-label">Total number of hours per week you are available to work</label>
                   <div className="form-field full-width">
-                    <input 
-                      type="text" 
-                      value={applicationData.availability.totalHours || ''} 
+                    <input
+                      type="text"
+                      value={applicationData.availability.totalHours || ''}
                       readOnly
                     />
                   </div>
@@ -648,9 +733,9 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                 <div className="form-section">
                   <label className="section-label">Please list any special requests or needs for a work schedule?</label>
                   <div className="form-field full-width">
-                    <input 
-                      type="text" 
-                      value={applicationData.availability.specialRequests || ''} 
+                    <input
+                      type="text"
+                      value={applicationData.availability.specialRequests || ''}
                       readOnly
                     />
                   </div>
@@ -733,7 +818,7 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
 
                 {['emp1', 'emp2', 'emp3'].map((prefix, index) => {
                   const title = ['First Employer', 'Second Employer', 'Third Employer'][index];
-                  
+
                   return (
                     <div className="employer-section" key={prefix}>
                       <h2 className="employer-title">{title}</h2>
@@ -757,10 +842,10 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                       <div className="form-section">
                         <label className="section-label">Job Title</label>
                         <div className="form-field full-width">
-                          <input 
-                            type="text" 
-                            value={applicationData.experience[`${prefix}JobTitle`] || ''} 
-                            readOnly 
+                          <input
+                            type="text"
+                            value={applicationData.experience[`${prefix}JobTitle`] || ''}
+                            readOnly
                           />
                         </div>
                       </div>
@@ -768,10 +853,10 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                       <div className="form-section">
                         <label className="section-label">Duties</label>
                         <div className="form-field full-width">
-                          <input 
-                            type="text" 
-                            value={applicationData.experience[`${prefix}Duties`] || ''} 
-                            readOnly 
+                          <input
+                            type="text"
+                            value={applicationData.experience[`${prefix}Duties`] || ''}
+                            readOnly
                           />
                         </div>
                       </div>
@@ -779,36 +864,36 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                       <div className="form-section">
                         <label className="section-label">Address</label>
                         <div className="form-field full-width">
-                          <input 
-                            type="text" 
-                            value={applicationData.experience[`${prefix}Address`] || ''} 
-                            readOnly 
+                          <input
+                            type="text"
+                            value={applicationData.experience[`${prefix}Address`] || ''}
+                            readOnly
                           />
                           <span className="field-label">Street Address</span>
                         </div>
                         <div className="address-grid" style={{ marginTop: '15px' }}>
                           <div className="form-field">
-                            <input 
-                              type="text" 
-                              value={applicationData.experience[`${prefix}City`] || ''} 
-                              readOnly 
+                            <input
+                              type="text"
+                              value={applicationData.experience[`${prefix}City`] || ''}
+                              readOnly
                             />
                             <span className="field-label">City</span>
                           </div>
                           <div className="form-field">
-                            <input 
-                              type="text" 
-                              value={applicationData.experience[`${prefix}State`] || ''} 
-                              readOnly 
+                            <input
+                              type="text"
+                              value={applicationData.experience[`${prefix}State`] || ''}
+                              readOnly
                             />
                             <span className="field-label">State / Province / Region</span>
                           </div>
                         </div>
                         <div className="form-field half-width" style={{ marginTop: '15px' }}>
-                          <input 
-                            type="text" 
-                            value={applicationData.experience[`${prefix}Zip`] || ''} 
-                            readOnly 
+                          <input
+                            type="text"
+                            value={applicationData.experience[`${prefix}Zip`] || ''}
+                            readOnly
                           />
                           <span className="field-label">ZIP / Postal Code</span>
                         </div>
@@ -818,19 +903,19 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                         <div className="form-field">
                           <label className="section-label">Dates of Employment</label>
                           <span className="field-sublabel">From</span>
-                          <input 
-                            type="date" 
-                            value={applicationData.experience[`${prefix}StartDate`] || ''} 
-                            readOnly 
+                          <input
+                            type="date"
+                            value={applicationData.experience[`${prefix}StartDate`] || ''}
+                            readOnly
                           />
                         </div>
                         <div className="form-field">
                           <label className="section-label">Dates of Employment</label>
                           <span className="field-sublabel">To</span>
-                          <input 
-                            type="date" 
-                            value={applicationData.experience[`${prefix}EndDate`] || ''} 
-                            readOnly 
+                          <input
+                            type="date"
+                            value={applicationData.experience[`${prefix}EndDate`] || ''}
+                            readOnly
                           />
                         </div>
                       </div>
@@ -855,8 +940,8 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                         <div className="form-section" key={payType}>
                           <label className="section-label">Hourly pay or salary - {payType.replace('Pay', '')}</label>
                           <div className="form-field full-width">
-                            <select 
-                              value={applicationData.experience[`${prefix}${payType}`] || ''} 
+                            <select
+                              value={applicationData.experience[`${prefix}${payType}`] || ''}
                               disabled
                             >
                               <option value="">Select {payType}</option>
@@ -873,10 +958,10 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                       <div className="form-section">
                         <label className="section-label">Telephone Number</label>
                         <div className="form-field full-width">
-                          <input 
-                            type="tel" 
-                            value={applicationData.experience[`${prefix}Phone`] || ''} 
-                            readOnly 
+                          <input
+                            type="tel"
+                            value={applicationData.experience[`${prefix}Phone`] || ''}
+                            readOnly
                           />
                         </div>
                       </div>
@@ -884,10 +969,10 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                       <div className="form-section">
                         <label className="section-label">Reason for leaving</label>
                         <div className="form-field full-width">
-                          <input 
-                            type="text" 
-                            value={applicationData.experience[`${prefix}Leaving`] || ''} 
-                            readOnly 
+                          <input
+                            type="text"
+                            value={applicationData.experience[`${prefix}Leaving`] || ''}
+                            readOnly
                           />
                         </div>
                       </div>
@@ -919,8 +1004,10 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                       <>
                         <div className="document-file">
                           <i className="fas fa-file-pdf"></i>
-                          <a href={`${base_url}/storage/${applicationData.documents[doc.name].local_path}`} target="_blank" rel="noopener noreferrer">
-                            {applicationData.documents[doc.name].local_path.split('/').pop()}
+                          <a href={applicationData.documents[doc.name]?.sharepoint_url || `${base_url}/storage/${applicationData.documents[doc.name]?.local_path}`}
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            {doc.label} (View in SharePoint)
                           </a>
                         </div>
                         {applicationData.documents[doc.expiry] && (
@@ -928,6 +1015,7 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                             <label className="section-label">Expiration Date</label>
                             <input
                               type="date"
+                              className={isExpired(applicationData.documents[doc.expiry]) ? 'text-danger' : ''}
                               value={applicationData.documents[doc.expiry] || ''}
                               readOnly
                             />
@@ -961,8 +1049,10 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                     {applicationData.documents[doc.name]?.local_path ? (
                       <div className="document-file">
                         <i className="fas fa-file-pdf"></i>
-                        <a href={`${base_url}/storage/${applicationData.documents[doc.name].local_path}`} target="_blank" rel="noopener noreferrer">
-                          {applicationData.documents[doc.name].local_path.split('/').pop()}
+                        <a href={applicationData.documents[doc.name]?.sharepoint_url || `${base_url}/storage/${applicationData.documents[doc.name]?.local_path}`}
+                          target="_blank"
+                          rel="noopener noreferrer">
+                          {doc.label} (View in SharePoint)
                         </a>
                       </div>
                     ) : (
@@ -972,7 +1062,23 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                 ))}
               </div>
             )}
-
+            {previewUrl && (
+              <div className="preview-modal-overlay" onClick={() => setPreviewUrl(null)}>
+                <div className="preview-modal-content" onClick={e => e.stopPropagation()}>
+                  <button className="close-preview" onClick={() => setPreviewUrl(null)}>×</button>
+                  <iframe
+                    src={previewUrl}
+                    width="100%"
+                    height="600px"
+                    frameBorder="0"
+                    title="Document Preview"
+                  >
+                    This browser does not support PDFs. Please download the PDF to view it:
+                    <a href={previewUrl}>Download PDF</a>
+                  </iframe>
+                </div>
+              </div>
+            )}
             {/* STEP 7 - REVIEW/SIGNATURE */}
             {activeStep === 7 && (
               <div className="detail-step">
@@ -982,9 +1088,9 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                   <label className="section-label">Agreement</label>
                   <div className="agreement-checkbox">
                     <label className="checkbox-label">
-                      <input 
-                        type="checkbox" 
-                        checked={applicationData.review?.agreeStatements || false} 
+                      <input
+                        type="checkbox"
+                        checked={applicationData.review?.agreeStatements || false}
                         readOnly
                       />
                       <span><strong>I have read, understand, and agree to the above statements</strong></span>
@@ -1006,8 +1112,8 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                 <div className="form-section">
                   <label className="section-label">Date</label>
                   <div className="form-field half-width">
-                    <input 
-                      type="date" 
+                    <input
+                      type="date"
                       value={applicationData.review?.signatureDate || ''}
                       readOnly
                     />
@@ -1020,16 +1126,16 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
           {/* Navigation Buttons */}
           <div className="detail-navigation">
             {activeStep > 1 && (
-              <button 
-                className="btn-previous" 
+              <button
+                className="btn-previous"
                 onClick={() => setActiveStep(activeStep - 1)}
               >
                 <i className="fas fa-arrow-left"></i> Previous
               </button>
             )}
             {activeStep < 7 && (
-              <button 
-                className="btn-next" 
+              <button
+                className="btn-next"
                 onClick={() => setActiveStep(activeStep + 1)}
               >
                 Next
@@ -1044,7 +1150,7 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
         <div className="final-application-section">
           <h2 className="section-title">Final Application Forms</h2>
           <p className="section-description">Select a final application form to view</p>
-          
+
           <div className="final-app-buttons">
             {[1, 2, 3, 4, 5, 6].map((num) => (
               <button
@@ -1099,7 +1205,7 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
                       <span className="note-date">
                         {new Date(note.created_at).toLocaleString()}
                       </span>
-                      <button 
+                      <button
                         className="btn-delete-note"
                         onClick={() => handleDeleteNote(note.id)}
                       >
@@ -1121,6 +1227,66 @@ const noteSuccess = useSelector(state => state.application?.noteSuccess || null)
           </div>
         </div>
       )}
+      {/* STATUS LOGS VIEW */}
+{viewMode === 'logs' && (
+  <div className="logs-section">
+    <h2 className="section-title">Status History</h2>
+    <p className="section-description">Complete timeline of application status changes</p>
+
+    {/* Status Timeline */}
+    <div className="status-timeline">
+      {statusLogs.length > 0 ? (
+        statusLogs.map((log, index) => (
+          <div key={log.id} className="timeline-item">
+            <div className="timeline-marker">
+              <div className={`timeline-dot ${getStatusColor(log.to_status)}`}>
+                <i className={getStatusIcon(log.to_status)}></i>
+              </div>
+              {index !== statusLogs.length - 1 && (
+                <div className="timeline-line"></div>
+              )}
+            </div>
+            <div className="timeline-content">
+              <div className="timeline-header">
+                <div className="timeline-status">
+                  <span className={`status-badge ${getStatusBadgeClass(log.to_status)}`}>
+                    {log.to_status}
+                  </span>
+                  {log.from_status && (
+                    <>
+                      <i className="fas fa-arrow-left" style={{ margin: '0 10px', color: '#9ca3af' }}></i>
+                      <span className="status-badge status-old">
+                        {log.from_status}
+                      </span>
+                    </>
+                  )}
+                </div>
+                <span className="timeline-date">
+                  {new Date(log.created_at).toLocaleString()}
+                </span>
+              </div>
+              {log.changed_by && (
+                <p className="timeline-user">
+                  <i className="fas fa-user"></i> Changed by: <strong>{log.changed_by}</strong>
+                </p>
+              )}
+              {log.notes && (
+                <p className="timeline-notes">
+                  <i className="fas fa-comment"></i> {log.notes}
+                </p>
+              )}
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="no-logs">
+          <i className="fas fa-clock"></i>
+          <p>No status changes recorded yet</p>
+        </div>
+      )}
+    </div>
+  </div>
+)}
     </>
   );
 };

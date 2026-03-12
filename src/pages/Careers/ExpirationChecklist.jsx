@@ -1,483 +1,239 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import './ExpirationChecklist.css';
+import ProfileSidebar from './ProfileSidebar';
 
 const ExpirationChecklist = ({ onBack }) => {
-  // Static data for demonstration - In real implementation, this would come from the backend/database
-  const [documents] = useState([
-    // Documents from Step 6
-    {
-      id: 1,
-      name: 'Physical Examination (3-6 months)',
-      category: 'Documents',
-      uploaded: true,
-      expiryDate: '2026-04-15',
-      fileName: 'physical_exam_2025.pdf',
-      uploadDate: '2025-10-20'
-    },
-    {
-      id: 2,
-      name: 'CPR Card',
-      category: 'Documents',
-      uploaded: true,
-      expiryDate: '2026-03-01',
-      fileName: 'cpr_card.pdf',
-      uploadDate: '2025-11-05'
-    },
-    {
-      id: 3,
-      name: "Driver's License",
-      category: 'Documents',
-      uploaded: true,
-      expiryDate: '2028-12-15',
-      fileName: 'drivers_license.jpg',
-      uploadDate: '2025-10-18'
-    },
-    {
-      id: 4,
-      name: 'Professional License (RN/LPN/CNA)',
-      category: 'Documents',
-      uploaded: false,
-      expiryDate: null,
-      fileName: null,
-      uploadDate: null
-    },
-    {
-      id: 5,
-      name: 'Liability Insurance',
-      category: 'Documents',
-      uploaded: true,
-      expiryDate: '2026-02-20',
-      fileName: 'liability_insurance.pdf',
-      uploadDate: '2025-11-10'
-    },
-    {
-      id: 6,
-      name: 'Auto Insurance',
-      category: 'Documents',
-      uploaded: true,
-      expiryDate: '2026-06-30',
-      fileName: 'auto_insurance.pdf',
-      uploadDate: '2025-12-01'
-    },
-    {
-      id: 7,
-      name: 'Work Authorization',
-      category: 'Documents',
-      uploaded: true,
-      expiryDate: '2027-01-15',
-      fileName: 'work_auth.pdf',
-      uploadDate: '2025-10-25'
-    },
-    {
-      id: 8,
-      name: 'Level 2 Background Screening',
-      category: 'Documents',
-      uploaded: true,
-      expiryDate: '2026-10-10',
-      fileName: 'background_screening.pdf',
-      uploadDate: '2025-10-10'
-    },
-    {
-      id: 9,
-      name: 'Palm Beach County ID Badge (HHA Only)',
-      category: 'Documents',
-      uploaded: true,
-      expiryDate: '2026-08-20',
-      fileName: 'palm_beach_badge.jpg',
-      uploadDate: '2025-11-15'
-    },
+  const { application, loading } = useSelector((state) => state.auth);
 
-    // Certifications from Step 8
-    {
-      id: 10,
-      name: 'Domestic Violence 2hr Certificate',
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-02-28',
-      fileName: 'domestic_violence_cert.pdf',
-      uploadDate: '2025-11-20'
-    },
-    {
-      id: 11,
-      name: "Alzheimer's/Dementia 3hr Certificate",
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-05-10',
-      fileName: 'alzheimers_cert.pdf',
-      uploadDate: '2025-12-05'
-    },
-    {
-      id: 12,
-      name: "1 Hour Alzheimer's Training - Elder Affairs of Florida",
-      category: 'Certifications',
-      uploaded: false,
-      expiryDate: null,
-      fileName: null,
-      uploadDate: null
-    },
-    {
-      id: 13,
-      name: 'HIV/AIDS 4+r Certificate',
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-03-15',
-      fileName: 'hiv_aids_cert.pdf',
-      uploadDate: '2025-11-12'
-    },
-    {
-      id: 14,
-      name: 'HIPAA Update 4hr Certificate',
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-02-10',
-      fileName: 'hipaa_update.pdf',
-      uploadDate: '2025-10-30'
-    },
-    {
-      id: 15,
-      name: 'OSHA Update 4hr Certificate/2hr Certificate',
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-07-22',
-      fileName: 'osha_update.pdf',
-      uploadDate: '2025-12-10'
-    },
-    {
-      id: 16,
-      name: 'Self-Administered Medication 2hr Certificate',
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-04-05',
-      fileName: 'medication_cert.pdf',
-      uploadDate: '2025-11-25'
-    },
-    {
-      id: 17,
-      name: 'Communicating Cognitively Impaired Patients (CNAs)',
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-06-18',
-      fileName: 'communication_training.pdf',
-      uploadDate: '2025-12-15'
-    },
-    {
-      id: 18,
-      name: 'Patient Rights 2hrs (CNAs)',
-      category: 'Certifications',
-      uploaded: false,
-      expiryDate: null,
-      fileName: null,
-      uploadDate: null
-    },
-    {
-      id: 19,
-      name: 'Medical Records Documentation 2hrs(CNAs)',
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-05-25',
-      fileName: 'medical_records_doc.pdf',
-      uploadDate: '2025-11-28'
-    },
-    {
-      id: 20,
-      name: 'Medical Errors Update 2hrs(CNAs, LPN, RN)',
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-03-08',
-      fileName: 'medical_errors.pdf',
-      uploadDate: '2025-12-01'
-    },
-    {
-      id: 21,
-      name: 'Florida laws and rules (LPN, RN, HHA and CNA)',
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-08-14',
-      fileName: 'florida_laws.pdf',
-      uploadDate: '2025-12-08'
-    },
-    {
-      id: 22,
-      name: 'Professional Liability Insurance',
-      category: 'Certifications',
-      uploaded: true,
-      expiryDate: '2026-02-15',
-      fileName: 'prof_liability_insurance.pdf',
-      uploadDate: '2025-11-18'
+  // --- Modal State ---
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeDoc, setActiveDoc] = useState(null);
+  const [uploadData, setUploadData] = useState({ file: null, expiry: '' });
+
+  // Helper to calculate status
+  const getDocumentStatus = (expiryDate, isUploaded) => {
+    const WARNING_THRESHOLD_DAYS = 60;
+    if (!isUploaded) {
+      return { label: 'Missing', class: 'status-missing', icon: '❌', status: 'missing' };
     }
-  ]);
-
-  // Warning threshold in days (this would be configurable by admin in real implementation)
-  const WARNING_THRESHOLD_DAYS = 60; // Show warning 60 days before expiry
-
-  // Calculate status for each document
-  const getDocumentStatus = (doc) => {
-    if (!doc.uploaded) {
-      return {
-        status: 'missing',
-        label: 'Missing',
-        class: 'status-missing',
-        icon: '❌',
-        daysUntilExpiry: null
-      };
-    }
-
-    if (!doc.expiryDate) {
-      return {
-        status: 'valid',
-        label: 'Uploaded',
-        class: 'status-valid',
-        icon: '✅',
-        daysUntilExpiry: null
-      };
+    if (!expiryDate) {
+      return { label: 'Valid', class: 'status-valid', icon: '✅', status: 'valid' };
     }
 
     const today = new Date();
-    const expiry = new Date(doc.expiryDate);
-    const diffTime = expiry - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const expiry = new Date(expiryDate);
+    const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) {
-      return {
-        status: 'expired',
-        label: 'Expired',
-        class: 'status-expired',
-        icon: '❌',
-        daysUntilExpiry: diffDays
-      };
+    if (diffDays < 0) return { label: 'Expired', class: 'status-expired', icon: '❌', status: 'expired' };
+    if (diffDays <= WARNING_THRESHOLD_DAYS) return { label: `Expiring in ${diffDays} days`, class: 'status-expiring', icon: '⚠️', status: 'expiring' };
+    
+    return { label: 'Valid', class: 'status-valid', icon: '✅', status: 'valid' };
+  };
+
+  const docMapping = {
+    documents: {
+      physicalExam: 'Physical Examination',
+      cprCard: 'CPR Card',
+      driversLicense: "Driver's License",
+      socialSecurity: "Social Security Card", 
+      workAuthorization: 'Work Authorization (I-9 / Passport)',
+      professionalLicense: 'Professional License (RN/LPN/CNA)',
+      liabilityInsurance: 'Liability Insurance',
+      autoInsurance: 'Auto Insurance',
+      backgroundScreening: 'Level 2 Background Screening',
+      palmBeachBadge: 'Palm Beach County ID Badge',
+    },
+    certifications: {
+      domesticViolence: 'Domestic Violence 2hr',
+      alzheimersDementia: "Alzheimer's/Dementia 3hr",
+      oneHourAlzheimers: "1 Hour Alzheimer's Training",
+      hivAids: 'HIV/AIDS Certificate',
+      hipaaUpdate: 'HIPAA Update',
+      oshaUpdate: 'OSHA Update',
+      selfAdministeredMedication: 'Self-Administered Medication',
+      communicatingCognitivelyImpaired: 'Communicating Cognitively Impaired',
+      patientRights: 'Patient Rights',
+      medicalRecordsDocumentation: 'Medical Records Documentation',
+      medicalErrorsUpdate: 'Medical Errors Update',
+      floridaLawsRules: 'Florida Laws and Rules',
+      professionalLiabilityInsurance: 'Professional Liability Insurance'
+    }
+  };
+
+  const processedData = useMemo(() => {
+    if (!application || !application.meta) {
+      return { categories: { Documents: [], Certifications: [] }, stats: { total: 0, uploaded: 0, missing: 0, expiring: 0, expired: 0 } };
     }
 
-    if (diffDays <= WARNING_THRESHOLD_DAYS) {
-      return {
-        status: 'expiring',
-        label: `Expiring in ${diffDays} days`,
-        class: 'status-expiring',
-        icon: '⚠️',
-        daysUntilExpiry: diffDays
-      };
-    }
+    const { documents, certifications } = application.meta;
+    const categories = { Documents: [], Certifications: [] };
+    let stats = { total: 0, uploaded: 0, missing: 0, expiring: 0, expired: 0 };
 
-    return {
-      status: 'valid',
-      label: 'Valid',
-      class: 'status-valid',
-      icon: '✅',
-      daysUntilExpiry: diffDays
+    const updateStats = (status) => {
+      stats.total++;
+      if (status === 'missing') stats.missing++;
+      else stats.uploaded++;
+      if (status === 'expiring') stats.expiring++;
+      if (status === 'expired') stats.expired++;
     };
+
+    // Process helper
+    const processItems = (source, mapping, categoryName) => {
+      Object.keys(mapping).forEach(key => {
+        const expiry = source?.[`${key}Expiry`];
+        const file = source?.[key]; 
+        const statusInfo = getDocumentStatus(expiry, !!file);
+        
+        categories[categoryName].push({ 
+          key,
+          name: mapping[key], 
+          expiry: expiry || 'N/A', 
+          statusInfo 
+        });
+        updateStats(statusInfo.status);
+      });
+    };
+
+    processItems(documents, docMapping.documents, 'Documents');
+    processItems(certifications, docMapping.certifications, 'Certifications');
+
+    return { categories, stats };
+  }, [application]);
+
+  const handleOpenModal = (doc, category) => {
+    setActiveDoc({ ...doc, category });
+    setIsModalOpen(true);
   };
 
-  // Format date for display
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    });
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setUploadData({ file: null, expiry: '' });
   };
 
-  // Group documents by category
-  const documentsByCategory = documents.reduce((acc, doc) => {
-    if (!acc[doc.category]) {
-      acc[doc.category] = [];
+  const handleSaveUpload = () => {
+    if (!uploadData.file || !uploadData.expiry) {
+      alert("Please provide both a file and an expiry date.");
+      return;
     }
-    acc[doc.category].push({
-      ...doc,
-      statusInfo: getDocumentStatus(doc)
-    });
-    return acc;
-  }, {});
+    // Logic for dispatching to backend goes here
+    handleCloseModal();
+  };
 
-  // Calculate summary stats
-  const totalDocs = documents.length;
-  const uploadedDocs = documents.filter(d => d.uploaded).length;
-  const missingDocs = documents.filter(d => !d.uploaded).length;
-  const expiringDocs = documents.filter(d => {
-    const status = getDocumentStatus(d);
-    return status.status === 'expiring';
-  }).length;
-  const expiredDocs = documents.filter(d => {
-    const status = getDocumentStatus(d);
-    return status.status === 'expired';
-  }).length;
+  if (loading) return <div className="p-5 text-center">Loading checklist...</div>;
 
   return (
     <div className="login-page">
-      {/* Header */}
       <header className="header">
         <div className="header-container">
-          <div className="logo">
-            <img src="/logo.png.png" alt="QualCare Logo" />
-          </div>
+          <div className="logo"><img src="/logo.png.png" alt="QualCare Logo" /></div>
           <button className="home-btn" onClick={onBack}>Home</button>
-          <div className="header-right">
-            <div className="social-icons">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                <i className="fab fa-facebook-f"></i>
-              </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                <i className="fab fa-linkedin-in"></i>
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                <i className="fab fa-twitter"></i>
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                <i className="fab fa-instagram"></i>
-              </a>
-            </div>
-          </div>
         </div>
       </header>
 
-      {/* Main Layout Container */}
       <div className="profile-wrapper mt-5 mb-5">
         <div className="container">
           <div className="row">
-<div className="col-md-3">
+            <div className="col-md-3"><ProfileSidebar /></div>
+            <div className="col-md-9">
+              <main className="profile-content-card expiration-checklist">
+                <h2>Document Expiration Checklist</h2>
+                <p className="text-muted mb-4">Update documents that are missing, expired, or nearing expiration.</p>
+                <hr />
 
-          {/* Left Sidebar Card */}
-          <aside className="sidebar-card">
-            <ul className="sidebar-nav">
-              <li>Account</li>
-              <li>Applications</li>
-              <li>Change Password</li>
-              <li className="active">Expiration Checklist</li>
-              <li className="logout-item">Logout</li>
-            </ul>
-          </aside>
-</div>
-<div className="col-md-9">
-
-          {/* Right Content Card */}
-          <main className="profile-content-card expiration-checklist">
-            <h2>Document & Certification Expiration Checklist</h2>
-            <hr />
-
-            {/* Summary Cards */}
-            <div className="summary-cards">
-              <div className="summary-card total">
-                <div className="card-icon">📄</div>
-                <div className="card-content">
-                  <h3>{totalDocs}</h3>
-                  <p>Total Documents</p>
+                <div className="summary-cards">
+                  <div className="summary-card total"><h3>{processedData.stats.total}</h3><p>Total</p></div>
+                  <div className="summary-card uploaded"><h3>{processedData.stats.uploaded}</h3><p>Uploaded</p></div>
+                  <div className="summary-card missing"><h3>{processedData.stats.missing}</h3><p>Missing</p></div>
+                  <div className="summary-card expiring"><h3>{processedData.stats.expiring}</h3><p>Expiring</p></div>
                 </div>
-              </div>
 
-              <div className="summary-card uploaded">
-                <div className="card-icon">✅</div>
-                <div className="card-content">
-                  <h3>{uploadedDocs}</h3>
-                  <p>Uploaded</p>
-                </div>
-              </div>
-
-              <div className="summary-card missing">
-                <div className="card-icon">❌</div>
-                <div className="card-content">
-                  <h3>{missingDocs}</h3>
-                  <p>Missing</p>
-                </div>
-              </div>
-
-              <div className="summary-card expiring">
-                <div className="card-icon">⚠️</div>
-                <div className="card-content">
-                  <h3>{expiringDocs}</h3>
-                  <p>Expiring Soon</p>
-                </div>
-              </div>
-
-              {expiredDocs > 0 && (
-                <div className="summary-card expired">
-                  <div className="card-icon">🚫</div>
-                  <div className="card-content">
-                    <h3>{expiredDocs}</h3>
-                    <p>Expired</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Warning Notice */}
-            {(expiringDocs > 0 || expiredDocs > 0 || missingDocs > 0) && (
-              <div className="warning-notice">
-                <span className="warning-icon">⚠️</span>
-                <div className="warning-content">
-                  {expiredDocs > 0 && <span> {expiredDocs} document(s) expired.</span>}
-                  {expiringDocs > 0 && <span> {expiringDocs} document(s) expiring soon.</span>}
-                  {missingDocs > 0 && <span> {missingDocs} document(s) missing.</span>}
-                </div>
-              </div>
-            )}
-
-            {Object.entries(documentsByCategory).map(([category, docs]) => (
-              <div key={category} className="category-section">
-                <h3 className="category-title">
-                  {category}
-                </h3>
-
-                <div className="documents-table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Status</th>
-                        <th>Document Name</th>
-                        <th>Expiry Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {docs.map((doc) => (
-                        <tr key={doc.id} className={doc.statusInfo.class}>
-                          <td>
-                            <div className="status-badge">
-                              <span className="status-icon">{doc.statusInfo.icon}</span>
-                              <span className="status-text">{doc.statusInfo.label}</span>
-                            </div>
-                          </td>
-                          <td className="doc-name">{doc.name}</td>
-                          <td className="expiry-date">
-                            {doc.expiryDate ? (
-                              <div>
-                                <div className="date">{formatDate(doc.expiryDate)}</div>
-                                {doc.statusInfo.daysUntilExpiry > 0 && (
-                                  <div className="days-remaining">
-                                    ({doc.statusInfo.daysUntilExpiry} days)
-                                  </div>
+                {Object.entries(processedData.categories).map(([category, docs]) => (
+                  <div key={category} className="category-section">
+                    <h3 className="category-title">{category}</h3>
+                    <div className="documents-table">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Status</th>
+                            <th>Document Name</th>
+                            <th>Expiry Date</th>
+                            <th className="text-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {docs.map((doc, index) => (
+                            <tr key={index} className={doc.statusInfo.class}>
+                              <td>
+                                <div className="status-badge">
+                                  <span>{doc.statusInfo.icon}</span> {doc.statusInfo.label}
+                                </div>
+                              </td>
+                              <td className="doc-name">{doc.name}</td>
+                              <td className="expiry-date">{doc.expiry || 'N/A'}</td>
+                              <td className="text-center">
+                                {/* Only show update button if document is NOT valid/green */}
+                                {doc.statusInfo.status !== 'valid' ? (
+                                  <button 
+                                    className="btn-next" 
+                                    onClick={() => handleOpenModal(doc, category)}
+                                  >
+                                    {doc.statusInfo.status === 'missing' ? 'Upload' : 'Swap'}
+                                  </button>
+                                ) : (
+                                  <span className="text-success small"></span>
                                 )}
-                              </div>
-                            ) : (
-                              <span className="no-expiry">No Expiry</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
-          </main>
-</div>
-
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+              </main>
+            </div>
           </div>
-          
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="footer-container">
-          <div className="footer-logo">
-            <img src="/ncpc-logo.jpg" alt="NCPC Member" />
-          </div>
-          <div className="footer-content">
-            <p>QUALCARE NURSE REGISTRY INC. © 2025. All Rights Reserved.</p>
-            <p>State Licensed Nurse Registry Broward County License #NR30212051</p>
-            <p>Powered by MISOL | <a href="#">Terms of Service</a> & <a href="#">Privacy Policy</a></p>
+      {/* --- Interactive Modal with Z-Index fix --- */}
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content card p-4" onClick={(e) => e.stopPropagation()}>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h3 className="mb-0">Update {activeDoc?.name}</h3>
+              <button className="btn-close" onClick={handleCloseModal}></button>
+            </div>
+            <p className="text-muted small">Select your new document and its expiration date.</p>
+            <hr />
+            
+            <div className="form-group mb-3">
+              <label className="fw-bold mb-1">New File (PDF/Image)</label>
+              <input 
+                type="file" 
+                className="form-control"
+                onChange={(e) => setUploadData({...uploadData, file: e.target.files[0]})}
+              />
+            </div>
+
+            <div className="form-group mb-3">
+              <label className="fw-bold mb-1">New Expiry Date</label>
+              <input 
+                type="date" 
+                className="form-control"
+                value={uploadData.expiry}
+                onChange={(e) => setUploadData({...uploadData, expiry: e.target.value})}
+              />
+            </div>
+
+            <div className="d-flex justify-content-end gap-2 mt-4">
+              <button className="btn btn-light" onClick={handleCloseModal}>Cancel</button>
+              <button className="btn-save" onClick={handleSaveUpload}>Save Changes</button>
+            </div>
           </div>
         </div>
-      </footer>
+      )}
     </div>
   );
 };

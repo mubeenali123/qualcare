@@ -1,10 +1,47 @@
-import React from 'react';
-import './ApplicationForm.css';
+import React, { useState, useEffect } from 'react'; // Added useEffect
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; // Added useNavigate
+import * as types from "../../redux/type";
 
 const LoginPage = ({ onBack }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize navigation
+  
+  // Pull token and user from auth state
+  const { loading, error, token } = useSelector(state => state.auth);
+
+  const [formData, setFormData] = useState({
+    referenceId: '',
+    password: ''
+  });
+
+  // ✅ REDIRECT LOGIC
+  // This runs whenever the 'token' changes. If login is successful, 
+  // the saga updates the store, the token appears, and this triggers.
+  useEffect(() => {
+    if (token) {
+      navigate('/profile');
+    }
+  }, [token, navigate]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = () => {
+    // Basic validation to prevent empty requests
+    if (!formData.referenceId || !formData.password) {
+      return; 
+    }
+    
+    dispatch({
+      type: types.USER_LOGIN_REQUEST,
+      payload: formData
+    });
+  };
+
   return (
     <div className="login-page">
-      {/* Header */}
       <header className="header">
         <div className="header-container">
           <div className="logo">
@@ -22,19 +59,22 @@ const LoginPage = ({ onBack }) => {
         </div>
       </header>
 
-      {/* Login Form Container */}
-      {/* Added 'centered-content' and 'my-5' (margin top and bottom) */}
       <div className="login-container centered-content mt-5 mb-5">
         <div className="login-form">
-          <h2 className="text-center mb-4">Login</h2>
-          
+          <h2 className="text-center mb-4">Applicant Login</h2>
+
+          {error && <div className="alert alert-danger">{error}</div>}
+
           <div className="form-field">
             <label className="section-label">Reference ID</label>
             <input
               type="text"
               name="referenceId"
+              value={formData.referenceId}
+              onChange={handleChange}
               placeholder="Enter your reference ID"
               className="form-control"
+              onKeyPress={(e) => e.key === 'Enter' && handleLogin()} // Login on Enter key
             />
           </div>
 
@@ -43,18 +83,25 @@ const LoginPage = ({ onBack }) => {
             <input
               type="password"
               name="password"
+              value={formData.password}
+              onChange={handleChange}
               placeholder="Enter your password"
               className="form-control"
+              onKeyPress={(e) => e.key === 'Enter' && handleLogin()} // Login on Enter key
             />
           </div>
 
-          <button type="button" className="btn-next mt-4">
-            Login
+          <button
+            type="button"
+            className="btn-next mt-4"
+            onClick={handleLogin}
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-logo">

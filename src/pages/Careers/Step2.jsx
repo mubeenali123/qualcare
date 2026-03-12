@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './ApplicationForm.css';
 import { useDispatch, useSelector } from 'react-redux';
 import * as types from '../../redux/type';
+import { useEffect } from 'react';
+
 const Step2 = ({ onNext, onPrevious, onBack, goToStep }) => {
   const dispatch = useDispatch();
   const referenceId = localStorage.getItem('applicationReferenceId');
-
+const { loading, error } = useSelector(state => state.applicationReducer);
+  const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     highSchoolName: '',
     highSchoolCity: '',
@@ -47,10 +50,15 @@ const handleSubmit = (e) => {
     }
   });
 
-  onNext();
+  // onNext();
+  setSubmitted(true);
 };
 
-
+useEffect(() => {
+    if (submitted && !loading && !error) {
+      onNext();
+    }
+  }, [loading, error, submitted]);
   const handleSave = () => {
     console.log('Step 2 Saved:', formData);
     alert('Progress saved!');
@@ -335,7 +343,7 @@ const handleSubmit = (e) => {
           <div className="form-actions">
             <button type="button" className="btn-previous" onClick={onPrevious}>Previous</button>
             <button type="button" className="btn-save" onClick={handleSave}>Save</button>
-            <button type="submit" className="btn-next">Save and Next</button>
+            <button type="submit" className="btn-next">{loading ? 'Saving...' : 'Save and Next'}</button>
           </div>
         </form>
       </div>

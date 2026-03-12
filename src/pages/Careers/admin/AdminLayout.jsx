@@ -79,6 +79,13 @@ const handleLogout = () => {
               <span>Applicants</span>
             </li>
             <li 
+  className={location.pathname === '/admin/status-logs' ? 'active' : ''}
+  onClick={() => navigate('/admin/status-logs')}
+>
+  <i className="fas fa-history"></i>
+  <span>Status Logs</span>
+</li>
+            <li 
               className={location.pathname === '/admin/settings' ? 'active' : ''}
               onClick={() => navigate('/admin/settings')}
             >

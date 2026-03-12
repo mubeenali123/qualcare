@@ -9,7 +9,8 @@ const initialState = {
   skills: [],
   documents: [],
   certification: [],
-
+  statusLogs: [],
+  allStatusLogs: [],
   // Admin Data
   applications: [],
   loading: false,
@@ -148,6 +149,46 @@ const applicationReducer = (state = initialState, action) => {
     case types.FETCH_APPLICATION_NOTES_FAILURE:
     case types.ADD_APPLICATION_NOTE_FAILURE:
     case types.DELETE_APPLICATION_NOTE_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+    case types.FETCH_ALL_STATUS_LOGS_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case types.FETCH_ALL_STATUS_LOGS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        allStatusLogs: action.payload,
+      };
+
+    case types.FETCH_ALL_STATUS_LOGS_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+    case types.FETCH_STATUS_LOGS_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case types.FETCH_STATUS_LOGS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        statusLogs: action.payload,
+      };
+
+    case types.FETCH_STATUS_LOGS_FAILURE:
       return {
         ...state,
         loading: false,

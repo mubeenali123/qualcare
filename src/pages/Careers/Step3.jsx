@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import './ApplicationForm.css';
 import * as types from '../../redux/type';
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from 'react';
 
 const Step3 = ({ onNext, onPrevious, onBack, goToStep }) => {
   const dispatch = useDispatch();
   const referenceId = localStorage.getItem('applicationReferenceId');
-
+const { loading, error } = useSelector(state => state.applicationReducer);
+  const [submitted, setSubmitted] = useState(false);
 
 const [formData, setFormData] = useState({
   mondayAvailable: false,
@@ -86,10 +88,15 @@ const handleSubmit = (e) => {
   });
 
   onNext();
+  setSubmitted(true);
 };
 
 
-
+useEffect(() => {
+    if (submitted && !loading && !error) {
+      onNext();
+    }
+  }, [loading, error, submitted]);
 const handleSave = () => {
   if (!referenceId) {
     alert("Application session expired. Please restart.");
@@ -268,7 +275,7 @@ const handleSave = () => {
           <div className="form-actions">
             <button type="button" className="btn-previous" onClick={onPrevious}>Previous</button>
             <button type="button" className="btn-save" onClick={handleSave}>Save</button>
-            <button type="submit" className="btn-next">Save and Next</button>
+            <button type="submit" className="btn-next">{loading ? 'Saving...' : 'Save and Next'}</button>
           </div>
         </form>
       </div>

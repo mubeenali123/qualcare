@@ -204,6 +204,39 @@ function* deleteApplicationNote(action) {
     });
   }
 }
+
+function* fetchAllStatusLogs() {
+  try {
+    const response = yield call(() => 
+      axios.get(`${base_url}/admin/status-logs`)
+    );
+    yield put({
+      type: types.FETCH_ALL_STATUS_LOGS_SUCCESS,
+      payload: response.data,
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_ALL_STATUS_LOGS_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+function* fetchStatusLogs(action) {
+  try {
+    const response = yield call(() => 
+      axios.get(`${base_url}/admin/applications/${action.payload}/status-logs`)
+    );
+    yield put({
+      type: types.FETCH_STATUS_LOGS_SUCCESS,
+      payload: response.data,
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_STATUS_LOGS_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
 // Watcher
 export function* watchApplicationActions() {
   yield takeLatest(types.SUBMIT_APPLICATION_REQUEST, submitApplication);
@@ -215,5 +248,6 @@ export function* watchApplicationActions() {
     yield takeLatest(types.FETCH_APPLICATION_NOTES_REQUEST, fetchApplicationNotes);
   yield takeLatest(types.ADD_APPLICATION_NOTE_REQUEST, addApplicationNote);
   yield takeLatest(types.DELETE_APPLICATION_NOTE_REQUEST, deleteApplicationNote);
-
+  yield takeLatest(types.FETCH_STATUS_LOGS_REQUEST, fetchStatusLogs);
+  yield takeLatest(types.FETCH_ALL_STATUS_LOGS_REQUEST, fetchAllStatusLogs);
 }

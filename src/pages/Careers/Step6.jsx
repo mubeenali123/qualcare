@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import './ApplicationForm.css';
 import { useDispatch, useSelector } from "react-redux";
 import * as types from '../../redux/type';
+import { useEffect } from 'react';
+
 const Step6 = ({ onNext, onPrevious, onBack, goToStep }) => {
 const dispatch = useDispatch();
   const referenceId = localStorage.getItem('applicationReferenceId');
-
+const { loading, error } = useSelector(state => state.applicationReducer);
+  const [submitted, setSubmitted] = useState(false);
 
   const [formData, setFormData] = useState({
     physicalExam: null,
@@ -58,7 +61,11 @@ const handleExpiryChange = (e) => {
     [name]: value
   }));
 };
-
+useEffect(() => {
+    if (submitted && !loading && !error) {
+      onNext();
+    }
+  }, [loading, error, submitted]);
 const FileUpload = React.memo(
   ({ label, name, expiryName, formData, onFileChange, onExpiryChange, useCamera }) => {
     return (
@@ -134,6 +141,8 @@ const handleSubmit = (e) => {
   });
 
    goToStep(8);
+       setSubmitted(true);
+
 };
 
 
@@ -312,9 +321,8 @@ const handleSubmit = (e) => {
       Previous
     </button>
     <button type="button" className="btn-save" onClick={handleSubmit}>Save</button>
-    <button type="submit" className="btn-next">
-      Save and Next
-    </button>
+            <button type="submit" className="btn-next">{loading ? 'Saving...' : 'Save and Next'}</button>
+
   </div>
 </form>
 
