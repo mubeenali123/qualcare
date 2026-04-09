@@ -215,7 +215,7 @@ function dataURLtoFile(dataurl, filename) {
             </p>
 
             <p className="statement-text">
-              I understand and acknowledge that unless otherwise defined by applicable law or written agreement with CORNERSTONE HOME CARE SERVICES, any employment/independent contractor relationship will be considered "employment at will." This means the employee/independent contractor may resign at any time and CORNERSTONE HOME CARE SERVICES may discharge the employee/independent contractor at any time, with or without cause, and with or without advance notice.
+              I understand and acknowledge that unless otherwise defined by applicable law or written agreement with QUALCARE NURSE REGISTRY INC, any employment/independent contractor relationship will be considered "employment at will." This means the employee/independent contractor may resign at any time and QUALCARE NURSE REGISTRY INC may discharge the employee/independent contractor at any time, with or without cause, and with or without advance notice.
             </p>
 
             <p className="statement-text">

@@ -163,7 +163,8 @@ function* addApplicationNote(action) {
     const response = yield call(() => 
       axios.post(`${base_url}/admin/applications/${action.payload.applicationId}/notes`, {
         note: action.payload.note,
-        admin_user: action.payload.admin_user
+        admin_user: action.payload.admin_user,
+        priority: action.payload.priority
       })
     );
     yield put({
@@ -237,6 +238,97 @@ function* fetchStatusLogs(action) {
     });
   }
 }
+
+function* fetchDashboardStats() {
+  try {
+    const response = yield call(() => 
+      axios.get(`${base_url}/admin/dashboard-stats`)
+    );
+    yield put({
+      type: types.FETCH_DASHBOARD_STATS_SUCCESS,
+      payload: response.data,
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_DASHBOARD_STATS_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+function* lockApplicantAccount(action) {
+  try {
+    const response = yield call(() =>
+      axios.put(`${base_url}/admin/applicants/${action.payload}/lock`)
+    );
+    yield put({
+      type: types.LOCK_APPLICANT_ACCOUNT_SUCCESS,
+      payload: response.data,
+    });
+    // Refetch applicants list
+    yield put({ type: types.FETCH_APPLICANTS_REQUEST });
+  } catch (error) {
+    yield put({
+      type: types.LOCK_APPLICANT_ACCOUNT_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+
+function* unlockApplicantAccount(action) {
+  try {
+    const response = yield call(() =>
+      axios.put(`${base_url}/admin/applicants/${action.payload}/unlock`)
+    );
+    yield put({
+      type: types.UNLOCK_APPLICANT_ACCOUNT_SUCCESS,
+      payload: response.data,
+    });
+    yield put({ type: types.FETCH_APPLICANTS_REQUEST });
+  } catch (error) {
+    yield put({
+      type: types.UNLOCK_APPLICANT_ACCOUNT_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+
+function* archiveApplicantAccount(action) {
+  try {
+    const response = yield call(() =>
+      axios.put(`${base_url}/admin/applicants/${action.payload}/archive`)
+    );
+    yield put({
+      type: types.ARCHIVE_APPLICANT_ACCOUNT_SUCCESS,
+      payload: response.data,
+    });
+    yield put({ type: types.FETCH_APPLICANTS_REQUEST });
+  } catch (error) {
+    yield put({
+      type: types.ARCHIVE_APPLICANT_ACCOUNT_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+
+function* resetApplicantPassword(action) {
+  try {
+    const response = yield call(() =>
+      axios.put(`${base_url}/admin/applicants/${action.payload.id}/reset-password`, {
+        new_password: action.payload.new_password
+      })
+    );
+    yield put({
+      type: types.RESET_APPLICANT_PASSWORD_SUCCESS,
+      payload: response.data,
+    });
+  } catch (error) {
+    yield put({
+      type: types.RESET_APPLICANT_PASSWORD_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+
 // Watcher
 export function* watchApplicationActions() {
   yield takeLatest(types.SUBMIT_APPLICATION_REQUEST, submitApplication);
@@ -250,4 +342,10 @@ export function* watchApplicationActions() {
   yield takeLatest(types.DELETE_APPLICATION_NOTE_REQUEST, deleteApplicationNote);
   yield takeLatest(types.FETCH_STATUS_LOGS_REQUEST, fetchStatusLogs);
   yield takeLatest(types.FETCH_ALL_STATUS_LOGS_REQUEST, fetchAllStatusLogs);
+    yield takeLatest(types.FETCH_DASHBOARD_STATS_REQUEST, fetchDashboardStats);
+      yield takeLatest(types.LOCK_APPLICANT_ACCOUNT_REQUEST, lockApplicantAccount);
+  yield takeLatest(types.UNLOCK_APPLICANT_ACCOUNT_REQUEST, unlockApplicantAccount);
+  yield takeLatest(types.ARCHIVE_APPLICANT_ACCOUNT_REQUEST, archiveApplicantAccount);
+  yield takeLatest(types.RESET_APPLICANT_PASSWORD_REQUEST, resetApplicantPassword);
+
 }

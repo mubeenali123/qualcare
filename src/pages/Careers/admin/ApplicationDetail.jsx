@@ -35,6 +35,7 @@ const ApplicationDetail = () => {
   const dispatch = useDispatch();
   const [viewMode, setViewMode] = useState('initial');
   const [newNote, setNewNote] = useState('');
+const [notePriority, setNotePriority] = useState('medium'); // ADD THIS
 
   const notes = useSelector(state => state.applicationReducer?.notes || []);
   const noteSuccess = useSelector(state => state.applicationReducer?.noteSuccess || null);
@@ -67,23 +68,37 @@ useEffect(() => {
     }
   }, [noteSuccess]);
 
-  const handleAddNote = (e) => {
-    e.preventDefault();
-    if (!newNote.trim()) {
-      alert('Please enter a note');
-      return;
+const handleAddNote = (e) => {
+  e.preventDefault();
+  if (!newNote.trim()) {
+    alert('Please enter a note');
+    return;
+  }
+
+  dispatch({
+    type: types.ADD_APPLICATION_NOTE_REQUEST,
+    payload: {
+      applicationId: id,
+      note: newNote,
+      priority: notePriority, // ADD THIS
+      admin_user: 'Admin' // Replace with actual admin username from auth
     }
-
-    dispatch({
-      type: types.ADD_APPLICATION_NOTE_REQUEST,
-      payload: {
-        applicationId: id,
-        note: newNote,
-        admin_user: 'Admin' // Replace with actual admin username from auth
-      }
-    });
-  };
-
+  });
+};
+const getPriorityIcon = (priority) => {
+  switch (priority?.toLowerCase()) {
+    case 'urgent':
+      return { icon: 'fas fa-exclamation-circle', color: '#ef4444', label: 'Urgent' };
+    case 'high':
+      return { icon: 'fas fa-circle', color: '#ef4444', label: 'High' };
+    case 'medium':
+      return { icon: 'fas fa-circle', color: '#f59e0b', label: 'Medium' };
+    case 'low':
+      return { icon: 'fas fa-circle', color: '#10b981', label: 'Low' };
+    default:
+      return { icon: 'fas fa-circle', color: '#6b7280', label: 'Normal' };
+  }
+};
   const handleDeleteNote = (noteId) => {
     if (window.confirm('Are you sure you want to delete this note?')) {
       dispatch({
@@ -1172,61 +1187,111 @@ const getStatusBadgeClass = (status) => {
         </div>
       )}
 
-      {viewMode === 'notes' && (
-        <div className="notes-section">
-          <h2 className="section-title">Internal Notes & Comments</h2>
-          <p className="section-description">Add internal notes and comments for this application</p>
+{viewMode === 'notes' && (
+  <div className="notes-section">
+    <h2 className="section-title">Internal Notes & Comments</h2>
+    <p className="section-description">Add internal notes and comments for this application</p>
 
-          {/* Add Note Form */}
-          <form onSubmit={handleAddNote} className="add-note-form">
-            <textarea
-              value={newNote}
-              onChange={(e) => setNewNote(e.target.value)}
-              placeholder="Write a note or comment..."
-              rows="4"
-              className="note-textarea"
-            />
-            <button type="submit" className="btn-add-note">
-              <i className="fas fa-plus-circle"></i> Add Note
-            </button>
-          </form>
+    {/* Add Note Form */}
+    <form onSubmit={handleAddNote} className="add-note-form">
+      <textarea
+        value={newNote}
+        onChange={(e) => setNewNote(e.target.value)}
+        placeholder="Write a note or comment..."
+        rows="4"
+        className="note-textarea"
+      />
+      
+      {/* Priority Selector */}
+      <div className="note-priority-selector">
+        <label className="priority-label">Priority Level:</label>
+        <div className="priority-options">
+          <button
+            type="button"
+            className={`priority-option ${notePriority === 'low' ? 'active' : ''}`}
+            onClick={() => setNotePriority('low')}
+          >
+            <i className="fas fa-circle" style={{ color: '#10b981' }}></i>
+            Low
+          </button>
+          <button
+            type="button"
+            className={`priority-option ${notePriority === 'medium' ? 'active' : ''}`}
+            onClick={() => setNotePriority('medium')}
+          >
+            <i className="fas fa-circle" style={{ color: '#f59e0b' }}></i>
+            Medium
+          </button>
+          <button
+            type="button"
+            className={`priority-option ${notePriority === 'high' ? 'active' : ''}`}
+            onClick={() => setNotePriority('high')}
+          >
+            <i className="fas fa-circle" style={{ color: '#ef4444' }}></i>
+            High
+          </button>
+          <button
+            type="button"
+            className={`priority-option ${notePriority === 'urgent' ? 'active' : ''}`}
+            onClick={() => setNotePriority('urgent')}
+          >
+            <i className="fas fa-exclamation-circle" style={{ color: '#ef4444' }}></i>
+            Urgent
+          </button>
+        </div>
+      </div>
 
-          {/* Notes List */}
-          <div className="notes-list">
-            {notes.length > 0 ? (
-              notes.map(note => (
-                <div key={note.id} className="note-card">
-                  <div className="note-header">
-                    <div className="note-author">
-                      <i className="fas fa-user-circle"></i>
-                      <span>{note.admin_user}</span>
-                    </div>
-                    <div className="note-meta">
-                      <span className="note-date">
-                        {new Date(note.created_at).toLocaleString()}
-                      </span>
-                      <button
-                        className="btn-delete-note"
-                        onClick={() => handleDeleteNote(note.id)}
-                      >
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="note-content">
-                    {note.note}
-                  </div>
+      <button type="submit" className="btn-add-note">
+        <i className="fas fa-plus-circle"></i> Add Note
+      </button>
+    </form>
+
+    {/* Notes List */}
+    <div className="notes-list">
+      {notes.length > 0 ? (
+        notes.map(note => {
+          const priorityInfo = getPriorityIcon(note.priority);
+          return (
+            <div key={note.id} className={`note-card priority-${note.priority}`}>
+              <div className="note-header">
+                <div className="note-author">
+                  <i className="fas fa-user-circle"></i>
+                  <span>{note.admin_user}</span>
+                  {/* Priority Badge */}
+                  <span className="note-priority-badge" style={{ marginLeft: '10px' }}>
+                    <i className={priorityInfo.icon} style={{ color: priorityInfo.color }}></i>
+                    <span style={{ color: priorityInfo.color, fontWeight: 600 }}>
+                      {priorityInfo.label}
+                    </span>
+                  </span>
                 </div>
-              ))
-            ) : (
-              <div className="no-notes">
-                <i className="fas fa-inbox"></i>
-                <p>No notes yet. Add your first note above.</p>
+                <div className="note-meta">
+                  <span className="note-date">
+                    {new Date(note.created_at).toLocaleString()}
+                  </span>
+                  <button
+                    className="btn-delete-note"
+                    onClick={() => handleDeleteNote(note.id)}
+                  >
+                    <i className="fas fa-trash"></i>
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
+              <div className="note-content">
+                {note.note}
+              </div>
+            </div>
+          );
+        })
+      ) : (
+        <div className="no-notes">
+          <i className="fas fa-inbox"></i>
+          <p>No notes yet. Add your first note above.</p>
         </div>
       )}
+    </div>
+  </div>
+)}
       {/* STATUS LOGS VIEW */}
 {viewMode === 'logs' && (
   <div className="logs-section">

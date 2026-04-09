@@ -13,6 +13,7 @@ const initialState = {
   allStatusLogs: [],
   // Admin Data
   applications: [],
+  dashboardStats: null,
   loading: false,
   error: null,
 };
@@ -194,6 +195,26 @@ const applicationReducer = (state = initialState, action) => {
         loading: false,
         error: action.payload,
       };
+      case types.FETCH_DASHBOARD_STATS_REQUEST:
+  return {
+    ...state,
+    loading: true,
+    error: null,
+  };
+
+case types.FETCH_DASHBOARD_STATS_SUCCESS:
+  return {
+    ...state,
+    loading: false,
+    dashboardStats: action.payload,
+  };
+
+case types.FETCH_DASHBOARD_STATS_FAILURE:
+  return {
+    ...state,
+    loading: false,
+    error: action.payload,
+  };
     default:
       return state;
   }
