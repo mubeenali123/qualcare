@@ -1,17 +1,167 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import './ApplicationForm.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Worker, Viewer } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
-import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import { readPdfFormFields } from '../../utils/pdfUtils';
+import { useDispatch, useSelector } from 'react-redux';
+import * as types from '../../redux/type';
 
-import WebViewer from '@pdftron/webviewer';
-
+const STEP_PDF_MAP = {
+    1: '/forms/section-2-page-1.pdf',
+};
+const STEP_NAME_MAP = {
+    1: 'final_eligibility',
+    2: 'final_w9',
+    3: 'final_attest_compliance',
+    4: 'final_attest_offenses',
+    5: 'final_bg_screening',
+    6: 'final_employee_attest',
+    7: 'final_policy_ack',
+    8: 'final_bg_attest',
+    9: 'final_patient_abandon',
+    10: 'final_charges_1',
+    11: 'final_charges_2',
+    12: 'final_charges_3',
+    13: 'final_bg_auth',
+};
+// Add this after your STEP_NAME_MAP
+const STEP_FIELDS_MAP = {
+    2: ['w9Name', 'businessName', 'taxClass', 'llcClassification', 'exemptPayee', 
+        'fatcaCode', 'w9Address', 'w9CityStateZip', 'requesterAddress', 'accountNumbers',
+        'ssn1', 'ssn2', 'ssn3', 'ein1', 'ein2', 'w9SignDate'],
+    
+    3: ['attestationEmployeeName', 'attestationEmployerName', 'attestationProviderAddress'],
+    
+    5: ['exemptionAHCA', 'exemptionDOH', 'ahcaDecisionDate', 'dohDecisionDate', 
+        'priorScreeningPurpose', 'screeningAgencyName', 'priorScreeningDate',
+        'agencyAHCA', 'agencyDOH', 'agencyAPD', 'agencyDOEA', 'agencyDFS', 'agencyDCF'],
+    
+    6: ['finalAttestName', 'finalAttestTitle', 'finalAttestDate'],
+    
+    7: ['privacyPrintedName', 'privacyDate'],
+    
+    8: ['doeaIdType', 'doeaApplicantName', 'doeaPosition', 'doeaEmployer', 
+        'doeaVolunteerHours', 'doeaLicenseException', 'doeaLicenseType'],
+    
+    9: ['doeaExemptionAgencyDate', 'doeaExemptionMultipleAgencies', 
+        'doeaFinalAffiantName', 'doeaAttestationDate'],
+    
+    13: ['backgroundTitle', 'previousNames', 'backgroundDate'],
+    
+    // Steps with no form fields (static content only)
+    1: [],   // Eligibility Verification - PDF form
+    4: [],   // Attestation Offenses - static
+    10: [],  // Charges Offenses 1 - static
+    11: [],  // Charges Offenses 2 - static
+    12: [],  // Charges Offenses 3 - static
+};
 const FinalApplicationForm2 = ({ }) => {
+    const dispatch = useDispatch();
+    const { savingStep, stepSaveSuccess, formProgress, error } = useSelector(
+        state => state.applicationReducer
+    );
+    const [pdfFieldData, setPdfFieldData] = useState({});
+const [iframePdfData, setIframePdfData] = useState(null);
+const [submittedStep, setSubmittedStep] = useState(null);
+
+useEffect(() => {
+    const handleMessage = (event) => {
+        // You'll need to implement PDF form data extraction in the iframe page
+        if (event.data && event.data.type === 'pdfFormData') {
+            setIframePdfData(event.data.data);
+            setPdfFieldData(event.data.data);
+        }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+}, []);
     const today = new Date().toISOString().split("T")[0];
-  const viewerRef = useRef(null);
-  const instanceRef = useRef(null);
-   const steps = [
+const [formData, setFormData] = useState({
+    // ============================================
+    // STEP 2: W-9 Form (17 fields)
+    // ============================================
+    w9Name: '',
+    businessName: '',
+    taxClass: '',
+    llcClassification: '',
+    exemptPayee: '',
+    fatcaCode: '',
+    w9Address: '',
+    w9CityStateZip: '',
+    requesterAddress: '',
+    accountNumbers: '',
+    ssn1: '',
+    ssn2: '',
+    ssn3: '',
+    ein1: '',
+    ein2: '',
+    w9SignDate: today,
+
+    // ============================================
+    // STEP 3: Attestation Compliance (3 fields)
+    // ============================================
+    attestationEmployeeName: '',
+    attestationEmployerName: '',
+    attestationProviderAddress: '',
+
+    // ============================================
+    // STEP 5: Background Screening (14 fields)
+    // ============================================
+    exemptionAHCA: false,
+    exemptionDOH: false,
+    ahcaDecisionDate: '',
+    dohDecisionDate: '',
+    priorScreeningPurpose: '',
+    screeningAgencyName: '',
+    priorScreeningDate: '',
+    agencyAHCA: false,
+    agencyDOH: false,
+    agencyAPD: false,
+    agencyDOEA: false,
+    agencyDFS: false,
+    agencyDCF: false,
+
+    // ============================================
+    // STEP 6: Employee Attestation (3 fields)
+    // ============================================
+    finalAttestName: '',
+    finalAttestTitle: '',
+    finalAttestDate: today,
+
+    // ============================================
+    // STEP 7: Privacy Policy (2 fields)
+    // ============================================
+    privacyPrintedName: '',
+    privacyDate: today,
+
+    // ============================================
+    // STEP 8: Background Attestation / DOEA (7 fields)
+    // ============================================
+    doeaIdType: '',
+    doeaApplicantName: '',
+    doeaPosition: '',
+    doeaEmployer: '',
+    doeaVolunteerHours: '',
+    doeaLicenseException: '',
+    doeaLicenseType: '',
+
+    // ============================================
+    // STEP 9: Patient Abandonment (4 fields)
+    // ============================================
+    doeaExemptionAgencyDate: '',
+    doeaExemptionMultipleAgencies: '',
+    doeaFinalAffiantName: '',
+    doeaAttestationDate: today,
+
+    // ============================================
+    // STEP 13: Background Authorization (3 fields)
+    // ============================================
+    backgroundTitle: '',
+    previousNames: '',
+    backgroundDate: today,
+});
+    const steps = [
         "Eligibility Verification",
         "Taxpayer Identification",
         "Attestation Compliance",
@@ -29,60 +179,111 @@ const FinalApplicationForm2 = ({ }) => {
 
     const [currentStep, setCurrentStep] = useState(1);
     const [isDrawing, setIsDrawing] = useState(false);
-    const canvasRef = useRef(null);
-    const policyCanvasRef = useRef(null);
-    const healthCanvasRef = useRef(null);
+    const canvasRefs = {
+        2: useRef(null),
+        6: useRef(null),
+        7: useRef(null),
+        9: useRef(null),
+        13: useRef(null),
+    };
+    const getActiveCanvasRef = () => canvasRefs[currentStep] || { current: null };
+
+
     const progressWidth = (currentStep / steps.length) * 100;
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     }, [currentStep]);
 
-    const goToStep = (step) => {
-        if (step < 1 || step > steps.length) return;
-        setCurrentStep(step);
-    };
+const goToStep = (step) => {
+    if (step < 1 || step > steps.length) return;
+    // Clear error when manually changing steps
+    if (error) {
+        dispatch({ type: types.CLEAR_FINAL_FORM_ERROR });
+    }
+    setCurrentStep(step);
+};
 
-    const onNext = () => {
+    const onNext = useCallback(() => {
         setCurrentStep(prev => Math.min(prev + 1, steps.length));
         window.scrollTo({
             top: 0,
             behavior: "smooth"
         });
-    };
-    const handleNext = (e) => {
-        e.preventDefault();
-        console.log('Form Data:', formData);
-        onNext();
-    };
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        alert('Form Submitted')
-    };
-    const onBack = () => {
-        setCurrentStep(prev => Math.max(prev - 1, 1));
+    }, [steps.length]);
+const handleNext = useCallback((e) => {
+    e.preventDefault();
+    if (savingStep) return;
+    
+    const referenceId = localStorage.getItem('applicationReferenceId');
+    const signatureData = getSignatureData();
+    const stepName = STEP_NAME_MAP[currentStep];
+    
+    // Filter formData to ONLY include fields for this step
+    let formDataToSend = {};
+    const relevantFields = STEP_FIELDS_MAP[currentStep] || [];
+    
+    if (relevantFields.length > 0) {
+        formDataToSend = relevantFields.reduce((obj, field) => {
+            if (formData[field] !== undefined && formData[field] !== '') {
+                obj[field] = formData[field];
+            }
+            return obj;
+        }, {});
+    }
+    
+    console.log(`Step ${currentStep}: Sending ${Object.keys(formDataToSend).length} fields`);
+    
+    // PDF data only for step 1
+    let pdfData = null;
+    if (currentStep === 1) {
+        pdfData = iframePdfData;
+    }
+    
+    setSubmittedStep(currentStep);
+    
+    dispatch({
+        type: types.SAVE_FINAL_FORM_STEP_REQUEST,
+        payload: {
+            stepNumber: currentStep,
+            stepName: stepName,
+            formData: formDataToSend,
+            signatureData,
+            pdfFieldData: pdfData,
+            referenceId,
+        },
+    });
+}, [currentStep, formData, iframePdfData, savingStep, dispatch]);
 
-    };
-    const startDrawing = (e) => setIsDrawing(true);
-    const stopDrawing = (e) => setIsDrawing(false);
+
+const onBack = () => {
+    // Clear error when going back
+    if (error) {
+        dispatch({ type: types.CLEAR_FINAL_FORM_ERROR });
+    }
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+};
+    const startDrawing = () => setIsDrawing(true);
+    const stopDrawing = () => setIsDrawing(false);
     const draw = (e) => {
         if (!isDrawing) return;
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
+        const canvas = getActiveCanvasRef().current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
         const y = e.clientY ? e.clientY - rect.top : e.touches[0].clientY - rect.top;
         ctx.lineWidth = 2;
-        ctx.lineCap = "round";
-        ctx.strokeStyle = "black";
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'black';
         ctx.lineTo(x, y);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(x, y);
     };
     const clearSignature = () => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const canvas = getActiveCanvasRef().current;
+        if (!canvas) return;
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
     };
     const capitalizeLabelsInFinalApplication = () => {
         const container = document.querySelector(".final-application");
@@ -137,189 +338,39 @@ const FinalApplicationForm2 = ({ }) => {
     useEffect(() => {
         capitalizeLabelsInFinalApplication();
     }, []);
+    useEffect(() => {
+        const referenceId = localStorage.getItem('applicationReferenceId');
+        if (referenceId) {
+            dispatch({ type: types.FETCH_FINAL_FORM_DATA_REQUEST, payload: referenceId });
+                    dispatch({ type: types.FETCH_FORM_PROGRESS_REQUEST, payload: referenceId });
 
-    const [formData, setFormData] = useState({
-        lastName: '',
-        firstName: '',
-        middleInitial: '',
-        dob: '',
-        ssn: '',
-        presentAddress: '',
-        presentCity: '',
-        presentState: '',
-        presentZip: '',
-        permanentAddress: '',
-        permanentCity: '',
-        permanentState: '',
-        permanentZip: '',
-        homePhone: '',
-        cellPhone: '',
-        otherPhone: '',
-        email: '',
-        referredBy: '',
+        }
+    }, []);
+    useEffect(() => {
+        if (STEP_PDF_MAP[currentStep]) {
+            readPdfFormFields(STEP_PDF_MAP[currentStep])
+                .then(fields => setPdfFieldData(fields))
+                .catch(() => setPdfFieldData({}));
+        }
+    }, [currentStep]);
 
-        // Contract Position Desired
-        positionRN: false,
-        positionLPN: false,
-        positionCNA: false,
-        positionHHA: false,
-        positionCompanion: false,
-        licenseNumber: '',
-        licenseExpiration: '',
-        dateCanStart: '',
-        contractCompensation: '',
-
-        // Employment Status
-        employedNow: '',
-        mayInquire: '',
-        contractedBefore: '',
-        whenContracted: '',
-        unemployed: '',
-        goingToSchool: '',
-        physicalDisabilities: '',
-        everInjured: '',
-
-        // Emergency Contact
-        emergencyName: '',
-        emergencyRelationship: '',
-        emergencyAddress: '',
-        emergencyPhone: '',
-        emergencyAltPhone: '',
-
-        // Work Availability
-        fullTime: false,
-        partTime: false,
-        days: false,
-        nights: false,
-        liveInWeekdays: false,
-        liveOutWeekdays: false,
-        liveInWeekends: false,
-        liveOutWeekends: false,
-        driversLicense: '',
-        ownCar: '',
-
-        // Languages
-        languageEnglish: false,
-        languageSpanish: false,
-        languageOther: '',
-
-        // Experience
-        expAlzheimers: false,
-        expStroke: false,
-        expCatheter: false,
-        expDementia: false,
-        expHIV: false,
-        expWheelchair: false,
-        expBedridden: false,
-        expLiftingPatients: false,
-        expBrokenHip: false,
-        expBypassSurgery: false,
-        expFeedingTubes: false,
-        expBreathingTreatments: false,
-        expHearingVision: false,
-        expCancer: false,
-        expDiabeticDiet: false,
-        expKosherDiet: false,
-        expLowSaltDiet: false,
-        expDehydration: false,
-        expConstipation: false,
-        expIncontinence: false,
-        expHeartProblems: false,
-
-        // Availability Schedule
-        mondayFrom: '',
-        mondayTo: '',
-        mondayOvernight: '',
-        tuesdayFrom: '',
-        tuesdayTo: '',
-        tuesdayOvernight: '',
-        wednesdayFrom: '',
-        wednesdayTo: '',
-        wednesdayOvernight: '',
-        thursdayFrom: '',
-        thursdayTo: '',
-        thursdayOvernight: '',
-        fridayFrom: '',
-        fridayTo: '',
-        fridayOvernight: '',
-        saturdayFrom: '',
-        saturdayTo: '',
-        saturdayOvernight: '',
-        sundayFrom: '',
-        sundayTo: '',
-        sundayOvernight: '',
-
-        // References
-        reference1Name: '',
-        reference1Address: '',
-        reference1Phone: '',
-        reference1Business: '',
-        reference1YearsKnown: '',
-        reference2Name: '',
-        reference2Address: '',
-        reference2Phone: '',
-        reference2Business: '',
-        reference2YearsKnown: '',
-        reference3Name: '',
-        reference3Address: '',
-        reference3Phone: '',
-        reference3Business: '',
-        reference3YearsKnown: '',
-
-        // Education
-        grammarSchoolName: '',
-        grammarSchoolLocation: '',
-        grammarSchoolYears: '',
-        grammarSchoolGraduated: '',
-        grammarSchoolSubject: '',
-        highSchoolName: '',
-        highSchoolLocation: '',
-        highSchoolYears: '',
-        highSchoolGraduated: '',
-        highSchoolSubject: '',
-        collegeName: '',
-        collegeLocation: '',
-        collegeYears: '',
-        collegeGraduated: '',
-        collegeSubject: '',
-
-        // Additional Education
-        additionalEducation: '',
-
-        // Former Employers
-        employer1From: '',
-        employer1To: '',
-        employer1Name: '',
-        employer1Earnings: '',
-        employer1Position: '',
-        employer1Reason: '',
-        employer2From: '',
-        employer2To: '',
-        employer2Name: '',
-        employer2Earnings: '',
-        employer2Position: '',
-        employer2Reason: '',
-        employer3From: '',
-        employer3To: '',
-        employer3Name: '',
-        employer3Earnings: '',
-        employer3Position: '',
-        employer3Reason: '',
-        employer4From: '',
-        employer4To: '',
-        employer4Name: '',
-        employer4Earnings: '',
-        employer4Position: '',
-        employer4Reason: '',
-        employerTodayDate:today,
-        signatureDate:today,
-        w9SignDate:today,
-        finalAttestDate:today,
-        privacyDate:today,
-        doeaAttestationDate:today,
-        backgroundDate:today
-
-    });
+    // Get signature as base64
+    const getSignatureData = useCallback(() => {
+        const canvas = getActiveCanvasRef().current;
+        if (!canvas) return null;
+        
+        // Check if canvas is actually drawn on (not blank)
+        const ctx = canvas.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const isBlank = !Array.from(imageData.data).some(value => value !== 0);
+        
+        if (isBlank) return null;
+        
+        return canvas.toDataURL('image/png');
+    }, [currentStep]);
+    const clearError = () => {
+        dispatch({ type: types.CLEAR_FINAL_FORM_ERROR });
+    };
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -328,7 +379,65 @@ const FinalApplicationForm2 = ({ }) => {
             [name]: type === 'checkbox' ? checked : value
         });
     };
-
+    useEffect(() => {
+    // Only navigate if:
+    // 1. We submitted a step (submittedStep is not null)
+    // 2. Not currently saving
+    // 3. Save was successful for THIS step
+    if (submittedStep !== null && !savingStep && stepSaveSuccess === STEP_NAME_MAP[submittedStep]) {
+        // Clear the submitted step
+        setSubmittedStep(null);
+        
+        // If this was the last step (step 13), show success and maybe redirect
+        if (submittedStep === steps.length) {
+            alert('Application submitted successfully!');
+            // Optionally redirect to dashboard or applications page
+            // navigate('/applications');
+        } else {
+            // Navigate to next step
+            setCurrentStep(prev => Math.min(prev + 1, steps.length));
+        }
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+}, [savingStep, stepSaveSuccess, submittedStep, steps.length]);
+    const handleSubmit = useCallback((e) => {
+    e.preventDefault();
+    if (savingStep) return;
+    
+    const referenceId = localStorage.getItem('applicationReferenceId');
+    const signatureData = getSignatureData();
+    const stepName = STEP_NAME_MAP[currentStep]; // This will be 'final_bg_auth' for step 13
+    
+    // Filter formData for step 13 fields
+    let formDataToSend = {};
+    const relevantFields = STEP_FIELDS_MAP[currentStep] || [];
+    
+    if (relevantFields.length > 0) {
+        formDataToSend = relevantFields.reduce((obj, field) => {
+            if (formData[field] !== undefined && formData[field] !== '') {
+                obj[field] = formData[field];
+            }
+            return obj;
+        }, {});
+    }
+    
+    console.log(`Final Step ${currentStep}: Submitting ${Object.keys(formDataToSend).length} fields`);
+    
+    setSubmittedStep(currentStep);
+    
+    dispatch({
+        type: types.SAVE_FINAL_FORM_STEP_REQUEST,
+        payload: {
+            stepNumber: currentStep,
+            stepName: stepName,
+            formData: formDataToSend,
+            signatureData,
+            pdfFieldData: null,
+            referenceId,
+        },
+    });
+}, [currentStep, formData, savingStep, dispatch, getSignatureData]);
+const currentFormProgress = formProgress?.['final'] || null;
     return (
         <div className="application-page final-application">
             {/* Header */}
@@ -352,7 +461,7 @@ const FinalApplicationForm2 = ({ }) => {
             {/* Form Content */}
             <div className="form-container">
                 {/* Progress Steps */}
-                <div className="progress-steps">
+                {/* <div className="progress-steps">
                     {steps.map((label, index) => {
                         const stepNumber = index + 1;
 
@@ -368,47 +477,80 @@ const FinalApplicationForm2 = ({ }) => {
                             </div>
                         );
                     })}
+                </div> */}
+                <div className="progress-steps">
+                    {steps.map((label, index) => {
+                        const stepNumber = index + 1;
+                         const status = currentFormProgress?.stepStatuses?.[stepNumber];
+                         console.log(currentFormProgress);
+                         console.log('status comes here:');
+                         console.log(status);
+                        return (
+                            <div
+                                key={stepNumber}
+                                className={`step ${stepNumber === currentStep ? 'active' : ''} ${status === 'complete' ? 'completed' : ''}`}
+                                onClick={() => setCurrentStep(stepNumber)}
+                                role="button"
+                            >
+                                <div className="step-number">
+                                    {status === 'complete' ? '✓' : stepNumber}
+                                </div>
+                                <span className="step-label">{label}</span>
+                            </div>
+                        );
+                    })}
                 </div>
 
-
-
-                {/* Progress Bar */}
+                {/* Step progress bar */}
                 <div className="progress-bar">
-                    <div className="progress-text">
-                        Step {currentStep} of {steps.length}
-                    </div>
-
+                    <div className="progress-text">Step {currentStep} of {steps.length}</div>
                     <div className="progress-track">
                         <div className="progress-fill" style={{ width: `${progressWidth}%` }}></div>
                     </div>
                 </div>
 
                 <p className="required-note"><span className="required">*</span> indicates required fields</p>
+                {/* ✅ Saving loader — visible during API call */}
+                {savingStep && (
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '12px',
+                        background: '#e3f2fd',
+                        borderRadius: '4px',
+                        marginBottom: '10px',
+                        color: '#1565c0',
+                        fontSize: 14,
+                        fontWeight: 500,
+                    }}>
+                        ⏳ Saving, please wait...
+                    </div>
+                )}
 
+                {/* ✅ Error banner — stays visible if save fails */}
+                {error && !savingStep && (
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '12px',
+                        background: '#ffebee',
+                        borderRadius: '4px',
+                        marginBottom: '10px',
+                        color: '#c62828',
+                        fontSize: 14,
+                        fontWeight: 500,
+                    }}>
+                        ❌ Error saving: {typeof error === 'string' ? error : JSON.stringify(error)}. Please try again.
+                    </div>
+                )}
                 <form onSubmit={handleSubmit}>
-{currentStep === 1 && (
-  <div style={{ 
-    height: '100vh', 
-    width: '100%', 
-    backgroundColor: '#ffffff', // White background
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    overflow: 'auto'
-  }}>
-    <iframe
-      src="/forms/section-2-page-1.pdf#toolbar=1&navpanes=1"
-      style={{ 
-        height: '100%', 
-        width: '100%',
-        maxWidth: '1200px', // Limit max width
-        border: 'none',
-        backgroundColor: 'white'
-      }}
-      title="PDF Form"
-    />
-  </div>
-)}
+                    {currentStep === 1 && (
+                        <div style={{ height: '100vh', width: '100%', backgroundColor: '#ffffff', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflow: 'auto' }}>
+                            <iframe
+                                src="/forms/section-2-page-1.pdf#toolbar=1&navpanes=1"
+                                style={{ height: '100%', width: '100%', maxWidth: '1200px', border: 'none', backgroundColor: 'white' }}
+                                title="PDF Form"
+                            />
+                        </div>
+                    )}
 
 
 
@@ -607,7 +749,7 @@ const FinalApplicationForm2 = ({ }) => {
                                                 <label className="section-label" style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold' }}>Signature of<br />U.S. person ▶</label>
                                                 <div className="signature-pad-container" style={{ position: 'relative', border: '2px solid #000', backgroundColor: '#fff', height: '70px' }}>
                                                     <canvas
-                                                        ref={canvasRef}
+                                                        ref={canvasRefs[2]}
                                                         width={700}
                                                         height={70}
                                                         className="signature-canvas"
@@ -1014,7 +1156,7 @@ const FinalApplicationForm2 = ({ }) => {
                                                 boxShadow: 'inset 0 0 5px rgba(0,0,0,0.05)'
                                             }}>
                                                 <canvas
-                                                    ref={canvasRef}
+                                                    ref={canvasRefs[6]}
                                                     width={800}
                                                     height={120}
                                                     style={{ width: '100%', height: '100%', cursor: 'crosshair' }}
@@ -1149,7 +1291,7 @@ const FinalApplicationForm2 = ({ }) => {
 
                                     <div className="signature-pad-container mb-1">
                                         <canvas
-                                            ref={canvasRef}
+                                            ref={canvasRefs[7]}
                                             width={700}
                                             height={120}
                                             className="signature-canvas"
@@ -1398,7 +1540,7 @@ const FinalApplicationForm2 = ({ }) => {
                                 <div className="col-md-7">
                                     <div style={{ position: 'relative', borderBottom: '1px solid #000', backgroundColor: '#fffbe6' }}>
                                         <canvas
-                                            ref={canvasRef}
+                                            ref={canvasRefs[9]}
                                             width={500}
                                             height={80}
                                             className="signature-canvas"
@@ -1766,7 +1908,7 @@ const FinalApplicationForm2 = ({ }) => {
 
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={canvasRef}
+                                                ref={canvasRefs[13]}
                                                 width={1000}
                                                 height={200}
                                                 className="signature-canvas"
@@ -1823,30 +1965,33 @@ const FinalApplicationForm2 = ({ }) => {
                                     />
                                 </div>
                             </div>
-
                         </>
                     )}
                     <div className="form-actions">
                         {currentStep !== 1 && (
-                            <button
-                                type="button"
-                                className="btn-previous"
-                                onClick={onBack}
-                            >
+                            <button type="button" className="btn-previous" onClick={onBack} disabled={savingStep}>
                                 Previous
                             </button>
                         )}
-                        <button type="button" className="btn-save">Save</button>
-                        {currentStep !== steps.length && (
+                        <button type="button" className="btn-save" disabled={savingStep}>Save</button>
+                        {currentStep !== steps.length ? (
                             <button
                                 type="button"
                                 className="btn-next"
                                 onClick={handleNext}
+                                disabled={savingStep}
                             >
-                                Save & Next
+                                {savingStep ? 'Saving...' : 'Save & Next'}
+                            </button>
+                        ) : (
+                            <button
+                                type="submit"
+                                className="btn-next"
+                                disabled={savingStep}
+                            >
+                                {savingStep ? 'Submitting...' : 'Submit'}
                             </button>
                         )}
-
                     </div>
                 </form>
             </div>

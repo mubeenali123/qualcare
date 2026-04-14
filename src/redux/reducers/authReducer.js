@@ -6,6 +6,7 @@ const initialState = {
   role: null,        // 'admin' or 'applicant'
   // Initialize token from a generic key to support both
   token: localStorage.getItem("authToken") || null,
+  referenceId: localStorage.getItem("applicationReferenceId") || null,
   loading: false,
   error: null,
   successMessage: null,
@@ -41,6 +42,7 @@ const authReducer = (state = initialState, action) => {
         loading: false,
         user: action.payload.user,
         token: action.payload.token,
+        referenceId: action.payload.application?.reference_id || null,
         application: action.payload.application, // Store progress (current step, etc.)
         role: 'applicant',
         successMessage: action.payload.message,
@@ -63,6 +65,7 @@ const authReducer = (state = initialState, action) => {
         token: null,
         user: null,
         application: null,
+        referenceId: null,
         role: null
       };
     case types.CHANGE_PASSWORD_REQUEST:

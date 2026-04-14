@@ -15,6 +15,7 @@
     "axios": "^1.13.5",
     "bootstrap": "^5.3.8",
     "jquery": "^4.0.0",
+    "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^3.11.174",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

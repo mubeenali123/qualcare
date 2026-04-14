@@ -44,8 +44,12 @@ function* userLogin(action) {
     const response = yield call(() =>
       axios.post(`${base_url}/applicant/login`, action.payload)
     );
-    const { token } = response.data;
+    const { token, application } = response.data;
     localStorage.setItem("authToken", token); // Store under generic key
+        if (application && application.reference_id) {
+      localStorage.setItem("applicationReferenceId", application.reference_id);
+      console.log('Reference ID stored:', application.reference_id);
+    }
     yield put({ type: types.USER_LOGIN_SUCCESS, payload: response.data });
   } catch (error) {
     yield put({
@@ -71,6 +75,7 @@ function* userLogout() {
   } finally {
     // ALWAYS clean up locally
     localStorage.removeItem("authToken");
+    localStorage.removeItem("applicationReferenceId");
     yield put({ type: types.USER_LOGOUT_SUCCESS });
   }
 }

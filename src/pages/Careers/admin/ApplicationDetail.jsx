@@ -4,6 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { base_url } from '../../../components/config';
 import * as types from '../../../redux/type';
+import FinalApplicationView1 from '../../../components/FinalApplicationView1';
+import FinalApplicationView2 from '../../../components/FinalApplicationView2';
+import FinalApplicationView3 from '../../../components/FinalApplicationView3';
+import FinalApplicationView4 from '../../../components/FinalApplicationView4';
+import FinalApplicationView5 from '../../../components/FinalApplicationView5';
 
 const ApplicationDetail = () => {
   const isExpired = (date) => new Date(date) < new Date();
@@ -42,7 +47,26 @@ const [notePriority, setNotePriority] = useState('medium'); // ADD THIS
   const [activeStep, setActiveStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [applicationData, setApplicationData] = useState(null);
+  const [finalAppData, setFinalAppData] = useState({});
+const [selectedFinalApp, setSelectedFinalApp] = useState(null);
+const [finalAppLoading, setFinalAppLoading] = useState(false);
 const statusLogs = useSelector(state => state.applicationReducer?.statusLogs || []);
+const fetchFinalApplicationData = async (formType) => {
+  setFinalAppLoading(true);
+  try {
+    const referenceId = applicationData?.details?.reference_id;
+    if (!referenceId) return;
+    
+    const response = await axios.get(`${base_url}/applications-final-data/${referenceId}`);
+    setFinalAppData(response.data);
+    setSelectedFinalApp(formType);
+  } catch (error) {
+    console.error('Error fetching final application data:', error);
+  } finally {
+    setFinalAppLoading(false);
+  }
+};
+
 
 useEffect(() => {
   if (viewMode === 'logs') {
@@ -135,10 +159,17 @@ const getPriorityIcon = (priority) => {
     }
   };
 
-  const handleFinalApplicationClick = (formNumber) => {
-    console.log(`Opening Final Application ${formNumber}`);
-    // TODO: Add logic to open/view specific final application form
+// Update handleFinalApplicationClick
+const handleFinalApplicationClick = (formNumber) => {
+  const formTypeMap = {
+    1: 'final',
+    2: 'final_2',
+    3: 'final_3',
+    4: 'final_4',
+    5: 'final_5',
   };
+  fetchFinalApplicationData(formTypeMap[formNumber]);
+};
 
   if (loading) {
     return (
@@ -1161,31 +1192,64 @@ const getStatusBadgeClass = (status) => {
       )}
 
       {/* FINAL APPLICATION VIEW */}
-      {viewMode === 'final' && (
-        <div className="final-application-section">
-          <h2 className="section-title">Final Application Forms</h2>
-          <p className="section-description">Select a final application form to view</p>
-
-          <div className="final-app-buttons">
-            {[1, 2, 3, 4, 5, 6].map((num) => (
-              <button
-                key={num}
-                className="final-app-button"
-                onClick={() => handleFinalApplicationClick(num)}
-              >
-                <div className="button-icon">
-                  <i className="fas fa-file-contract"></i>
-                </div>
-                <div className="button-content">
-                  <h3>Final Application {num}</h3>
-                  <p>View form details</p>
-                </div>
-                <i className="fas fa-chevron-right"></i>
-              </button>
-            ))}
-          </div>
+{/* FINAL APPLICATION VIEW */}
+{viewMode === 'final' && (
+  <div className="final-application-section">
+    {!selectedFinalApp ? (
+      <>
+        <h2 className="section-title">Final Application Forms</h2>
+        <p className="section-description">Select a final application form to view</p>
+        <div className="final-app-buttons">
+          {[1, 2, 3, 4, 5].map((num) => (
+            <button
+              key={num}
+              className="final-app-button"
+              onClick={() => handleFinalApplicationClick(num)}
+            >
+              <div className="button-icon">
+                <i className="fas fa-file-contract"></i>
+              </div>
+              <div className="button-content">
+                <h3>Final Application {num}</h3>
+                <p>View form details</p>
+              </div>
+              <i className="fas fa-chevron-right"></i>
+            </button>
+          ))}
         </div>
-      )}
+      </>
+    ) : (
+      <>
+        <button 
+          className="btn-back mb-3" 
+          onClick={() => setSelectedFinalApp(null)}
+          style={{ background: 'none', border: 'none', color: '#4361ee', cursor: 'pointer' }}
+        >
+          <i className="fas fa-arrow-left"></i> Back to Final Applications
+        </button>
+        {finalAppLoading ? (
+          <div className="text-center p-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3">Loading application data...</p>
+          </div>
+        ) : (
+          <>
+            {selectedFinalApp === 'final' && <FinalApplicationView1 data={finalAppData} />}
+           {selectedFinalApp === 'final_2' && <FinalApplicationView2 data={finalAppData} />}
+           {selectedFinalApp === 'final_3' && <FinalApplicationView3 data={finalAppData} />}
+           {selectedFinalApp === 'final_4' && <FinalApplicationView4 data={finalAppData} />}
+{selectedFinalApp === 'final_5' && <FinalApplicationView5 data={finalAppData} />}
+
+
+
+          </>
+        )}
+      </>
+    )}
+  </div>
+)}
 
 {viewMode === 'notes' && (
   <div className="notes-section">

@@ -14,6 +14,11 @@ const initialState = {
   // Admin Data
   applications: [],
   dashboardStats: null,
+  finalFormData: {},        // keyed by step_name
+  formProgress: null,       // { completedSteps, totalSteps, percentage, stepStatuses }
+  currentFinalStep: 1,
+  savingStep: false,
+  stepSaveSuccess: null,
   loading: false,
   error: null,
 };
@@ -195,26 +200,83 @@ const applicationReducer = (state = initialState, action) => {
         loading: false,
         error: action.payload,
       };
-      case types.FETCH_DASHBOARD_STATS_REQUEST:
-  return {
-    ...state,
-    loading: true,
-    error: null,
-  };
+    case types.FETCH_DASHBOARD_STATS_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
 
-case types.FETCH_DASHBOARD_STATS_SUCCESS:
-  return {
-    ...state,
-    loading: false,
-    dashboardStats: action.payload,
-  };
+    case types.FETCH_DASHBOARD_STATS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        dashboardStats: action.payload,
+      };
 
-case types.FETCH_DASHBOARD_STATS_FAILURE:
-  return {
-    ...state,
-    loading: false,
-    error: action.payload,
-  };
+    case types.FETCH_DASHBOARD_STATS_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+    case types.SAVE_FINAL_FORM_STEP_REQUEST:
+      return {
+        ...state,
+        savingStep: true,
+        stepSaveSuccess: null,
+        error: null,
+      };
+
+    case types.SAVE_FINAL_FORM_STEP_SUCCESS:
+      return {
+        ...state,
+        savingStep: false,
+        stepSaveSuccess: action.payload.stepName,
+        finalFormData: {
+          ...state.finalFormData,
+          [action.payload.stepName]: action.payload.data,
+        },
+        formProgress: action.payload.progress || state.formProgress,
+      };
+
+    case types.SAVE_FINAL_FORM_STEP_FAILURE:
+      return {
+        ...state,
+        savingStep: false,
+        error: action.payload,
+      };
+    case types.FETCH_FORM_PROGRESS_REQUEST:
+      return { ...state, loading: true };
+
+    case types.FETCH_FORM_PROGRESS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        formProgress: action.payload,
+      };
+
+    case types.FETCH_FORM_PROGRESS_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+
+    case types.FETCH_FINAL_FORM_DATA_REQUEST:
+      return { ...state, loading: true };
+
+    case types.FETCH_FINAL_FORM_DATA_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        finalFormData: action.payload,
+      };
+
+    case types.FETCH_FINAL_FORM_DATA_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+    case types.CLEAR_FINAL_FORM_ERROR:
+      return {
+        ...state,
+        error: null,
+        stepSaveSuccess: null,
+      };
     default:
       return state;
   }

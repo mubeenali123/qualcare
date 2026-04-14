@@ -1,7 +1,90 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+
 import './ApplicationForm.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-const FinalApplicationForm = ({ }) => {
+import { useDispatch, useSelector } from 'react-redux';
+import * as types from '../../redux/type';
+const STEP_NAME_MAP = {
+    1: 'hr_checklist',
+    2: 'employee_application_part1',
+    3: 'employee_application_part2',
+    4: 'reference_check',
+    5: 'paycheck_policy',
+    6: 'disciplinary_action',
+    7: 'safety_policy',
+    8: 'patient_abandonment',
+    9: 'confidentiality_statement',
+    10: 'contractor_agreement',
+    11: 'non_discrimination',
+    12: 'health_questionnaire',
+    13: 'infection_control',
+    14: 'policy_statement',
+};
+
+// Fields mapping for each step
+const STEP_FIELDS_MAP = {
+    1: ['hr_contractor_name', 'hr_role_RN', 'hr_role_LPN', 'hr_role_CNA', 'hr_role_HHA',
+        'hr_doc_0', 'hr_doc_1', 'hr_doc_2', 'hr_doc_3', 'hr_doc_4', 'hr_doc_5', 'hr_doc_6',
+        'hr_doc_7', 'hr_doc_8', 'hr_doc_9', 'hr_doc_10', 'hr_doc_11', 'hr_doc_12',
+        'hr_inservice_0', 'hr_inservice_1', 'hr_inservice_2', 'hr_inservice_3', 'hr_inservice_4',
+        'hr_inservice_5', 'hr_inservice_6', 'hr_inservice_7', 'hr_inservice_8', 'hr_inservice_9',
+        'hr_inservice_10', 'hr_inservice_11', 'hr_inservice_12', 'hr_inservice_13'],
+    
+    2: ['lastName', 'firstName', 'dob', 'ssn', 'presentAddress', 'presentCity', 'presentState', 'presentZip',
+        'permanentAddress', 'permanentCity', 'permanentState', 'permanentZip', 'homePhone', 'cellPhone',
+        'otherPhone', 'email', 'referredBy', 'positionRN', 'positionLPN', 'positionCNA', 'positionHHA',
+        'positionCompanion', 'dateCanStart', 'contractCompensation', 'licenseNumber', 'licenseExpiration',
+        'employedNow', 'mayInquire', 'contractedBefore', 'whenContracted', 'unemployed', 'goingToSchool',
+        'languageEnglish', 'languageSpanish', 'languageOther', 'emergencyName', 'emergencyRelationship',
+        'emergencyAddress', 'emergencyPhone', 'emergencyAltPhone'],
+    
+    3: ['expAlzheimers', 'expStroke', 'expCatheter', 'expDementia', 'expHIV', 'expWheelchair',
+        'expBedridden', 'expLiftingPatients', 'expBrokenHip', 'expBypassSurgery', 'expFeedingTubes',
+        'expBreathingTreatments', 'expHearingVision', 'expCancer', 'expDiabeticDiet', 'expKosherDiet',
+        'expLowSaltDiet', 'expDehydration', 'expConstipation', 'expIncontinence', 'expHeartProblems',
+        'liveInWeekdays', 'liveOutWeekdays', 'liveInWeekends', 'liveOutWeekends', 'driversLicense',
+        'ownCar', 'fullTime', 'partTime', 'days', 'nights', 'ref1Name', 'ref1Address', 'ref1Phone',
+        'ref1Business', 'ref1Years', 'ref2Name', 'ref2Address', 'ref2Phone', 'ref2Business', 'ref2Years',
+        'ref3Name', 'ref3Address', 'ref3Phone', 'ref3Business', 'ref3Years', 'grammarSchoolName',
+        'grammarSchoolLocation', 'grammarSchoolYears', 'grammarSchoolGraduated', 'grammarSchoolSubject',
+        'highSchoolName', 'highSchoolLocation', 'highSchoolYears', 'highSchoolGraduated', 'highSchoolSubject',
+        'collegeName', 'collegeLocation', 'collegeYears', 'collegeGraduated', 'collegeSubject',
+        'additionalEdu1', 'additionalEdu2', 'additionalEdu3', 'additionalEdu4', 'additionalEdu5',
+        'employer0From', 'employer0To', 'employer0Name', 'employer0Earnings', 'employer0Position', 'employer0Reason',
+        'employer1From', 'employer1To', 'employer1Name', 'employer1Earnings', 'employer1Position', 'employer1Reason',
+        'employer2From', 'employer2To', 'employer2Name', 'employer2Earnings', 'employer2Position', 'employer2Reason',
+        'employer3From', 'employer3To', 'employer3Name', 'employer3Earnings', 'employer3Position', 'employer3Reason',
+        'authDate', 'authSignature', 'authPrintName', 'mondayFrom', 'mondayTo', 'mondayOvernight',
+        'tuesdayFrom', 'tuesdayTo', 'tuesdayOvernight', 'wednesdayFrom', 'wednesdayTo', 'wednesdayOvernight',
+        'thursdayFrom', 'thursdayTo', 'thursdayOvernight', 'fridayFrom', 'fridayTo', 'fridayOvernight',
+        'saturdayFrom', 'saturdayTo', 'saturdayOvernight', 'sundayFrom', 'sundayTo', 'sundayOvernight'],
+    
+    4: ['lastManager', 'referenceDate', 'organization', 'address', 'phone', 'fax', 'positionApplied',
+        'lengthFrom', 'lengthTo', 'rn', 'reasonLeaving', 'eligibleRehire', 'abilityFollowInstructions',
+        'professionalDress', 'willingnessResponsibility', 'skillsProficiency', 'overallPerformance',
+        'reliabilityAttendance', 'teamwork', 'qualityOfWork', 'jobKnowledge', 'additionalComments',
+        'printName', 'dateSignature', 'positionTitle'],
+    
+    5: ['paycheckPreference', 'paycheckMailName', 'paycheckMailAddress', 'paycheckMailCity', 'paycheckMailZip',
+        'acknowledgementName', 'paycheckPolicyTitle', 'paycheckPolicyDate'],
+    
+    6: ['disciplinaryTitle', 'disciplinaryDate'],
+    7: ['safetyPolicyTitle', 'safetyPolicyDate'],
+    8: ['dressCodeTitle', 'dressCodeDate'],
+    9: ['confidentialityStatementDate'],
+    10: ['contractorAgreementDate'],
+    11: ['nonDiscriminationDate'],
+    12: ['contractorNameHealth', 'contractorSSN', 'healthHeight', 'healthWeight', 'healthTitle', 'healthDate'],
+    13: ['infectionControlTitle', 'infectionControlDate'],
+    14: ['policyTitle', 'policyDate'],
+};
+const FinalApplicationForm = ({ formType = 'final_5' }) => {
+        const dispatch = useDispatch();
+    const { savingStep, stepSaveSuccess, formProgress, error } = useSelector(
+        state => state.applicationReducer
+    );
+    
+    const [submittedStep, setSubmittedStep] = useState(null);
 const today = new Date().toISOString().split("T")[0];
     const steps = [
         "HR Folder Checklist",
@@ -22,16 +105,126 @@ const today = new Date().toISOString().split("T")[0];
 
     const [currentStep, setCurrentStep] = useState(1);
     const [isDrawing, setIsDrawing] = useState(false);
-    const canvasRef = useRef(null);
-    const policyCanvasRef = useRef(null);
-    const healthCanvasRef = useRef(null);
+        const signatureRef = useRef(null);
+    const healthSignatureRef = useRef(null);
+    const policySignatureRef = useRef(null);
+    
     const progressWidth = (currentStep / steps.length) * 100;
+    
+    // Get current form progress for this form type
+    const currentFormProgress = formProgress?.[formType] || null;
+    const [formData, setFormData] = useState({
+        // Step 1: HR Checklist
+        hr_contractor_name: '',
+        hr_role_RN: false,
+        hr_role_LPN: false,
+        hr_role_CNA: false,
+        hr_role_HHA: false,
+        // Dynamic fields for docs and in-services will be handled via the mapping
+        
+        // Step 2-3: Employee Application fields
+        lastName: '', firstName: '', dob: '', ssn: '', presentAddress: '', presentCity: '', presentState: '', presentZip: '',
+        permanentAddress: '', permanentCity: '', permanentState: '', permanentZip: '', homePhone: '', cellPhone: '',
+        otherPhone: '', email: '', referredBy: '', positionRN: false, positionLPN: false, positionCNA: false,
+        positionHHA: false, positionCompanion: false, dateCanStart: '', contractCompensation: '', licenseNumber: '',
+        licenseExpiration: '', employedNow: '', mayInquire: '', contractedBefore: '', whenContracted: '', unemployed: '',
+        goingToSchool: '', languageEnglish: false, languageSpanish: false, languageOther: false, emergencyName: '',
+        emergencyRelationship: '', emergencyAddress: '', emergencyPhone: '', emergencyAltPhone: '',
+        
+        // Experience and availability fields
+        expAlzheimers: false, expStroke: false, expCatheter: false, expDementia: false, expHIV: false,
+        expWheelchair: false, expBedridden: false, expLiftingPatients: false, expBrokenHip: false,
+        expBypassSurgery: false, expFeedingTubes: false, expBreathingTreatments: false, expHearingVision: false,
+        expCancer: false, expDiabeticDiet: false, expKosherDiet: false, expLowSaltDiet: false, expDehydration: false,
+        expConstipation: false, expIncontinence: false, expHeartProblems: false,
+        liveInWeekdays: false, liveOutWeekdays: false, liveInWeekends: false, liveOutWeekends: false,
+        driversLicense: '', ownCar: '', fullTime: false, partTime: false, days: false, nights: false,
+        
+        // References
+        ref1Name: '', ref1Address: '', ref1Phone: '', ref1Business: '', ref1Years: '',
+        ref2Name: '', ref2Address: '', ref2Phone: '', ref2Business: '', ref2Years: '',
+        ref3Name: '', ref3Address: '', ref3Phone: '', ref3Business: '', ref3Years: '',
+        
+        // Education
+        grammarSchoolName: '', grammarSchoolLocation: '', grammarSchoolYears: '', grammarSchoolGraduated: '', grammarSchoolSubject: '',
+        highSchoolName: '', highSchoolLocation: '', highSchoolYears: '', highSchoolGraduated: '', highSchoolSubject: '',
+        collegeName: '', collegeLocation: '', collegeYears: '', collegeGraduated: '', collegeSubject: '',
+        additionalEdu1: '', additionalEdu2: '', additionalEdu3: '', additionalEdu4: '', additionalEdu5: '',
+        
+        // Employers
+        employer0From: '', employer0To: '', employer0Name: '', employer0Earnings: '', employer0Position: '', employer0Reason: '',
+        employer1From: '', employer1To: '', employer1Name: '', employer1Earnings: '', employer1Position: '', employer1Reason: '',
+        employer2From: '', employer2To: '', employer2Name: '', employer2Earnings: '', employer2Position: '', employer2Reason: '',
+        employer3From: '', employer3To: '', employer3Name: '', employer3Earnings: '', employer3Position: '', employer3Reason: '',
+        
+        // Authorization
+        authDate: today, authSignature: '', authPrintName: '',
+        
+        // Availability Schedule
+        mondayFrom: '', mondayTo: '', mondayOvernight: '', tuesdayFrom: '', tuesdayTo: '', tuesdayOvernight: '',
+        wednesdayFrom: '', wednesdayTo: '', wednesdayOvernight: '', thursdayFrom: '', thursdayTo: '', thursdayOvernight: '',
+        fridayFrom: '', fridayTo: '', fridayOvernight: '', saturdayFrom: '', saturdayTo: '', saturdayOvernight: '',
+        sundayFrom: '', sundayTo: '', sundayOvernight: '',
+        
+        // Step 4: Reference Check
+        lastManager: '', referenceDate: today, organization: '', address: '', phone: '', fax: '', positionApplied: '',
+        lengthFrom: '', lengthTo: '', rn: '', reasonLeaving: '', eligibleRehire: '',
+        abilityFollowInstructions: '', professionalDress: '', willingnessResponsibility: '', skillsProficiency: '',
+        overallPerformance: '', reliabilityAttendance: '', teamwork: '', qualityOfWork: '', jobKnowledge: '',
+        additionalComments: '', printName: '', dateSignature: today, positionTitle: '',
+        
+        // Step 5: Paycheck Policy
+        paycheckPreference: '', paycheckMailName: '', paycheckMailAddress: '', paycheckMailCity: '', paycheckMailZip: '',
+        acknowledgementName: '', paycheckPolicyTitle: '', paycheckPolicyDate: today,
+        
+        // Step 6: Disciplinary Action
+        disciplinaryTitle: '', disciplinaryDate: today,
+        
+        // Step 7: Safety Policy
+        safetyPolicyTitle: '', safetyPolicyDate: today,
+        
+        // Step 8: Patient Abandonment / Dress Code
+        dressCodeTitle: '', dressCodeDate: today,
+        
+        // Step 9: Confidentiality Statement
+        confidentialityStatementDate: today,
+        
+        // Step 10: Contractor Agreement
+        contractorAgreementDate: today,
+        
+        // Step 11: Non-Discrimination
+        nonDiscriminationDate: today,
+        
+        // Step 12: Health Questionnaire
+        contractorNameHealth: '', contractorSSN: '', healthHeight: '', healthWeight: '', healthTitle: '', healthDate: today,
+        
+        // Step 13: Infection Control
+        infectionControlTitle: '', infectionControlDate: today,
+        
+        // Step 14: Policy Statement
+        policyTitle: '', policyDate: today,
+    });
+    useEffect(() => {
+        if (submittedStep !== null && !savingStep && stepSaveSuccess === STEP_NAME_MAP[submittedStep]) {
+            setSubmittedStep(null);
+            if (submittedStep === steps.length) {
+                alert('Application submitted successfully!');
+            } else {
+                setCurrentStep(prev => Math.min(prev + 1, steps.length));
+            }
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    }, [savingStep, stepSaveSuccess, submittedStep, steps.length]);
+
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     }, [currentStep]);
 
     const goToStep = (step) => {
         if (step < 1 || step > steps.length) return;
+        if (error) {
+            dispatch({ type: types.CLEAR_FINAL_FORM_ERROR });
+        }
         setCurrentStep(step);
     };
 
@@ -42,38 +235,142 @@ const today = new Date().toISOString().split("T")[0];
             behavior: "smooth"
         });
     };
-    const handleNext = (e) => {
+    const handleNext = useCallback((e) => {
         e.preventDefault();
-        console.log('Form Data:', formData);
-        onNext();
-    };
-    const handleSubmit = (e) => {
+        if (savingStep) return;
+        
+        const referenceId = localStorage.getItem('applicationReferenceId');
+        const stepName = STEP_NAME_MAP[currentStep];
+        const stepNumber = currentStep;
+        
+        // Filter formData to ONLY include fields for this step
+        let formDataToSend = {};
+        const relevantFields = STEP_FIELDS_MAP[currentStep] || [];
+        
+        if (relevantFields.length > 0) {
+            formDataToSend = relevantFields.reduce((obj, field) => {
+                if (formData[field] !== undefined && formData[field] !== '') {
+                    obj[field] = formData[field];
+                }
+                return obj;
+            }, {});
+        }
+        
+        // Get signature for steps that need it
+        let signatureData = null;
+        if ([4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].includes(currentStep)) {
+            let activeRef = signatureRef;
+            if (currentStep === 12) activeRef = healthSignatureRef;
+            if (currentStep === 14) activeRef = policySignatureRef;
+            signatureData = getSignatureData(activeRef);
+        }
+        
+        console.log(`Step ${currentStep}: Sending ${Object.keys(formDataToSend).length} fields`);
+        
+        setSubmittedStep(currentStep);
+        
+        dispatch({
+            type: types.SAVE_FINAL_FORM_STEP_REQUEST,
+            payload: {
+                stepNumber: stepNumber,
+                stepName: stepName,
+                formData: formDataToSend,
+                signatureData: signatureData,
+                pdfFieldData: null,
+                referenceId: referenceId,
+            },
+        });
+    }, [currentStep, formData, savingStep, dispatch]);
+    const handleSubmit = useCallback((e) => {
         e.preventDefault();
-        alert('Form Submitted')
-    };
+        if (savingStep) return;
+        
+        const referenceId = localStorage.getItem('applicationReferenceId');
+        const stepName = STEP_NAME_MAP[currentStep];
+        const stepNumber = currentStep;
+        
+        let formDataToSend = {};
+        const relevantFields = STEP_FIELDS_MAP[currentStep] || [];
+        
+        if (relevantFields.length > 0) {
+            formDataToSend = relevantFields.reduce((obj, field) => {
+                if (formData[field] !== undefined && formData[field] !== '') {
+                    obj[field] = formData[field];
+                }
+                return obj;
+            }, {});
+        }
+        
+        const signatureData = getSignatureData(policySignatureRef);
+        
+        setSubmittedStep(currentStep);
+        
+        dispatch({
+            type: types.SAVE_FINAL_FORM_STEP_REQUEST,
+            payload: {
+                stepNumber: stepNumber,
+                stepName: stepName,
+                formData: formDataToSend,
+                signatureData: signatureData,
+                pdfFieldData: null,
+                referenceId: referenceId,
+            },
+        });
+    }, [currentStep, formData, savingStep, dispatch]);
     const onBack = () => {
+        if (error) {
+            dispatch({ type: types.CLEAR_FINAL_FORM_ERROR });
+        }
         setCurrentStep(prev => Math.max(prev - 1, 1));
     };
-    const startDrawing = (e) => setIsDrawing(true);
-    const stopDrawing = (e) => setIsDrawing(false);
-    const draw = (e) => {
+        const getCanvasRefForStep = () => {
+        if (currentStep === 12) return healthSignatureRef;
+        if (currentStep === 14) return policySignatureRef;
+        return signatureRef;
+    };
+      const getSignatureData = (canvasRef) => {
+        const canvas = canvasRef?.current;
+        if (!canvas) return null;
+        
+        const ctx = canvas.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const isBlank = !Array.from(imageData.data).some(value => value !== 0);
+        
+        if (isBlank) return null;
+        return canvas.toDataURL('image/png');
+    };
+        const startDrawing = (e, canvasRef) => {
+        setIsDrawing(true);
+        const canvas = canvasRef?.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
+        const y = e.clientY ? e.clientY - rect.top : e.touches[0].clientY - rect.top;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    };
+    const stopDrawing = () => setIsDrawing(false);
+    const draw = (e, canvasRef) => {
         if (!isDrawing) return;
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
+        const canvas = canvasRef?.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
         const y = e.clientY ? e.clientY - rect.top : e.touches[0].clientY - rect.top;
         ctx.lineWidth = 2;
-        ctx.lineCap = "round";
-        ctx.strokeStyle = "black";
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'black';
         ctx.lineTo(x, y);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(x, y);
     };
-    const clearSignature = () => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
+    const clearSignature = (canvasRef) => {
+        const canvas = canvasRef?.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
     const capitalizeLabelsInFinalApplication = () => {
@@ -130,203 +427,13 @@ const today = new Date().toISOString().split("T")[0];
         capitalizeLabelsInFinalApplication();
     }, []);
 
-    const [formData, setFormData] = useState({
-        lastName: '',
-        firstName: '',
-        middleInitial: '',
-        dob: '',
-        ssn: '',
-        presentAddress: '',
-        presentCity: '',
-        presentState: '',
-        presentZip: '',
-        permanentAddress: '',
-        permanentCity: '',
-        permanentState: '',
-        permanentZip: '',
-        homePhone: '',
-        cellPhone: '',
-        otherPhone: '',
-        email: '',
-        referredBy: '',
-
-        // Contract Position Desired
-        positionRN: false,
-        positionLPN: false,
-        positionCNA: false,
-        positionHHA: false,
-        positionCompanion: false,
-        licenseNumber: '',
-        licenseExpiration: '',
-        dateCanStart: '',
-        contractCompensation: '',
-
-        // Employment Status
-        employedNow: '',
-        mayInquire: '',
-        contractedBefore: '',
-        whenContracted: '',
-        unemployed: '',
-        goingToSchool: '',
-        physicalDisabilities: '',
-        everInjured: '',
-
-        // Emergency Contact
-        emergencyName: '',
-        emergencyRelationship: '',
-        emergencyAddress: '',
-        emergencyPhone: '',
-        emergencyAltPhone: '',
-
-        // Work Availability
-        fullTime: false,
-        partTime: false,
-        days: false,
-        nights: false,
-        liveInWeekdays: false,
-        liveOutWeekdays: false,
-        liveInWeekends: false,
-        liveOutWeekends: false,
-        driversLicense: '',
-        ownCar: '',
-
-        // Languages
-        languageEnglish: false,
-        languageSpanish: false,
-        languageOther: '',
-
-        // Experience
-        expAlzheimers: false,
-        expStroke: false,
-        expCatheter: false,
-        expDementia: false,
-        expHIV: false,
-        expWheelchair: false,
-        expBedridden: false,
-        expLiftingPatients: false,
-        expBrokenHip: false,
-        expBypassSurgery: false,
-        expFeedingTubes: false,
-        expBreathingTreatments: false,
-        expHearingVision: false,
-        expCancer: false,
-        expDiabeticDiet: false,
-        expKosherDiet: false,
-        expLowSaltDiet: false,
-        expDehydration: false,
-        expConstipation: false,
-        expIncontinence: false,
-        expHeartProblems: false,
-
-        // Availability Schedule
-        mondayFrom: '',
-        mondayTo: '',
-        mondayOvernight: '',
-        tuesdayFrom: '',
-        tuesdayTo: '',
-        tuesdayOvernight: '',
-        wednesdayFrom: '',
-        wednesdayTo: '',
-        wednesdayOvernight: '',
-        thursdayFrom: '',
-        thursdayTo: '',
-        thursdayOvernight: '',
-        fridayFrom: '',
-        fridayTo: '',
-        fridayOvernight: '',
-        saturdayFrom: '',
-        saturdayTo: '',
-        saturdayOvernight: '',
-        sundayFrom: '',
-        sundayTo: '',
-        sundayOvernight: '',
-
-        // References
-        reference1Name: '',
-        reference1Address: '',
-        reference1Phone: '',
-        reference1Business: '',
-        reference1YearsKnown: '',
-        reference2Name: '',
-        reference2Address: '',
-        reference2Phone: '',
-        reference2Business: '',
-        reference2YearsKnown: '',
-        reference3Name: '',
-        reference3Address: '',
-        reference3Phone: '',
-        reference3Business: '',
-        reference3YearsKnown: '',
-
-        // Education
-        grammarSchoolName: '',
-        grammarSchoolLocation: '',
-        grammarSchoolYears: '',
-        grammarSchoolGraduated: '',
-        grammarSchoolSubject: '',
-        highSchoolName: '',
-        highSchoolLocation: '',
-        highSchoolYears: '',
-        highSchoolGraduated: '',
-        highSchoolSubject: '',
-        collegeName: '',
-        collegeLocation: '',
-        collegeYears: '',
-        collegeGraduated: '',
-        collegeSubject: '',
-
-        // Additional Education
-        additionalEducation: '',
-
-        // Former Employers
-        employer1From: '',
-        employer1To: '',
-        employer1Name: '',
-        employer1Earnings: '',
-        employer1Position: '',
-        employer1Reason: '',
-        employer2From: '',
-        employer2To: '',
-        employer2Name: '',
-        employer2Earnings: '',
-        employer2Position: '',
-        employer2Reason: '',
-        employer3From: '',
-        employer3To: '',
-        employer3Name: '',
-        employer3Earnings: '',
-        employer3Position: '',
-        employer3Reason: '',
-        employer4From: '',
-        employer4To: '',
-        employer4Name: '',
-        employer4Earnings: '',
-        employer4Position: '',
-        employer4Reason: '',
-        dateSignature:today,
-        authDate:today,
-        paycheckPolicyDate:today,
-        referenceDate:today,
-        disciplinaryDate:today,
-        safetyPolicyDate:today,
-        dressCodeDate:today,
-        confidentialityStatementDate:today,
-        contractorAgreementDate:today,
-        nonDiscriminationDate:today,
-        healthDate:today,
-        infectionControlDate:today,
-        policyDate:today
-
-
-
-    });
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData({
-            ...formData,
+        setFormData(prev => ({
+            ...prev,
             [name]: type === 'checkbox' ? checked : value
-        });
+        }));
     };
 
 
@@ -355,39 +462,67 @@ const today = new Date().toISOString().split("T")[0];
             {/* Form Content */}
             <div className="form-container">
                 {/* Progress Steps */}
-<div className="progress-steps">
-  {steps.map((label, index) => {
-    const stepNumber = index + 1;
-
-    return (
-      <div
-        key={stepNumber}
-        className={`step ${stepNumber === currentStep ? "active" : ""}`}
-        onClick={() => setCurrentStep(stepNumber)}
-        role="button"
-      >
-        <div className="step-number">{stepNumber}</div>
-        <span className="step-label">{label}</span>
-      </div>
-    );
-  })}
-</div>
+                <div className="progress-steps">
+                    {steps.map((label, index) => {
+                        const stepNumber = index + 1;
+                        const status = currentFormProgress?.stepStatuses?.[stepNumber];
+                        return (
+                            <div
+                                key={stepNumber}
+                                className={`step ${stepNumber === currentStep ? 'active' : ''} ${status === 'complete' ? 'completed' : ''}`}
+                                onClick={() => goToStep(stepNumber)}
+                                role="button"
+                            >
+                                <div className="step-number">
+                                    {status === 'complete' ? '✓' : stepNumber}
+                                </div>
+                                <span className="step-label">{label}</span>
+                            </div>
+                        );
+                    })}
+                </div>
 
 
 
                 {/* Progress Bar */}
-                <div className="progress-bar">
-                    <div className="progress-text">
-                        Step {currentStep} of {steps.length}
-                    </div>
-
+<div className="progress-bar">
+                    <div className="progress-text">Step {currentStep} of {steps.length}</div>
                     <div className="progress-track">
                         <div className="progress-fill" style={{ width: `${progressWidth}%` }}></div>
                     </div>
                 </div>
 
                 <p className="required-note"><span className="required">*</span> indicates required fields</p>
+                {savingStep && (
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '12px',
+                        background: '#e3f2fd',
+                        borderRadius: '4px',
+                        marginBottom: '10px',
+                        color: '#1565c0',
+                        fontSize: 14,
+                        fontWeight: 500,
+                    }}>
+                        ⏳ Saving, please wait...
+                    </div>
+                )}
 
+                {/* Error banner */}
+                {error && !savingStep && (
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '12px',
+                        background: '#ffebee',
+                        borderRadius: '4px',
+                        marginBottom: '10px',
+                        color: '#c62828',
+                        fontSize: 14,
+                        fontWeight: 500,
+                    }}>
+                        ❌ Error saving: {typeof error === 'string' ? error : JSON.stringify(error)}. Please try again.
+                    </div>
+                )}
                 <form onSubmit={handleSubmit}>
 {currentStep === 1 && (
     <>
@@ -1893,12 +2028,12 @@ const today = new Date().toISOString().split("T")[0];
                                         <label className="section-label">Applicant’s Signature <span className="required">*</span></label>
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={canvasRef}
+                                                ref={signatureRef}
                                                 width={500}
                                                 height={200}
                                                 className="signature-canvas"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
+                                                onMouseDown={(e) => startDrawing(e, signatureRef)}
+                                                onMouseMove={(e) => draw(e, signatureRef)}
                                                 onMouseUp={stopDrawing}
                                                 onMouseLeave={stopDrawing}
                                                 onTouchStart={startDrawing}
@@ -2183,12 +2318,12 @@ const today = new Date().toISOString().split("T")[0];
                                         <label className="section-label">Signature <span className="required">*</span></label>
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={canvasRef}
+                                                ref={signatureRef}
                                                 width={500}
                                                 height={200}
                                                 className="signature-canvas"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
+                                                onMouseDown={(e) => startDrawing(e, signatureRef)}
+                                                onMouseMove={(e) => draw(e, signatureRef)}
                                                 onMouseUp={stopDrawing}
                                                 onMouseLeave={stopDrawing}
                                                 onTouchStart={startDrawing}
@@ -2258,12 +2393,12 @@ const today = new Date().toISOString().split("T")[0];
                                         <label className="section-label">Signature <span className="required">*</span></label>
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={canvasRef}
+                                                ref={signatureRef}
                                                 width={500}
                                                 height={200}
                                                 className="signature-canvas"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
+                                                onMouseDown={(e) => startDrawing(e, signatureRef)}
+                                                onMouseMove={(e) => draw(e, signatureRef)}
                                                 onMouseUp={stopDrawing}
                                                 onMouseLeave={stopDrawing}
                                                 onTouchStart={startDrawing}
@@ -2371,12 +2506,12 @@ const today = new Date().toISOString().split("T")[0];
                                         <label className="section-label">Signature <span className="required">*</span></label>
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={canvasRef}
+                                                ref={signatureRef}
                                                 width={500}
                                                 height={200}
                                                 className="signature-canvas"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
+                                                onMouseDown={(e) => startDrawing(e, signatureRef)}
+                                                onMouseMove={(e) => draw(e, signatureRef)}
                                                 onMouseUp={stopDrawing}
                                                 onMouseLeave={stopDrawing}
                                                 onTouchStart={startDrawing}
@@ -2489,12 +2624,12 @@ const today = new Date().toISOString().split("T")[0];
                                         <label className="section-label">Signature <span className="required">*</span></label>
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={canvasRef}
+                                                ref={signatureRef}
                                                 width={500}
                                                 height={200}
                                                 className="signature-canvas"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
+                                                onMouseDown={(e) => startDrawing(e, signatureRef)}
+                                                onMouseMove={(e) => draw(e, signatureRef)}
                                                 onMouseUp={stopDrawing}
                                                 onMouseLeave={stopDrawing}
                                                 onTouchStart={startDrawing}
@@ -2557,12 +2692,12 @@ const today = new Date().toISOString().split("T")[0];
                                         <label className="section-label">Signature <span className="required">*</span></label>
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={canvasRef}
+                                                ref={signatureRef}
                                                 width={500}
                                                 height={200}
                                                 className="signature-canvas"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
+                                                onMouseDown={(e) => startDrawing(e, signatureRef)}
+                                                onMouseMove={(e) => draw(e, signatureRef)}
                                                 onMouseUp={stopDrawing}
                                                 onMouseLeave={stopDrawing}
                                                 onTouchStart={startDrawing}
@@ -2637,12 +2772,12 @@ const today = new Date().toISOString().split("T")[0];
                                     <label className="section-label">Signature <span className="required">*</span></label>
                                     <div className="signature-pad-container">
                                         <canvas
-                                            ref={canvasRef}
+                                            ref={signatureRef}
                                             width={500}
                                             height={200}
                                             className="signature-canvas"
-                                            onMouseDown={startDrawing}
-                                            onMouseMove={draw}
+                                            onMouseDown={(e) => startDrawing(e, signatureRef)}
+                                            onMouseMove={(e) => draw(e, signatureRef)}
                                             onMouseUp={stopDrawing}
                                             onMouseLeave={stopDrawing}
                                             onTouchStart={startDrawing}
@@ -2700,12 +2835,12 @@ const today = new Date().toISOString().split("T")[0];
                                         <label className="section-label">Signature <span className="required">*</span></label>
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={canvasRef}
+                                                ref={signatureRef}
                                                 width={500}
                                                 height={200}
                                                 className="signature-canvas"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
+                                                onMouseDown={(e) => startDrawing(e, signatureRef)}
+                                                onMouseMove={(e) => draw(e, signatureRef)}
                                                 onMouseUp={stopDrawing}
                                                 onMouseLeave={stopDrawing}
                                                 onTouchStart={startDrawing}
@@ -2790,16 +2925,16 @@ const today = new Date().toISOString().split("T")[0];
                                         <label className="section-label">Signature <span className="required">*</span></label>
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={healthCanvasRef}
+                                                ref={healthSignatureRef}
                                                 width={500}
                                                 height={200}
                                                 className="signature-canvas"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
+                                                onMouseDown={(e) => startDrawing(e, healthSignatureRef)}
+                                                onMouseMove={(e) => draw(e, healthSignatureRef)} 
                                                 onMouseUp={stopDrawing}
                                                 onMouseLeave={stopDrawing}
                                             />
-                                            <button type="button" className="clear-signature-btn" onClick={() => clearSignature(healthCanvasRef)}>
+                                            <button type="button" className="clear-signature-btn" onClick={() => clearSignature(healthSignatureRef)}>
                                                 ↻
                                             </button>
                                         </div>
@@ -2851,12 +2986,12 @@ const today = new Date().toISOString().split("T")[0];
                                         <label className="section-label">Signature <span className="required">*</span></label>
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={canvasRef}
+                                                ref={signatureRef}
                                                 width={500}
                                                 height={200}
                                                 className="signature-canvas"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
+                                                onMouseDown={(e) => startDrawing(e, signatureRef)}
+                                                onMouseMove={(e) => draw(e, signatureRef)}
                                                 onMouseUp={stopDrawing}
                                                 onMouseLeave={stopDrawing}
                                                 onTouchStart={startDrawing}
@@ -2924,16 +3059,16 @@ const today = new Date().toISOString().split("T")[0];
                                         <label className="section-label">Signature <span className="required">*</span></label>
                                         <div className="signature-pad-container">
                                             <canvas
-                                                ref={policyCanvasRef}
+                                                ref={policySignatureRef}
                                                 width={500}
                                                 height={200}
                                                 className="signature-canvas"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
+                                                onMouseDown={(e) => startDrawing(e, policySignatureRef)}
+                                                onMouseMove={(e) => draw(e, policySignatureRef)}
                                                 onMouseUp={stopDrawing}
                                                 onMouseLeave={stopDrawing}
                                             />
-                                            <button type="button" className="clear-signature-btn" onClick={() => clearSignature(policyCanvasRef)}>↻</button>
+                                            <button type="button" className="clear-signature-btn" onClick={() => clearSignature(policySignatureRef)}>↻</button>
                                         </div>
                                     </div>
                                     <div className="form-field col-md-3">
@@ -2958,7 +3093,7 @@ const today = new Date().toISOString().split("T")[0];
                             Previous
                         </button>
 )}
-                        <button type="button" className="btn-save">Save</button>
+                        <button type="button" className="btn-save" onClick={handleSubmit}>Save</button>
                         {currentStep !== steps.length && (
         <button
             type="button"

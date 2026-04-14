@@ -328,7 +328,196 @@ function* resetApplicantPassword(action) {
     });
   }
 }
+const STEP_NAME_MAP = {
+  1:  'final_eligibility',
+  2:  'final_w9',
+  3:  'final_attest_compliance',
+  4:  'final_attest_offenses',
+  5:  'final_bg_screening',
+  6:  'final_employee_attest',
+  7:  'final_policy_ack',
+  8:  'final_bg_attest',
+  9:  'final_patient_abandon',
+  10: 'final_charges_1',
+  11: 'final_charges_2',
+  12: 'final_charges_3',
+  13: 'final_bg_auth',
+};
+// function* saveFinalFormStep(action) {
+//   try {
+//     // Destructure including stepName from payload
+//     const { stepNumber, stepName, formData, signatureData, pdfFieldData, referenceId } = action.payload;
+    
+//     // Use stepName from payload or fallback to mapping
+//     const finalStepName = stepName || STEP_NAME_MAP[stepNumber];
+//     const storedReferenceId = referenceId || localStorage.getItem('applicationReferenceId');
+    
+//     console.log('Saving final step:', { stepNumber, finalStepName, storedReferenceId });
 
+//     const payload = new FormData();
+//     payload.append('referenceId', storedReferenceId);
+//     payload.append('step', finalStepName); // Use the step name
+//     payload.append('stepNumber', stepNumber);
+
+//     // Append regular form fields as JSON
+//     if (formData && Object.keys(formData).length > 0) {
+//       payload.append('data', JSON.stringify(formData));
+//     }
+
+//     // Append PDF field data if provided and not empty
+//     if (pdfFieldData && Object.keys(pdfFieldData).length > 0) {
+//       payload.append('pdfFieldData', JSON.stringify(pdfFieldData));
+//     }
+
+//     // Append signature as blob if present
+//     if (signatureData) {
+//       const blob = dataURItoBlob(signatureData);
+//       payload.append('signature', blob, `signature_step${stepNumber}.png`);
+//     }
+
+//     const response = yield call(() =>
+//       axios.post(`${base_url}/applications-final-save`, payload, {
+//         headers: { 'Content-Type': 'multipart/form-data' },
+//       })
+//     );
+
+//     yield put({
+//       type: types.SAVE_FINAL_FORM_STEP_SUCCESS,
+//       payload: {
+//         stepName: finalStepName,
+//         data: formData,
+//         progress: response.data.progress,
+//       },
+//     });
+
+//   } catch (error) {
+//     console.error('Save final step error:', error);
+//     yield put({
+//       type: types.SAVE_FINAL_FORM_STEP_FAILURE,
+//       payload: error.response?.data || error.message,
+//     });
+//   }
+// }
+function* saveFinalFormStep(action) {
+  try {
+    let stepNumber, finalStepName, formData, signatureData, pdfFieldData, storedReferenceId;
+    let payload;
+    
+    // Check if payload is FormData (file upload from FinalApplicationForm4)
+    if (action.payload instanceof FormData) {
+      // It's a FormData object - extract values
+      payload = action.payload;
+      storedReferenceId = payload.get('referenceId');
+      finalStepName = payload.get('step');
+      stepNumber = parseInt(payload.get('stepNumber'), 10);
+      
+      console.log('Saving final step (FormData):', { stepNumber, finalStepName, storedReferenceId });
+      
+      // For file uploads, we don't have these
+      formData = null;
+      signatureData = null;
+      pdfFieldData = null;
+    } 
+    else {
+      // Regular object payload (from other forms)
+      const { stepNumber: sn, stepName, formData: fd, signatureData: sd, pdfFieldData: pfd, referenceId } = action.payload;
+      
+      stepNumber = sn;
+      finalStepName = stepName || STEP_NAME_MAP[stepNumber];
+      storedReferenceId = referenceId || localStorage.getItem('applicationReferenceId');
+      formData = fd;
+      signatureData = sd;
+      pdfFieldData = pfd;
+      
+      console.log('Saving final step (Object):', { stepNumber, finalStepName, storedReferenceId });
+      
+      // Create FormData for non-file uploads
+      payload = new FormData();
+      payload.append('referenceId', storedReferenceId);
+      payload.append('step', finalStepName);
+      payload.append('stepNumber', stepNumber);
+      
+      if (formData && Object.keys(formData).length > 0) {
+        payload.append('data', JSON.stringify(formData));
+      }
+      if (pdfFieldData && Object.keys(pdfFieldData).length > 0) {
+        payload.append('pdfFieldData', JSON.stringify(pdfFieldData));
+      }
+      if (signatureData) {
+        const blob = dataURItoBlob(signatureData);
+        payload.append('signature', blob, `signature_step${stepNumber}.png`);
+      }
+    }
+    
+    // Make the API call
+    const response = yield call(() =>
+      axios.post(`${base_url}/applications-final-save`, payload, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+    );
+    
+    yield put({
+      type: types.SAVE_FINAL_FORM_STEP_SUCCESS,
+      payload: {
+        stepName: finalStepName,
+        data: formData || {},
+        progress: response.data.progress,
+      },
+    });
+    
+  } catch (error) {
+    console.error('Save final step error:', error);
+    yield put({
+      type: types.SAVE_FINAL_FORM_STEP_FAILURE,
+      payload: error.response?.data?.message || error.message || 'Failed to save step',
+    });
+  }
+}
+function* fetchFormProgress(action) {
+  try {
+    const referenceId = action.payload || localStorage.getItem('applicationReferenceId');
+    const response = yield call(() =>
+      axios.get(`${base_url}/applications-progress/${referenceId}`)
+    );
+    yield put({
+      type: types.FETCH_FORM_PROGRESS_SUCCESS,
+      payload: response.data,
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_FORM_PROGRESS_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+
+function* fetchFinalFormData(action) {
+  try {
+    const referenceId = action.payload || localStorage.getItem('applicationReferenceId');
+    const response = yield call(() =>
+      axios.get(`${base_url}/applications-final-data/${referenceId}`)
+    );
+    yield put({
+      type: types.FETCH_FINAL_FORM_DATA_SUCCESS,
+      payload: response.data,
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_FINAL_FORM_DATA_FAILURE,
+      payload: error.response?.data || error.message,
+    });
+  }
+}
+
+// Helper: convert base64 to Blob for signature upload
+function dataURItoBlob(dataURI) {
+  const byteString = atob(dataURI.split(',')[1]);
+  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+  return new Blob([ab], { type: mimeString });
+}
 // Watcher
 export function* watchApplicationActions() {
   yield takeLatest(types.SUBMIT_APPLICATION_REQUEST, submitApplication);
@@ -347,5 +536,8 @@ export function* watchApplicationActions() {
   yield takeLatest(types.UNLOCK_APPLICANT_ACCOUNT_REQUEST, unlockApplicantAccount);
   yield takeLatest(types.ARCHIVE_APPLICANT_ACCOUNT_REQUEST, archiveApplicantAccount);
   yield takeLatest(types.RESET_APPLICANT_PASSWORD_REQUEST, resetApplicantPassword);
+   yield takeLatest(types.SAVE_FINAL_FORM_STEP_REQUEST, saveFinalFormStep);
+  yield takeLatest(types.FETCH_FORM_PROGRESS_REQUEST, fetchFormProgress);
+  yield takeLatest(types.FETCH_FINAL_FORM_DATA_REQUEST, fetchFinalFormData);
 
 }
