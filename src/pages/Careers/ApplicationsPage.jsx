@@ -16,59 +16,48 @@ const ApplicationsPage = ({ onBack }) => {
   );
   
   // Define all final applications with their details
-  const finalApplications = [
-    {
-      id: 1,
-      name: 'Final Application 1',
-      description: 'Complete eligibility verification, W-9, attestations, and background screening',
-      formType: 'final',
-      path: '/final-form-2',
-      steps: 13,
-      icon: 'fas fa-file-contract',
-    },
-    {
-      id: 2,
-      name: 'Final Application 2',
-      description: 'Independent Contractor Agreement and Orientation',
-      formType: 'final_2',
-      path: '/final-form-3',
-      steps: 6,
-      icon: 'fas fa-file-alt',
-    },
-    {
-      id: 3,
-      name: 'Final Application 3',
-      description: 'Upload required documents and certifications',
-      formType: 'final_3',
-      path: '/final-form-4',
-      steps: 8,
-      icon: 'fas fa-file-medical',
-    },
-    {
-      id: 4,
-      name: 'Final Application 4',
-      formType: 'final_4',
-      path: '/final-form-6',
-      steps: 2,
-      icon: 'fas fa-file-invoice',
-    },
-    {
-      id: 5,
-      name: 'Final Application 5',
-      formType: 'final_5',
-      path: '/final-form',
-      steps: 14,
-      icon: 'fas fa-file-signature',
-    },
-    // {
-    //   id: 6,
-    //   name: 'Final Application 6',
-    //   formType: 'final_6',
-    //   path: '/final-application-6',
-    //   steps: 9,
-    //   icon: 'fas fa-file-check',
-    // }
-  ];
+const finalApplications = [
+  {
+    id: 1,
+    name: 'Background Check & Regulatory Compliance',
+    path: '/background-check-regulatory-compliance',
+    formType: 'final',
+    steps: 13,
+    icon: 'fas fa-file-contract',
+  },
+  {
+    id: 2,
+    name: 'Contractor Agreement, Duties & Compliance',
+    path: '/contractor-agreement-duties-compliance',
+    formType: 'final_2',
+    steps: 6,
+    icon: 'fas fa-file-alt',
+  },
+  {
+    id: 3,
+    name: 'Licenses, Certifications & Insurance Verification',
+    path: '/licenses-certifications-insurance',
+    formType: 'final_3',
+    steps: 8,
+    icon: 'fas fa-file-medical',
+  },
+  {
+    id: 4,
+    name: 'Employee Health & Medical Clearance',
+    path: '/employee-health-medical-clearance',
+    formType: 'final_4',
+    steps: 2,
+    icon: 'fas fa-file-invoice',
+  },
+  {
+    id: 5,
+    name: 'Application, Screening & Acknowledgements',
+    path: '/application-screening-acknowledgements',
+    formType: 'final_5',
+    steps: 13,
+    icon: 'fas fa-file-signature',
+  },
+];
   
   // Fetch progress using Redux saga when component mounts
   useEffect(() => {

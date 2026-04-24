@@ -19,6 +19,7 @@ import AdminProtectedRoute from "./pages/Careers/admin/AdminProtectedRoute";
 import ApplicationDetail from "./pages/Careers/admin/ApplicationDetail";
 import UserProtectedRoute from "./pages/Careers/UserProtectedRoute";
 import AdminStatusLogs from "./pages/Careers/admin/AdminStatusLogs";
+import SettingsPage from "./pages/Careers/admin/SettingsPage";
 
 function App() {
   return (
@@ -32,11 +33,20 @@ function App() {
       <Route path="/expiration-checklist" element={<ExpirationChecklist />} />
       
       {/* 45-Page Form Steps */}
-      <Route path="/final-form" element={<FinalApplicationForm />} />
-      <Route path="/final-form-2" element={<FinalApplicationForm2 />} />
-      <Route path="/final-form-3" element={<FinalApplicationForm3 />} />
-      <Route path="/final-form-4" element={<FinalApplicationForm4 />} />
-      <Route path="/final-form-6" element={<FinalApplicationForm6 />} />
+{/* Final Application 5 */}
+<Route path="/application-screening-acknowledgements" element={<FinalApplicationForm />} />
+
+{/* Final Application 1 */}
+<Route path="/background-check-regulatory-compliance" element={<FinalApplicationForm2 />} />
+
+{/* Final Application 2 */}
+<Route path="/contractor-agreement-duties-compliance" element={<FinalApplicationForm3 />} />
+
+{/* Final Application 3 */}
+<Route path="/licenses-certifications-insurance" element={<FinalApplicationForm4 />} />
+
+{/* Final Application 4 */}
+<Route path="/employee-health-medical-clearance" element={<FinalApplicationForm6 />} />
     </Route>
       <Route path="/login" element={<LoginPage />} />
 <Route path="/admin" element={<AdminLayout />}>
@@ -50,6 +60,7 @@ function App() {
     <Route path="applications" element={<AdminApplications />} />
 <Route path="applications/:id" element={<ApplicationDetail />} />
 <Route path="status-logs" element={<AdminStatusLogs />} />
+<Route path="settings" element={<SettingsPage />} />
   </Route>
 
 </Route>

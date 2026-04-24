@@ -1717,3 +1717,457 @@
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 }
+
+
+/* Locked Row Styling */
+.locked-row {
+  background-color: #fef2f2 !important;
+  opacity: 0.85;
+}
+
+.locked-row:hover {
+  background-color: #fee2e2 !important;
+}
+
+/* Lock Indicator Badge on Avatar */
+.user-avatar {
+  position: relative;
+}
+
+.avatar-lock-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+.avatar-lock-badge i {
+  color: white;
+  font-size: 9px;
+}
+
+/* Lock Indicator in ID Column */
+.lock-indicator {
+  animation: pulse-lock 2s ease-in-out infinite;
+}
+
+@keyframes pulse-lock {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Enhanced Button Styles */
+.btn-action.btn-unlock {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.btn-action.btn-unlock:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-action.btn-lock {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.btn-action.btn-lock:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Disabled state for locked accounts */
+.btn-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #9ca3af;
+}
+
+.btn-action:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Account Status Badges Enhanced */
+.account-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-locked {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border: 1px solid #f87171;
+}
+
+.status-locked i {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.status-active {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  border: 1px solid #34d399;
+}
+
+.status-archived {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  color: #374151;
+  border: 1px solid #9ca3af;
+}
+
+/* Locked Text Below Name */
+.locked-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.locked-text i {
+  font-size: 10px;
+}
+
+
+.step.warning .step-number {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.btn-send-tablet {
+  background: #10b981;;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);
+}
+
+.btn-send-tablet:hover:not(:disabled) {
+  background: #10b981;;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(139, 92, 246, 0.4);
+}
+
+.btn-send-tablet:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-send-tablet i {
+  font-size: 16px;
+}
+
+/* ============================================
+   NOTIFICATION TOAST
+   ============================================ */
+
+.notification-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 350px;
+  max-width: 500px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 9999;
+  animation: slideInRight 0.4s ease-out, fadeOut 0.3s ease-in 4.7s;
+  font-weight: 500;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.notification-content i {
+  font-size: 20px;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 4px 8px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.notification-close:hover {
+  opacity: 1;
+}
+
+/* Notification Types */
+.notification-success {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-left: 4px solid #10b981;
+  color: #065f46;
+}
+
+.notification-success i {
+  color: #10b981;
+}
+
+.notification-warning {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left: 4px solid #f59e0b;
+  color: #92400e;
+}
+
+.notification-warning i {
+  color: #f59e0b;
+}
+
+.notification-error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-left: 4px solid #ef4444;
+  color: #991b1b;
+}
+
+.notification-error i {
+  color: #ef4444;
+}
+
+.notification-info {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-left: 4px solid #3b82f6;
+  color: #1e40af;
+}
+
+.notification-info i {
+  color: #3b82f6;
+}
+
+/* ============================================
+   UNARCHIVE BUTTON
+   ============================================ */
+
+.btn-action.btn-unarchive {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.btn-action.btn-unarchive:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-action.btn-unarchive i {
+  animation: rotate-undo 0.6s ease-in-out;
+}
+
+@keyframes rotate-undo {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-180deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+/* ============================================
+   EXISTING BUTTON ENHANCEMENTS
+   ============================================ */
+
+.btn-action.btn-unlock {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.btn-action.btn-unlock:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-action.btn-lock {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.btn-action.btn-lock:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.btn-action.btn-archive {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+}
+
+.btn-action.btn-archive:hover {
+  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
+}
+
+/* Disabled state for locked/archived accounts */
+.btn-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #9ca3af;
+}
+
+.btn-action:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============================================
+   LOCKED ROW STYLING
+   ============================================ */
+
+.locked-row {
+  background-color: #fef2f2 !important;
+  opacity: 0.85;
+}
+
+.locked-row:hover {
+  background-color: #fee2e2 !important;
+}
+
+/* Lock Indicator Badge on Avatar */
+.user-avatar {
+  position: relative;
+}
+
+.avatar-lock-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+.avatar-lock-badge i {
+  color: white;
+  font-size: 9px;
+}
+
+/* Lock Indicator in ID Column */
+.lock-indicator {
+  animation: pulse-lock 2s ease-in-out infinite;
+}
+
+@keyframes pulse-lock {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ============================================
+   ACCOUNT STATUS BADGES
+   ============================================ */
+
+.account-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-locked {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border: 1px solid #f87171;
+}
+
+.status-locked i {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.status-active {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  border: 1px solid #34d399;
+}
+
+.status-archived {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  color: #374151;
+  border: 1px solid #9ca3af;
+}

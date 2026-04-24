@@ -97,6 +97,7 @@ function* fetchApplicationDetail(action) {
     });
   }
 }
+
 function* approveApplication(action) {
   try {
     const response = yield call(() => 
@@ -222,6 +223,7 @@ function* fetchAllStatusLogs() {
     });
   }
 }
+
 function* fetchStatusLogs(action) {
   try {
     const response = yield call(() => 
@@ -508,6 +510,37 @@ function* fetchFinalFormData(action) {
     });
   }
 }
+function* sendToTablet(action) {
+  try {
+    const response = yield call(() =>
+      axios.post(`${base_url}/applications-send-to-tablet`, {
+        reference_id: action.payload.referenceId,
+        applicant_id: action.payload.applicantId
+      })
+    );
+
+    yield put({
+      type: types.SEND_TO_TABLET_SUCCESS,
+      payload: response.data
+    });
+
+    alert('✅ Application details sent to office tablet successfully!');
+    
+    // Optionally refresh application data
+    yield put({
+      type: types.FETCH_APPLICATION_DETAIL_REQUEST,
+      payload: action.payload.referenceId
+    });
+
+  } catch (error) {
+    yield put({
+      type: types.SEND_TO_TABLET_FAILURE,
+      payload: error.response?.data?.message || 'Failed to send to tablet'
+    });
+
+    alert('❌ Failed to send to tablet. Please try again.');
+  }
+}
 
 // Helper: convert base64 to Blob for signature upload
 function dataURItoBlob(dataURI) {
@@ -517,6 +550,27 @@ function dataURItoBlob(dataURI) {
   const ia = new Uint8Array(ab);
   for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
   return new Blob([ab], { type: mimeString });
+}
+function* unarchiveApplicantAccount(action) {
+  try {
+    yield call(() =>
+      axios.post(`${base_url}/admin/applicants/${action.payload}/unarchive`)
+    );
+
+    yield put({
+      type: types.UNARCHIVE_APPLICANT_ACCOUNT_SUCCESS,
+      payload: action.payload
+    });
+
+    // Refresh applicants list
+    yield put({ type: types.FETCH_APPLICANTS_REQUEST });
+
+  } catch (error) {
+    yield put({
+      type: types.UNARCHIVE_APPLICANT_ACCOUNT_FAILURE,
+      payload: error.response?.data?.message || 'Failed to unarchive account'
+    });
+  }
 }
 // Watcher
 export function* watchApplicationActions() {
@@ -535,9 +589,12 @@ export function* watchApplicationActions() {
       yield takeLatest(types.LOCK_APPLICANT_ACCOUNT_REQUEST, lockApplicantAccount);
   yield takeLatest(types.UNLOCK_APPLICANT_ACCOUNT_REQUEST, unlockApplicantAccount);
   yield takeLatest(types.ARCHIVE_APPLICANT_ACCOUNT_REQUEST, archiveApplicantAccount);
+    yield takeLatest(types.UNARCHIVE_APPLICANT_ACCOUNT_REQUEST, unarchiveApplicantAccount); // NEW
+
   yield takeLatest(types.RESET_APPLICANT_PASSWORD_REQUEST, resetApplicantPassword);
    yield takeLatest(types.SAVE_FINAL_FORM_STEP_REQUEST, saveFinalFormStep);
   yield takeLatest(types.FETCH_FORM_PROGRESS_REQUEST, fetchFormProgress);
   yield takeLatest(types.FETCH_FINAL_FORM_DATA_REQUEST, fetchFinalFormData);
+  yield takeLatest(types.SEND_TO_TABLET_REQUEST, sendToTablet);
 
 }

@@ -533,7 +533,7 @@ const FinalApplicationView1 = ({ data }) => {
   <div className="doea-form-container" style={{ maxWidth: '900px', margin: 'auto', color: '#000', padding: '20px' }}>
     <div className="doea-header" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
       <div className="doea-logo">
-        <img src="images/0.jpg" alt="Elder Affairs Florida" style={{ height: '160px' }} />
+        <img src="../../images/0.jpg" alt="Elder Affairs Florida" style={{ height: '160px' }} />
       </div>
     </div>
 

@@ -11,6 +11,13 @@ import FinalApplicationView4 from '../../../components/FinalApplicationView4';
 import FinalApplicationView5 from '../../../components/FinalApplicationView5';
 
 const ApplicationDetail = () => {
+  const FINAL_FORMS = [
+  { id: 1, name: "Background Check & Regulatory Compliance" },
+  { id: 2, name: "Contractor Agreement, Duties & Compliance" },
+  { id: 3, name: "Licenses, Certifications & Insurance Verification" },
+  { id: 4, name: "Employee Health & Medical Clearance" },
+  { id: 5, name: "Application, Screening & Acknowledgements" },
+];
   const isExpired = (date) => new Date(date) < new Date();
   const [previewUrl, setPreviewUrl] = useState(null);
   const handlePreview = (sharepointUrl) => {
@@ -51,6 +58,27 @@ const [notePriority, setNotePriority] = useState('medium'); // ADD THIS
 const [selectedFinalApp, setSelectedFinalApp] = useState(null);
 const [finalAppLoading, setFinalAppLoading] = useState(false);
 const statusLogs = useSelector(state => state.applicationReducer?.statusLogs || []);
+const tabletSendSuccess = useSelector(state => state.applicationReducer?.tabletSendSuccess);
+const tabletSendError = useSelector(state => state.applicationReducer?.tabletSendError);
+useEffect(() => {
+  if (tabletSendSuccess) {
+    // Update local state when API succeeds
+    setApplicationData(prevData => ({
+      ...prevData,
+      details: {
+        ...prevData.details,
+        sent_to_tablet: true,
+        tablet_sent_at: new Date().toISOString()
+      }
+    }));
+    
+    alert('✅ Application details sent to office tablet successfully!');
+  }
+  
+  if (tabletSendError) {
+    alert('❌ Failed to send to tablet: ' + tabletSendError);
+  }
+}, [tabletSendSuccess, tabletSendError]);
 const fetchFinalApplicationData = async (formType) => {
   setFinalAppLoading(true);
   try {
@@ -232,6 +260,68 @@ const getStatusBadgeClass = (status) => {
       return '';
   }
 };
+// CHECK DOCUMENTS (STEP 6)
+const isDocumentsIncomplete = () => {
+  const docs = applicationData?.documents;
+  if (!docs) return true;
+
+  const requiredDocs = [
+    'physicalExam',
+    'cprCard',
+    'driversLicense',
+    'professionalLicense',
+    'liabilityInsurance',
+    'autoInsurance',
+    'workAuthorization',
+    'backgroundScreening',
+    'palmBeachBadge'
+  ];
+
+  return requiredDocs.some(doc => !docs[doc]?.local_path);
+};
+
+// GENERIC STEP CHECK
+const isStepIncomplete = (stepNum) => {
+  if (!applicationData) return false;
+
+  switch (stepNum) {
+    case 1:
+      return !applicationData.preEmployment?.firstName;
+
+    case 2:
+      return !applicationData.education?.highSchoolName;
+
+    case 3:
+      return !applicationData.availability?.totalHours;
+
+    case 4:
+      return !applicationData.references?.employer1Name;
+
+    case 5:
+      return !applicationData.experience?.emp1FirstName;
+
+    case 6:
+      return isDocumentsIncomplete();
+
+    case 7:
+      return !applicationData.review?.signature;
+
+    default:
+      return false;
+  }
+};
+
+const handleSendToTablet = async () => {
+  if (window.confirm(`📧 Send application details to office tablet?\n\nThis will notify the tablet at the office to prepare for applicant ${applicationData.details.first_name} ${applicationData.details.last_name}'s login.`)) {
+    dispatch({
+      type: types.SEND_TO_TABLET_REQUEST,
+      payload: {
+        referenceId: applicationData.details.reference_id,
+        applicantId: applicationData.details.id
+      }
+    });
+  }
+};
   return (
     <>
       <div className="page-header">
@@ -239,33 +329,43 @@ const getStatusBadgeClass = (status) => {
           <h2>Application Details - #{id?.padStart(4, '0')}</h2>
           <p>View complete application submission</p>
         </div>
-        <div className="action-buttons-header">
+<div className="action-buttons-header">
+  {/* Send to Tablet Button - Available for approved applications */}
+  {applicationData?.details?.status === "approved" && (
+    <button 
+      className="btn-send-tablet" 
+      onClick={handleSendToTablet}
+      disabled={applicationData?.details?.sent_to_tablet}
+    >
+      <i className="fas fa-tablet-alt"></i> 
+      {applicationData?.details?.sent_to_tablet ? 'Sent to Tablet' : 'Send to Tablet'}
+    </button>
+  )}
 
-          {applicationData?.details?.status === "pending" && (
-            <>
-              <button className="btn-approve" onClick={handleApprove}>
-                <i className="fas fa-check-circle"></i> Approve
-              </button>
+  {applicationData?.details?.status === "pending" && (
+    <>
+      <button className="btn-approve" onClick={handleApprove}>
+        <i className="fas fa-check-circle"></i> Approve
+      </button>
 
-              <button className="btn-reject" onClick={handleReject}>
-                <i className="fas fa-times-circle"></i> Reject
-              </button>
-            </>
-          )}
+      <button className="btn-reject" onClick={handleReject}>
+        <i className="fas fa-times-circle"></i> Reject
+      </button>
+    </>
+  )}
 
-          {applicationData?.details?.status === "approved" && (
-            <button className="btn-approve" disabled>
-              <i className="fas fa-check-circle"></i> Approved
-            </button>
-          )}
+  {applicationData?.details?.status === "approved" && (
+    <button className="btn-approve" disabled>
+      <i className="fas fa-check-circle"></i> Approved
+    </button>
+  )}
 
-          {applicationData?.details?.status === "rejected" && (
-            <button className="btn-rejecte" disabled>
-              <i className="fas fa-times-circle"></i> Rejected
-            </button>
-          )}
-
-        </div>
+  {applicationData?.details?.status === "rejected" && (
+    <button className="btn-reject" disabled>
+      <i className="fas fa-times-circle"></i> Rejected
+    </button>
+  )}
+</div>
       </div>
       {/* View Mode Tabs */}
       <div className="view-mode-tabs">
@@ -301,26 +401,33 @@ const getStatusBadgeClass = (status) => {
           {/* Step Navigation */}
           <div className="application-detail-nav">
             <div className="progress-steps">
-              {[
-                { num: 1, label: 'Pre-Employment' },
-                { num: 2, label: 'Education' },
-                { num: 3, label: 'Availability' },
-                { num: 4, label: 'References' },
-                { num: 5, label: 'Experience' },
-                { num: 6, label: 'Documents' },
-                { num: 7, label: 'Review' }
-              ].map(step => (
-                <div
-                  key={step.num}
-                  className={`step ${activeStep === step.num ? 'active' : 'completed'}`}
-                  onClick={() => setActiveStep(step.num)}
-                >
-                  <div className="step-number">
-                    {activeStep > step.num ? '✓' : step.num}
-                  </div>
-                  <span className="step-label">{step.label}</span>
-                </div>
-              ))}
+{[
+  { num: 1, label: 'Pre-Employment' },
+  { num: 2, label: 'Education' },
+  { num: 3, label: 'Availability' },
+  { num: 4, label: 'References' },
+  { num: 5, label: 'Experience' },
+  { num: 6, label: 'Documents' },
+  { num: 7, label: 'Review' }
+].map(step => {
+  const isWarning = isStepIncomplete(step.num);
+
+  return (
+    <div
+      key={step.num}
+      className={`step 
+        ${activeStep === step.num ? 'active' : 'completed'} 
+        ${isWarning ? 'warning' : ''}
+      `}
+      onClick={() => setActiveStep(step.num)}
+    >
+      <div className="step-number">
+        {activeStep > step.num ? '✓' : step.num}
+      </div>
+      <span className="step-label">{step.label}</span>
+    </div>
+  );
+})}
             </div>
           </div>
 
@@ -1199,24 +1306,25 @@ const getStatusBadgeClass = (status) => {
       <>
         <h2 className="section-title">Final Application Forms</h2>
         <p className="section-description">Select a final application form to view</p>
-        <div className="final-app-buttons">
-          {[1, 2, 3, 4, 5].map((num) => (
-            <button
-              key={num}
-              className="final-app-button"
-              onClick={() => handleFinalApplicationClick(num)}
-            >
-              <div className="button-icon">
-                <i className="fas fa-file-contract"></i>
-              </div>
-              <div className="button-content">
-                <h3>Final Application {num}</h3>
-                <p>View form details</p>
-              </div>
-              <i className="fas fa-chevron-right"></i>
-            </button>
-          ))}
-        </div>
+<div className="final-app-buttons">
+  {FINAL_FORMS.map((form) => (
+    <button
+      key={form.id}
+      className="final-app-button"
+      onClick={() => handleFinalApplicationClick(form.id)}
+    >
+      <div className="button-icon">
+        <i className="fas fa-file-contract"></i>
+      </div>
+      <div className="button-content">
+        {/* Displays the actual name you provided */}
+        <h3>{form.name}</h3>
+        <p>View form details</p>
+      </div>
+      <i className="fas fa-chevron-right"></i>
+    </button>
+  ))}
+</div>
       </>
     ) : (
       <>

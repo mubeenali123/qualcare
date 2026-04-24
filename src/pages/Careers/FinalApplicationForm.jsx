@@ -5,20 +5,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useDispatch, useSelector } from 'react-redux';
 import * as types from '../../redux/type';
 const STEP_NAME_MAP = {
-    1: 'hr_checklist',
-    2: 'employee_application_part1',
-    3: 'employee_application_part2',
-    4: 'reference_check',
-    5: 'paycheck_policy',
-    6: 'disciplinary_action',
-    7: 'safety_policy',
-    8: 'patient_abandonment',
-    9: 'confidentiality_statement',
-    10: 'contractor_agreement',
-    11: 'non_discrimination',
-    12: 'health_questionnaire',
-    13: 'infection_control',
-    14: 'policy_statement',
+    1: 'employee_application_part1',
+    2: 'employee_application_part2',
+    3: 'reference_check',
+    4: 'paycheck_policy',
+    5: 'disciplinary_action',
+    6: 'safety_policy',
+    7: 'patient_abandonment',
+    8: 'confidentiality_statement',
+    9: 'contractor_agreement',
+    10: 'non_discrimination',
+    11: 'health_questionnaire',
+    12: 'infection_control',
+    13: 'policy_statement',
 };
 
 // Fields mapping for each step
@@ -87,7 +86,6 @@ const FinalApplicationForm = ({ formType = 'final_5' }) => {
     const [submittedStep, setSubmittedStep] = useState(null);
 const today = new Date().toISOString().split("T")[0];
     const steps = [
-        "HR Folder Checklist",
         "Employee Application",
         "Employee Application",
         "Reference Check",
@@ -114,12 +112,7 @@ const today = new Date().toISOString().split("T")[0];
     // Get current form progress for this form type
     const currentFormProgress = formProgress?.[formType] || null;
     const [formData, setFormData] = useState({
-        // Step 1: HR Checklist
-        hr_contractor_name: '',
-        hr_role_RN: false,
-        hr_role_LPN: false,
-        hr_role_CNA: false,
-        hr_role_HHA: false,
+
         // Dynamic fields for docs and in-services will be handled via the mapping
         
         // Step 2-3: Employee Application fields
@@ -524,109 +517,8 @@ const today = new Date().toISOString().split("T")[0];
                     </div>
                 )}
                 <form onSubmit={handleSubmit}>
-{currentStep === 1 && (
-    <>
-        <div className="form-section">
-            <h1 className="form-title">INDEPENDENT CONTRACTOR HR FOLDER CHECKLIST</h1>
-            
-            <div className="row mb-4">
-                <div className="form-field col-md-8">
-                    <label className="section-label">Contractor’s Name:</label>
-                    <input 
-                        type="text" 
-                        name="hr_contractor_name" 
-                        value={formData.hr_contractor_name} 
-                        onChange={handleInputChange} 
-                    />
-                </div>
-                <div className="col-md-4 d-flex align-items-end justify-content-around pb-2">
-                    {['RN', 'LPN', 'CNA', 'HHA'].map((role) => (
-                        <label key={role} className="form-check form-check-inline">
-                            <input 
-                                className="form-check-input"
-                                type="checkbox" 
-                                name={`hr_role_${role}`} 
-                                checked={formData[`hr_role_${role}`] || false}
-                                onChange={handleInputChange}
-                            />
-                            <span className="form-check-label">{role}</span>
-                        </label>
-                    ))}
-                </div>
-            </div>
 
-            <h3 className="section-header-small" style={{ borderBottom: '2px solid #000', marginBottom: '15px' }}>Documents</h3>
-            <div className="checklist-container">
-                {[
-                    "Application Form with ALL SIGNATURES",
-                    "Liability Insurance",
-                    "Orientation Form:",
-                    "RN/ LPN/CAN License",
-                    "HHA Certification:",
-                    "Social Security Card:",
-                    "Driver’s License",
-                    "Auto Insurance",
-                    "Voter's Card, Alien Card, US Passport, US Birth Certificate, Work Authorization",
-                    "CPR Card (American Heart Association, American Red Cross, or Health & Safety Institute)",
-                    "Physical Certificate done within the last 3-6 months stating \"Free from Communicable Diseases\" Yearly",
-                    "Level 2 Background Screening",
-                    "Palm Beach County ID Badge (HHA Only)"
-                ].map((item, idx) => (
-                    <div className="d-flex align-items-center mb-2" key={`doc-${idx}`}>
-                        <label className="form-check form-check-inline mb-0">
-                            <input 
-                                className="form-check-input"
-                                type="checkbox" 
-                                name={`hr_doc_${idx}`} 
-                                checked={formData[`hr_doc_${idx}`] || false}
-                                onChange={handleInputChange}
-                            />
-                        </label>
-                        <div className="flex-grow-1" style={{ borderBottom: '1px solid #ccc' }}>
-                            <p className="form-note mb-0 py-1">{item}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            <h3 className="section-header-small mt-4" style={{ borderBottom: '2px solid #000', marginBottom: '15px' }}>In-Services</h3>
-            <div className="checklist-container">
-                {[
-                    "Domestic Violence 2hr Certificate",
-                    "Alzheimer’s/Dementia 3hr Certificate",
-                    "1 Hour Alzheimer’s Training - Elder Affairs of Florida (https://elderaffairs.org/adrd-training/one-hour-training)",
-                    "HIV/AIDS 4hr Certificate",
-                    "HIPPA Update 4hr Certificate",
-                    "OSHA Update 4hr Certificate/2hr Certificate",
-                    "Self-Administered Medication 2hr Certificate",
-                    "Communications Cognitively Impaired Patients (CNAs)",
-                    "Patient Rights 2hrs (CNAs)",
-                    "Medical Records Documentation 2hrs(CNAs)",
-                    "Medical Errors Update 2hrs(CNA, LPN, RN)",
-                    "Florida laws and rules (LPN, RN, HHA and CNA)",
-                    "Professional Liability Insurance (see office for online application)",
-                    "Federal Tax EIN (Employer Identification Number not required) Must have paper from IRS"
-                ].map((item, idx) => (
-                    <div className="d-flex align-items-center mb-2" key={`service-${idx}`}>
-                        <label className="form-check form-check-inline mb-0">
-                            <input 
-                                className="form-check-input"
-                                type="checkbox" 
-                                name={`hr_inservice_${idx}`} 
-                                checked={formData[`hr_inservice_${idx}`] || false}
-                                onChange={handleInputChange}
-                            />
-                        </label>
-                        <div className="flex-grow-1" style={{ borderBottom: '1px solid #ccc' }}>
-                            <p className="form-note mb-0 py-1">{item}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    </>
-)}
-                    {currentStep === 2 && (
+                    {currentStep === 1 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">PERSONAL INFORMATION:</h1>
@@ -1714,7 +1606,7 @@ const today = new Date().toISOString().split("T")[0];
                         </>
 
                     )}
-                    {currentStep === 3 && (
+                    {currentStep === 2 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">7. EDUCATION:</h1>
@@ -1931,7 +1823,7 @@ const today = new Date().toISOString().split("T")[0];
                             </div>
                         </>
                     )}
-                    {currentStep === 4 && (
+                    {currentStep === 3 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">REFERENCE CHECK FORM</h1>
@@ -2199,7 +2091,7 @@ const today = new Date().toISOString().split("T")[0];
                             </div>
                         </>
                     )}
-                    {currentStep === 5 && (
+                    {currentStep === 4 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">PAYCHECK POLICY</h1>
@@ -2360,7 +2252,7 @@ const today = new Date().toISOString().split("T")[0];
                             </div>
                         </>
                     )}
-                    {currentStep === 6 && (
+                    {currentStep === 5 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">
@@ -2434,7 +2326,7 @@ const today = new Date().toISOString().split("T")[0];
                             </div>
                         </>
                     )}
-                    {currentStep === 7 && (
+                    {currentStep === 6 && (
                         <>
                             <div className="form-section">
                                 {/* SAFETY POLICY SECTION */}
@@ -2547,7 +2439,7 @@ const today = new Date().toISOString().split("T")[0];
                             </div>
                         </>
                     )}
-                    {currentStep === 8 && (
+                    {currentStep === 7 && (
                         <>
                             <div className="form-section">
                                 {/* PATIENT ABANDONMENT POLICY */}
@@ -2665,7 +2557,7 @@ const today = new Date().toISOString().split("T")[0];
                             </div>
                         </>
                     )}
-                    {currentStep === 9 && (
+                    {currentStep === 8 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">CONFIDENTIALITY STATEMENT</h1>
@@ -2734,7 +2626,7 @@ const today = new Date().toISOString().split("T")[0];
 
                         </>
                     )}
-                    {currentStep === 10 && (
+                    {currentStep === 9 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">Contractor Agreement</h1>
@@ -2812,7 +2704,7 @@ const today = new Date().toISOString().split("T")[0];
                             </div>
                         </>
                     )}
-                    {currentStep === 11 && (
+                    {currentStep === 10 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">NON-DISCRIMINATION POLICY</h1>
@@ -2877,7 +2769,7 @@ const today = new Date().toISOString().split("T")[0];
 
                         </>
                     )}
-                    {currentStep === 12 && (
+                    {currentStep === 11 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">COMPANY DISCIPLINARY ACTION FOR A POSITIVE CONFIRMED DRUG AND ALCOHOL SCREEN</h1>
@@ -2952,7 +2844,7 @@ const today = new Date().toISOString().split("T")[0];
 
                         </>
                     )}
-                    {currentStep === 13 && (
+                    {currentStep === 12 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">INFECTION CONTROL UNIVERSAL ISOLATION</h1>
@@ -3016,7 +2908,7 @@ const today = new Date().toISOString().split("T")[0];
 
                         </>
                     )}
-                    {currentStep === 14 && (
+                    {currentStep === 13 && (
                         <>
                             <div className="form-section">
                                 <h1 className="form-title">POLICY STATEMENT</h1>

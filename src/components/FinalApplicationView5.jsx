@@ -6,7 +6,6 @@ const FinalApplicationView5 = ({ data }) => {
   const [currentStep, setCurrentStep] = useState(1);
 
   const steps = [
-    "HR Folder Checklist",
     "Employee Application",
     "Employee Application",
     "Reference Check",
@@ -71,20 +70,19 @@ const FinalApplicationView5 = ({ data }) => {
   // Helper to get status for progress steps
   const getStepStatus = (stepNumber) => {
     const stepNameMap = {
-      1: 'hr_checklist',
-      2: 'employee_application_part1',
-      3: 'employee_application_part2',
-      4: 'reference_check',
-      5: 'paycheck_policy',
-      6: 'disciplinary_action',
-      7: 'safety_policy',
-      8: 'patient_abandonment',
-      9: 'confidentiality_statement',
-      10: 'contractor_agreement_final5',
-      11: 'non_discrimination',
-      12: 'health_questionnaire',
-      13: 'infection_control',
-      14: 'policy_statement',
+      1: 'employee_application_part1',
+      2: 'employee_application_part2',
+      3: 'reference_check',
+      4: 'paycheck_policy',
+      5: 'disciplinary_action',
+      6: 'safety_policy',
+      7: 'patient_abandonment',
+      8: 'confidentiality_statement',
+      9: 'contractor_agreement_final5',
+      10: 'non_discrimination',
+      11: 'health_questionnaire',
+      12: 'infection_control',
+      13: 'policy_statement',
     };
     const stepName = stepNameMap[stepNumber];
     if (stepName && data?.[stepName]?.formData && Object.keys(data[stepName].formData).length > 0) {
@@ -172,36 +170,10 @@ const FinalApplicationView5 = ({ data }) => {
           </div>
         </div>
 
-        {/* Step 1: HR Folder Checklist */}
-        {currentStep === 1 && (
-          <div className="form-section">
-            <h1 className="form-title">INDEPENDENT CONTRACTOR HR FOLDER CHECKLIST</h1>
-            
-            <div className="row mb-4">
-              <div className="form-field col-md-8">
-                <label className="section-label">Contractor's Name:</label>
-                <input type="text" value={hrChecklistData.hr_contractor_name || ''} readOnly className="form-control" style={{ backgroundColor: '#f5f5f5' }} />
-              </div>
-              <div className="col-md-4 d-flex align-items-end justify-content-around pb-2">
-                {['RN', 'LPN', 'CNA', 'HHA'].map((role) => (
-                  <label key={role} className="form-check form-check-inline">
-                    <input type="checkbox" checked={hrChecklistData[`hr_role_${role}`] || false} readOnly disabled />
-                    <span className="form-check-label">{role}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
 
-            <h3 className="section-header-small" style={{ borderBottom: '2px solid #000', marginBottom: '15px' }}>Documents</h3>
-            {renderChecklist(docItems, 'hr_doc', hrChecklistData)}
-
-            <h3 className="section-header-small mt-4" style={{ borderBottom: '2px solid #000', marginBottom: '15px' }}>In-Services</h3>
-            {renderChecklist(inserviceItems, 'hr_inservice', hrChecklistData)}
-          </div>
-        )}
 
         {/* Step 2: Employee Application Part 1 - Personal Information */}
-        {currentStep === 2 && (
+        {currentStep === 1 && (
           <>
             <div className="form-section">
               <h1 className="form-title">PERSONAL INFORMATION:</h1>
@@ -268,7 +240,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 3: Employee Application Part 2 - Experience, Education, Availability */}
-        {currentStep === 3 && (
+        {currentStep === 2 && (
           <>
             <div className="form-section">
               <h1 className="form-title">EXPERIENCE:</h1>
@@ -361,7 +333,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 4: Reference Check */}
-        {currentStep === 4 && (
+        {currentStep === 3 && (
           <div className="form-section">
             <h1 className="form-title">REFERENCE CHECK FORM</h1>
             <div className="row mb-2">
@@ -409,7 +381,7 @@ const FinalApplicationView5 = ({ data }) => {
         {/* For brevity, I'll show the pattern for remaining steps */}
 
         {/* Step 5: Paycheck Policy */}
-        {currentStep === 5 && (
+        {currentStep === 4 && (
           <div className="form-section">
             <h1 className="form-title">PAYCHECK POLICY</h1>
             <div className="form-field"><label className="section-label">Preference</label><input type="text" value={paycheckPolicyData.paycheckPreference || ''} readOnly className="form-control" style={{ backgroundColor: '#f5f5f5' }} /></div>
@@ -425,7 +397,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 6: Disciplinary Action */}
-        {currentStep === 6 && (
+        {currentStep === 5 && (
           <div className="form-section">
             <h1 className="form-title">COMPANY DISCIPLINARY ACTION</h1>
             <div className="form-field"><label className="section-label">Title</label><input type="text" value={disciplinaryData.disciplinaryTitle || ''} readOnly className="form-control" style={{ backgroundColor: '#f5f5f5' }} /></div>
@@ -435,7 +407,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 7: Safety Policy */}
-        {currentStep === 7 && (
+        {currentStep === 6 && (
           <div className="form-section">
             <h1 className="form-title">SAFETY POLICY</h1>
             <div className="form-field"><label className="section-label">Title</label><input type="text" value={safetyPolicyData.safetyPolicyTitle || ''} readOnly className="form-control" style={{ backgroundColor: '#f5f5f5' }} /></div>
@@ -445,7 +417,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 8: Patient Abandonment / Dress Code */}
-        {currentStep === 8 && (
+        {currentStep === 7 && (
           <div className="form-section">
             <h1 className="form-title">PATIENT ABANDONMENT & DRESS CODE</h1>
             <div className="form-field"><label className="section-label">Title</label><input type="text" value={patientAbandonmentData.dressCodeTitle || ''} readOnly className="form-control" style={{ backgroundColor: '#f5f5f5' }} /></div>
@@ -455,7 +427,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 9: Confidentiality Statement */}
-        {currentStep === 9 && (
+        {currentStep === 8 && (
           <div className="form-section">
             <h1 className="form-title">CONFIDENTIALITY STATEMENT</h1>
             <div className="form-field"><label className="section-label">Date</label><input type="date" value={confidentialityData.confidentialityStatementDate || ''} readOnly className="form-control" style={{ backgroundColor: '#f5f5f5' }} /></div>
@@ -464,7 +436,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 10: Contractor Agreement */}
-        {currentStep === 10 && (
+        {currentStep === 9 && (
           <div className="form-section">
             <h1 className="form-title">CONTRACTOR AGREEMENT</h1>
             <div className="form-field"><label className="section-label">Date</label><input type="date" value={contractorAgreementData.contractorAgreementDate || ''} readOnly className="form-control" style={{ backgroundColor: '#f5f5f5' }} /></div>
@@ -473,7 +445,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 11: Non-Discrimination Policy */}
-        {currentStep === 11 && (
+        {currentStep === 10 && (
           <div className="form-section">
             <h1 className="form-title">NON-DISCRIMINATION POLICY</h1>
             <div className="form-field"><label className="section-label">Date</label><input type="date" value={nonDiscriminationData.nonDiscriminationDate || ''} readOnly className="form-control" style={{ backgroundColor: '#f5f5f5' }} /></div>
@@ -482,7 +454,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 12: Health Questionnaire */}
-        {currentStep === 12 && (
+        {currentStep === 11 && (
           <div className="form-section">
             <h1 className="form-title">HEALTH QUESTIONNAIRE</h1>
             <div className="row mb-3">
@@ -498,7 +470,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 13: Infection Control */}
-        {currentStep === 13 && (
+        {currentStep === 12 && (
           <div className="form-section">
             <h1 className="form-title">INFECTION CONTROL</h1>
             <div className="form-field"><label className="section-label">Title</label><input type="text" value={infectionControlData.infectionControlTitle || ''} readOnly className="form-control" style={{ backgroundColor: '#f5f5f5' }} /></div>
@@ -508,7 +480,7 @@ const FinalApplicationView5 = ({ data }) => {
         )}
 
         {/* Step 14: Policy Statement */}
-        {currentStep === 14 && (
+        {currentStep === 13 && (
           <div className="form-section">
             <h1 className="form-title">POLICY STATEMENT</h1>
             <div className="form-field"><label className="section-label">Title</label><input type="text" value={policyStatementData.policyTitle || ''} readOnly className="form-control" style={{ backgroundColor: '#f5f5f5' }} /></div>

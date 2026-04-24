@@ -21,6 +21,8 @@ const initialState = {
   stepSaveSuccess: null,
   loading: false,
   error: null,
+  sendingToTablet: false,
+  sendToTabletError: null
 };
 
 const applicationReducer = (state = initialState, action) => {
@@ -276,6 +278,26 @@ const applicationReducer = (state = initialState, action) => {
         ...state,
         error: null,
         stepSaveSuccess: null,
+      };
+    case types.SEND_TO_TABLET_REQUEST:
+      return {
+        ...state,
+        sendingToTablet: true,
+        sendToTabletError: null
+      };
+
+    case types.SEND_TO_TABLET_SUCCESS:
+      return {
+        ...state,
+        sendingToTablet: false,
+        sendToTabletError: null
+      };
+
+    case types.SEND_TO_TABLET_FAILURE:
+      return {
+        ...state,
+        sendingToTablet: false,
+        sendToTabletError: action.payload
       };
     default:
       return state;

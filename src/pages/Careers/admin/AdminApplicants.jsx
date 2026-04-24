@@ -8,6 +8,7 @@ const AdminApplicants = () => {
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [notification, setNotification] = useState(null); // NEW: For user feedback
   
   const dispatch = useDispatch();
   
@@ -16,6 +17,12 @@ const AdminApplicants = () => {
   useEffect(() => {
     dispatch({ type: types.FETCH_APPLICANTS_REQUEST });
   }, [dispatch]);
+
+  // NEW: Show notification function
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000); // Auto-hide after 5 seconds
+  };
 
   const filteredApplicants = applicants.filter(applicant =>
     applicant.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -29,6 +36,7 @@ const AdminApplicants = () => {
         type: types.LOCK_APPLICANT_ACCOUNT_REQUEST,
         payload: id
       });
+      showNotification(`🔒 Account locked for ${name}`, 'warning');
     }
   };
 
@@ -38,6 +46,7 @@ const AdminApplicants = () => {
         type: types.UNLOCK_APPLICANT_ACCOUNT_REQUEST,
         payload: id
       });
+      showNotification(`🔓 Account unlocked for ${name}`, 'success');
     }
   };
 
@@ -47,6 +56,18 @@ const AdminApplicants = () => {
         type: types.ARCHIVE_APPLICANT_ACCOUNT_REQUEST,
         payload: id
       });
+      showNotification(`📦 Account archived for ${name}`, 'info');
+    }
+  };
+
+  // NEW: Unarchive function
+  const handleUnarchiveAccount = (id, name) => {
+    if (window.confirm(`♻️ Restore ${name}'s account from archive?`)) {
+      dispatch({
+        type: types.UNARCHIVE_APPLICANT_ACCOUNT_REQUEST,
+        payload: id
+      });
+      showNotification(`♻️ Account restored for ${name}`, 'success');
     }
   };
 
@@ -70,6 +91,7 @@ const AdminApplicants = () => {
       }
     });
 
+    showNotification(`🔑 Password reset successfully for ${selectedApplicant.first_name} ${selectedApplicant.last_name}`, 'success');
     alert(`Password reset successfully!\n\nNew Password: ${newPassword}\n\nPlease share this with the applicant.`);
     setShowPasswordModal(false);
   };
@@ -89,18 +111,31 @@ const AdminApplicants = () => {
         type: types.DELETE_APPLICANT_REQUEST,
         payload: id
       });
+      showNotification('🗑️ Applicant deleted successfully', 'error');
     }
   };
 
   const getAccountStatusBadge = (status) => {
     switch (status) {
       case 'locked':
-        return <span className="account-status status-locked"><i className="fas fa-lock"></i> Locked</span>;
+        return (
+          <span className="account-status status-locked">
+            <i className="fas fa-lock"></i> Locked
+          </span>
+        );
       case 'archived':
-        return <span className="account-status status-archived"><i className="fas fa-archive"></i> Archived</span>;
+        return (
+          <span className="account-status status-archived">
+            <i className="fas fa-archive"></i> Archived
+          </span>
+        );
       case 'active':
       default:
-        return <span className="account-status status-active"><i className="fas fa-check-circle"></i> Active</span>;
+        return (
+          <span className="account-status status-active">
+            <i className="fas fa-check-circle"></i> Active
+          </span>
+        );
     }
   };
 
@@ -115,6 +150,27 @@ const AdminApplicants = () => {
 
   return (
     <>
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`notification-toast notification-${notification.type}`}>
+          <div className="notification-content">
+            <i className={`fas ${
+              notification.type === 'success' ? 'fa-check-circle' :
+              notification.type === 'warning' ? 'fa-exclamation-triangle' :
+              notification.type === 'error' ? 'fa-times-circle' :
+              'fa-info-circle'
+            }`}></i>
+            <span>{notification.message}</span>
+          </div>
+          <button 
+            className="notification-close" 
+            onClick={() => setNotification(null)}
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+      )}
+
       <div className="page-header">
         <h2>Applicants</h2>
         <p>Manage and review all nurse applicants</p>
@@ -149,84 +205,134 @@ const AdminApplicants = () => {
           </thead>
           <tbody>
             {filteredApplicants.length > 0 ? (
-              filteredApplicants.map((applicant) => (
-                <tr key={applicant.id}>
-                  <td>
-                    <span className="app-id">#{applicant.id.toString().padStart(4, '0')}</span>
-                  </td>
-                  
-                  <td className="name-cell">
-                    <div className="user-avatar">
-                      {`${applicant.first_name?.[0] || ''}${applicant.last_name?.[0] || ''}`}
-                    </div>
-                    <div>
-                      <strong>{applicant.first_name} {applicant.middle_name} {applicant.last_name}</strong>
-                    </div>
-                  </td>
-
-                  <td>{applicant.email}</td>
+              filteredApplicants.map((applicant) => {
+                const isLocked = applicant?.account_status === 'locked';
+                const isArchived = applicant?.account_status === 'archived';
                 
-                  <td>
-                    {applicant.date_applied 
-                      ? new Date(applicant.date_applied).toLocaleDateString() 
-                      : 'N/A'}
-                  </td>
+                return (
+                  <tr key={applicant.id} className={isLocked ? 'locked-row' : ''}>
+                    <td>
+                      <span className="app-id">
+                        #{applicant.id.toString().padStart(4, '0')}
+                        {isLocked && (
+                          <i 
+                            className="fas fa-lock lock-indicator" 
+                            title="Account Locked"
+                            style={{
+                              marginLeft: '8px',
+                              color: '#ef4444',
+                              fontSize: '14px'
+                            }}
+                          ></i>
+                        )}
+                      </span>
+                    </td>
+                    
+                    <td className="name-cell">
+                      <div className="user-avatar">
+                        {`${applicant.first_name?.[0] || ''}${applicant.last_name?.[0] || ''}`}
+                        {isLocked && (
+                          <div className="avatar-lock-badge">
+                            <i className="fas fa-lock"></i>
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <strong>{applicant.first_name} {applicant.middle_name} {applicant.last_name}</strong>
+                        {isLocked && (
+                          <span 
+                            className="locked-text"
+                            style={{
+                              display: 'block',
+                              fontSize: '12px',
+                              color: '#ef4444',
+                              fontWeight: '500',
+                              marginTop: '2px'
+                            }}
+                          >
+                            <i className="fas fa-lock"></i> Account Locked
+                          </span>
+                        )}
+                      </div>
+                    </td>
 
-                  <td>
-                    {getAccountStatusBadge(applicant.user?.account_status)}
-                  </td>
+                    <td>{applicant.email}</td>
+                  
+                    <td>
+                      {applicant.date_applied 
+                        ? new Date(applicant.date_applied).toLocaleDateString() 
+                        : 'N/A'}
+                    </td>
 
-                  <td>
-                    <div className="action-buttons">
-                      {/* Lock/Unlock Toggle */}
-                      {applicant.user?.account_status === 'locked' ? (
+                    <td>
+                      {getAccountStatusBadge(applicant.user?.account_status)}
+                    </td>
+
+                    <td>
+                      <div className="action-buttons">
+                        {/* Lock/Unlock Toggle */}
+                        {isLocked ? (
+                          <button
+                            className="btn-action btn-unlock"
+                            onClick={() => handleUnlockAccount(applicant.id, `${applicant.first_name} ${applicant.last_name}`)}
+                            title="Unlock Account"
+                          >
+                            <i className="fas fa-unlock-alt"></i>
+                          </button>
+                        ) : (
+                          <button
+                            className="btn-action btn-lock"
+                            onClick={() => handleLockAccount(applicant.id, `${applicant.first_name} ${applicant.last_name}`)}
+                            title="Lock Account"
+                            disabled={isArchived}
+                          >
+                            <i className="fas fa-lock"></i>
+                          </button>
+                        )}
+
+                        {/* Archive/Unarchive Toggle */}
+                        {isArchived ? (
+                          <button
+                            className="btn-action btn-unarchive"
+                            onClick={() => handleUnarchiveAccount(applicant.id, `${applicant.first_name} ${applicant.last_name}`)}
+                            title="Restore from Archive"
+                          >
+                            <i className="fas fa-undo"></i>
+                          </button>
+                        ) : (
+                          <button
+                            className="btn-action btn-archive"
+                            onClick={() => handleArchiveAccount(applicant.id, `${applicant.first_name} ${applicant.last_name}`)}
+                            title="Archive Account"
+                            disabled={isArchived}
+                          >
+                            <i className="fas fa-archive"></i>
+                          </button>
+                        )}
+
+                        {/* Reset Password Button */}
                         <button
-                          className="btn-action btn-unlock"
-                          onClick={() => handleUnlockAccount(applicant.id, `${applicant.first_name} ${applicant.last_name}`)}
-                          title="Unlock Account"
+                          className="btn-action btn-reset-password"
+                          onClick={() => handleResetPassword(applicant)}
+                          title="Reset Password"
+                          disabled={isLocked || isArchived}
                         >
-                          <i className="fas fa-unlock"></i>
+                          <i className="fas fa-key"></i>
                         </button>
-                      ) : (
+
+                        {/* Delete Button */}
                         <button
-                          className="btn-action btn-lock"
-                          onClick={() => handleLockAccount(applicant.id, `${applicant.first_name} ${applicant.last_name}`)}
-                          title="Lock Account"
+                          className="btn-action btn-delete"
+                          onClick={() => handleDelete(applicant.id)}
+                          title="Delete"
                         >
-                          <i className="fas fa-lock"></i>
+                          <i className="fas fa-trash"></i>
                         </button>
-                      )}
-
-                      {/* Archive Button */}
-                      <button
-                        className="btn-action btn-archive"
-                        onClick={() => handleArchiveAccount(applicant.id, `${applicant.first_name} ${applicant.last_name}`)}
-                        title="Archive Account"
-                      >
-                        <i className="fas fa-archive"></i>
-                      </button>
-
-                      {/* Reset Password Button */}
-                      <button
-                        className="btn-action btn-reset-password"
-                        onClick={() => handleResetPassword(applicant)}
-                        title="Reset Password"
-                      >
-                        <i className="fas fa-key"></i>
-                      </button>
-
-                      {/* Delete Button */}
-                      <button
-                        className="btn-action btn-delete"
-                        onClick={() => handleDelete(applicant.id)}
-                        title="Delete"
-                      >
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan="6" className="no-data">
