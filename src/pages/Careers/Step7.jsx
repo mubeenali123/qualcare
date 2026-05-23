@@ -2,9 +2,11 @@ import React, { useState, useRef } from 'react';
 import './ApplicationForm.css';
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from 'react';
+import * as types from '../../redux/type';
+
 const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
   const today = new Date().toISOString().split("T")[0];
-  const { loading, error } = useSelector(state => state.applicationReducer);
+  const { loading, error, review: savedData } = useSelector(state => state.applicationReducer);
   const [submitted, setSubmitted] = useState(false);
   const dispatch = useDispatch();
   
@@ -14,6 +16,24 @@ const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
     agreeStatements: false,
     signatureDate: today,
   });
+    useEffect(() => {
+    if (referenceId) {
+      dispatch({
+        type: types.FETCH_REVIEW_DATA_REQUEST,
+        payload: referenceId
+      });
+    }
+  }, [dispatch, referenceId]);
+
+  // Update form when saved data is loaded from Redux
+  useEffect(() => {
+    if (savedData && Object.keys(savedData).length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        ...savedData
+      }));
+    }
+  }, [savedData]);
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef(null);
 

@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 const Step3 = ({ onNext, onPrevious, onBack, goToStep }) => {
   const dispatch = useDispatch();
   const referenceId = localStorage.getItem('applicationReferenceId');
-const { loading, error } = useSelector(state => state.applicationReducer);
+const { loading, error, availability: savedData } = useSelector(state => state.applicationReducer);
   const [submitted, setSubmitted] = useState(false);
 
 const [formData, setFormData] = useState({
@@ -43,7 +43,24 @@ const [formData, setFormData] = useState({
   specialRequests: ''
 });
 
+useEffect(() => {
+  if (referenceId) {
+    dispatch({
+      type: types.FETCH_AVAILABILITY_DATA_REQUEST,
+      payload: referenceId
+    });
+  }
+}, [dispatch, referenceId]);
 
+// Update form when data loads
+useEffect(() => {
+  if (savedData && Object.keys(savedData).length > 0) {
+    setFormData(prev => ({
+      ...prev,
+      ...savedData
+    }));
+  }
+}, [savedData]);
 const handleInputChange = (e) => {
   const { name, value, type, checked } = e.target;
 

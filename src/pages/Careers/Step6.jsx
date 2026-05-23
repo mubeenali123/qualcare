@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 const Step6 = ({ onNext, onPrevious, onBack, goToStep }) => {
 const dispatch = useDispatch();
   const referenceId = localStorage.getItem('applicationReferenceId');
-const { loading, error } = useSelector(state => state.applicationReducer);
+const { loading, error, documents: savedData } = useSelector(state => state.applicationReducer);
   const [submitted, setSubmitted] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -43,7 +43,23 @@ const { loading, error } = useSelector(state => state.applicationReducer);
     medicalErrors: null,
     floridaLaws: null
   });
+useEffect(() => {
+  if (referenceId) {
+    dispatch({
+      type: types.FETCH_DOCUMENTS_DATA_REQUEST,
+      payload: referenceId
+    });
+  }
+}, [dispatch, referenceId]);
 
+useEffect(() => {
+  if (savedData && Object.keys(savedData).length > 0) {
+    setFormData(prev => ({
+      ...prev,
+      ...savedData
+    }));
+  }
+}, [savedData]);
 const handleFileChange = (e) => {
   const { name, files } = e.target;
 

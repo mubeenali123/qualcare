@@ -470,7 +470,9 @@ const handleSendToTablet = async () => {
 
                 <div className="form-section">
                   <label className="section-label">Address</label>
-                  <div className="form-field full-width">
+
+                  <div className="address-grid">
+                                      <div className="form-field">
                     <input
                       type="text"
                       value={applicationData.preEmployment.streetAddress || ''}
@@ -478,7 +480,6 @@ const handleSendToTablet = async () => {
                     />
                     <span className="field-label">Street Address</span>
                   </div>
-                  <div className="address-grid">
                     <div className="form-field">
                       <input
                         type="text"
@@ -495,8 +496,7 @@ const handleSendToTablet = async () => {
                       />
                       <span className="field-label">State / Province / Region</span>
                     </div>
-                  </div>
-                  <div className="form-field half-width">
+                                      <div className="form-field">
                     <input
                       type="text"
                       value={applicationData.preEmployment.zipCode || ''}
@@ -504,6 +504,8 @@ const handleSendToTablet = async () => {
                     />
                     <span className="field-label">ZIP / Postal Code</span>
                   </div>
+                  </div>
+
                 </div>
 
                 <div className="form-row">
@@ -901,7 +903,7 @@ const handleSendToTablet = async () => {
               <div className="detail-step">
                 <h1 className="form-title">GIVE THREE REFERENCES</h1>
 
-                {[1, 2, 3].map(num => (
+                {[1, 2].map(num => (
                   <div className="employer-section" key={num}>
                     <h2 className="employer-number">{num}</h2>
 
@@ -969,8 +971,8 @@ const handleSendToTablet = async () => {
               <div className="detail-step">
                 <h1 className="form-title">EMPLOYMENT HISTORY</h1>
 
-                {['emp1', 'emp2', 'emp3'].map((prefix, index) => {
-                  const title = ['First Employer', 'Second Employer', 'Third Employer'][index];
+                {['emp1', 'emp2'].map((prefix, index) => {
+                  const title = ['First Employer', 'Second Employer'][index];
 
                   return (
                     <div className="employer-section" key={prefix}>
@@ -978,8 +980,8 @@ const handleSendToTablet = async () => {
 
                       <div className="form-section">
                         <label className="section-label">Name of Employer</label>
-                        <div className="name-grid">
-                          {['First', 'Middle', 'Last'].map(part => (
+                        <div className="form-field full-width">
+                          {['Name'].map(part => (
                             <div className="form-field" key={part}>
                               <input
                                 type="text"
@@ -998,6 +1000,16 @@ const handleSendToTablet = async () => {
                           <input
                             type="text"
                             value={applicationData.experience[`${prefix}JobTitle`] || ''}
+                            readOnly
+                          />
+                        </div>
+                      </div>
+                      <div className="form-section">
+                        <label className="section-label">Business/Organization Name</label>
+                        <div className="form-field full-width">
+                          <input
+                            type="text"
+                            value={applicationData.experience[`${prefix}BusinessName`] || ''}
                             readOnly
                           />
                         </div>

@@ -1,4 +1,3 @@
-// components/Admin/SettingsPage.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { base_url } from '../../../components/config';
@@ -8,16 +7,22 @@ const SettingsPage = () => {
     companyName: '',
     contactEmail: '',
     phoneNumber: '',
-    notificationInterval: '24', // default to 24 hours
-    notificationIntervalUnit: 'hours', // hours or days
+    notificationInterval: '24',
+    notificationIntervalUnit: 'hours',
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [resetting, setResetting] = useState(false);
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     fetchSettings();
   }, []);
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
 
   const fetchSettings = async () => {
     setLoading(true);
@@ -28,13 +33,13 @@ const SettingsPage = () => {
           companyName: response.data.companyName || '',
           contactEmail: response.data.contactEmail || '',
           phoneNumber: response.data.phoneNumber || '',
-          notificationInterval: response.data.notificationInterval || '24',
+          notificationInterval: response.data.notificationInterval?.toString() || '24',
           notificationIntervalUnit: response.data.notificationIntervalUnit || 'hours',
         });
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
-      setMessage({ type: 'error', text: 'Failed to load settings' });
+      showNotification('Failed to load settings', 'error');
     } finally {
       setLoading(false);
     }
@@ -48,17 +53,43 @@ const SettingsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    setMessage(null);
 
     try {
-      await axios.post(`${base_url}/admin/settings`, settings);
-      setMessage({ type: 'success', text: 'Settings saved successfully!' });
-      setTimeout(() => setMessage(null), 3000);
+      const response = await axios.post(`${base_url}/admin/settings`, settings);
+      
+      if (response.data.success) {
+        showNotification('✅ Settings saved successfully!', 'success');
+      }
     } catch (error) {
       console.error('Error saving settings:', error);
-      setMessage({ type: 'error', text: 'Failed to save settings' });
+      showNotification('❌ Failed to save settings', 'error');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleResetSettings = async () => {
+    if (window.confirm('⚠️ Are you sure you want to reset all settings to defaults? This action cannot be undone.')) {
+      setResetting(true);
+      try {
+        const response = await axios.post(`${base_url}/admin/settings/reset`);
+        
+        if (response.data.success) {
+          setSettings({
+            companyName: response.data.data.companyName || '',
+            contactEmail: response.data.data.contactEmail || '',
+            phoneNumber: response.data.data.phoneNumber || '',
+            notificationInterval: response.data.data.notificationInterval?.toString() || '24',
+            notificationIntervalUnit: response.data.data.notificationIntervalUnit || 'hours',
+          });
+          showNotification('🔄 Settings reset to defaults', 'info');
+        }
+      } catch (error) {
+        console.error('Error resetting settings:', error);
+        showNotification('❌ Failed to reset settings', 'error');
+      } finally {
+        setResetting(false);
+      }
     }
   };
 
@@ -73,29 +104,56 @@ const SettingsPage = () => {
 
   return (
     <>
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`notification-toast notification-${notification.type}`}>
+          <div className="notification-content">
+            <i className={`fas ${
+              notification.type === 'success' ? 'fa-check-circle' :
+              notification.type === 'error' ? 'fa-times-circle' :
+              'fa-info-circle'
+            }`}></i>
+            <span>{notification.message}</span>
+          </div>
+          <button 
+            className="notification-close" 
+            onClick={() => setNotification(null)}
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+      )}
+
       <div className="page-header">
         <div>
           <h2>Settings</h2>
-          <p>Configure application settings</p>
+          <p>Configure application settings and preferences</p>
         </div>
+        <button
+          className="btn-reset"
+          onClick={handleResetSettings}
+          disabled={resetting}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#6b7280',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '500'
+          }}
+        >
+          {resetting ? (
+            <><i className="fas fa-spinner fa-spin"></i> Resetting...</>
+          ) : (
+            <><i className="fas fa-undo"></i> Reset to Defaults</>
+          )}
+        </button>
       </div>
 
       <div className="settings-container">
         <form onSubmit={handleSubmit} className="settings-form">
-          {/* Success/Error Message */}
-          {message && (
-            <div className={`alert alert-${message.type}`} style={{
-              padding: '12px 16px',
-              borderRadius: '8px',
-              marginBottom: '20px',
-              backgroundColor: message.type === 'success' ? '#d4edda' : '#f8d7da',
-              color: message.type === 'success' ? '#155724' : '#721c24',
-              border: `1px solid ${message.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
-            }}>
-              {message.text}
-            </div>
-          )}
-
           {/* General Settings */}
           <div className="form-section">
             <h1 className="form-title">General Settings</h1>
@@ -158,6 +216,7 @@ const SettingsPage = () => {
                   className="form-control"
                   placeholder="e.g. 24"
                   min="1"
+                  max="999"
                   style={{ maxWidth: '120px' }}
                 />
                 <select
@@ -186,14 +245,16 @@ const SettingsPage = () => {
               className="btn-save"
               disabled={saving}
               style={{
-                padding: '10px 24px',
-                backgroundColor: '#4361ee',
+                padding: '12px 32px',
+                backgroundColor: '#10b981',
                 color: 'white',
                 border: 'none',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 cursor: 'pointer',
                 fontSize: '14px',
-                fontWeight: '500'
+                fontWeight: '600',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 4px 6px rgba(16, 185, 129, 0.3)'
               }}
             >
               {saving ? (
@@ -206,46 +267,6 @@ const SettingsPage = () => {
         </form>
       </div>
 
-      <style jsx>{`
-        .settings-container {
-          background: white;
-          border-radius: 12px;
-          padding: 24px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .settings-form {
-          max-width: 600px;
-        }
-        
-        .form-control {
-          width: 100%;
-          padding: 10px 12px;
-          border: 1px solid #ddd;
-          border-radius: 6px;
-          font-size: 14px;
-          transition: border-color 0.2s;
-        }
-        
-        .form-control:focus {
-          outline: none;
-          border-color: #4361ee;
-        }
-
-        .form-field {
-          margin-bottom: 20px;
-        }
-
-        .btn-save:hover {
-          background-color: #3a56d4 !important;
-          transform: translateY(-1px);
-        }
-        
-        .btn-save:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      `}</style>
     </>
   );
 };

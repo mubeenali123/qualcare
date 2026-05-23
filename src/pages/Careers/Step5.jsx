@@ -13,9 +13,8 @@ const EmployerForm = ({ prefix, title, formData, handleInputChange }) => (
     {/* Employer Name */}
     <div className="form-section">
       <label className="section-label">Name of Employer</label>
-      <div className="name-grid">
-        {['First', 'Middle', 'Last'].map(part => (
-          <div className="form-field" key={part}>
+        {['Name'].map(part => (
+          <div className="form-field full-width" key={part}>
             <input
               type="text"
               name={`${prefix}${part}Name`}
@@ -25,7 +24,6 @@ const EmployerForm = ({ prefix, title, formData, handleInputChange }) => (
             <span className="field-label">{part}</span>
           </div>
         ))}
-      </div>
     </div>
 
     {/* Job Title */}
@@ -35,7 +33,12 @@ const EmployerForm = ({ prefix, title, formData, handleInputChange }) => (
         <input type="text" name={`${prefix}JobTitle`} value={formData[`${prefix}JobTitle`] || ''} onChange={handleInputChange} />
       </div>
     </div>
-
+    <div className="form-section">
+      <label className="section-label">Business/Organization Name</label>
+      <div className="form-field full-width">
+        <input type="text" name={`${prefix}BusinessName`} value={formData[`${prefix}BusinessName`] || ''} onChange={handleInputChange} />
+      </div>
+    </div>
     {/* Duties */}
     <div className="form-section">
       <label className="section-label">Duties</label>
@@ -60,11 +63,12 @@ const EmployerForm = ({ prefix, title, formData, handleInputChange }) => (
           <input type="text" name={`${prefix}State`} value={formData[`${prefix}State`] || ''} onChange={handleInputChange} />
           <span className="field-label">State / Province / Region</span>
         </div>
-      </div>
-      <div className="form-field half-width" style={{ marginTop: '15px' }}>
+              <div className="form-field">
         <input type="text" name={`${prefix}Zip`} value={formData[`${prefix}Zip`] || ''} onChange={handleInputChange} />
         <span className="field-label">ZIP / Postal Code</span>
       </div>
+      </div>
+
     </div>
 
     {/* Dates of Employment */}
@@ -72,12 +76,22 @@ const EmployerForm = ({ prefix, title, formData, handleInputChange }) => (
       <div className="form-field">
         <label className="section-label">Dates of Employment</label>
         <span className="field-sublabel">From</span>
-        <input type="date" name={`${prefix}StartDate`} value={formData[`${prefix}StartDate`] || ''} onChange={handleInputChange} />
+        <input
+  type="date"
+  name={`${prefix}StartDate`}
+  value={formData[`${prefix}StartDate`] || ''}
+  onChange={handleInputChange}
+/>
       </div>
       <div className="form-field">
         <label className="section-label">Dates of Employment</label>
         <span className="field-sublabel">To</span>
-        <input type="date" name={`${prefix}EndDate`} value={formData[`${prefix}EndDate`] || ''} onChange={handleInputChange} />
+        <input
+  type="date"
+  name={`${prefix}EndDate`}
+  value={formData[`${prefix}EndDate`] || ''}
+  onChange={handleInputChange}
+/>
       </div>
     </div>
 
@@ -117,12 +131,21 @@ const EmployerForm = ({ prefix, title, formData, handleInputChange }) => (
     ))}
 
     {/* Phone */}
-    <div className="form-section">
-      <label className="section-label">Telephone Number</label>
-      <div className="form-field full-width">
-        <input type="tel" name={`${prefix}Phone`} value={formData[`${prefix}Phone`] || ''} onChange={handleInputChange} />
-      </div>
-    </div>
+<div className="form-section">
+  <label className="section-label">Telephone Number</label>
+  <div className="form-field full-width">
+    <input
+      type="tel"
+      name={`${prefix}Phone`}
+      value={formData[`${prefix}Phone`] || ''}
+      onChange={handleInputChange}
+      pattern="[0-9]{10}"
+      maxLength={10}
+      title="Phone number must be exactly 10 digits"
+      required
+    />
+  </div>
+</div>
 
     {/* Leaving Reason */}
     <div className="form-section">
@@ -137,7 +160,8 @@ const EmployerForm = ({ prefix, title, formData, handleInputChange }) => (
 const Step5 = ({ onNext, onPrevious, onBack, goToStep }) => {
   const dispatch = useDispatch();
   const referenceId = localStorage.getItem('applicationReferenceId');
-const { loading, error } = useSelector(state => state.applicationReducer);
+const { loading, error, experience: savedData } = useSelector(state => state.applicationReducer);
+
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     emp1FirstName: '', emp1MiddleName: '', emp1LastName: '',
@@ -156,11 +180,42 @@ const { loading, error } = useSelector(state => state.applicationReducer);
     emp3SupervisorFirst: '', emp3SupervisorMiddle: '', emp3SupervisorLast: '',
     emp3StartingPay: '', emp3EndingPay: '', emp3Phone: '', emp3Leaving: ''
   });
+useEffect(() => {
+  if (referenceId) {
+    dispatch({
+      type: types.FETCH_EXPERIENCE_DATA_REQUEST,
+      payload: referenceId
+    });
+  }
+}, [dispatch, referenceId]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+useEffect(() => {
+  if (savedData && Object.keys(savedData).length > 0) {
+    setFormData(prev => ({
+      ...prev,
+      ...savedData
+    }));
+  }
+}, [savedData]);
+const handleInputChange = (e) => {
+  const { name, value, type } = e.target;
+
+  if (type === "date") {
+    const isValid = /^\d{4}-\d{2}-\d{2}$/.test(value);
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: isValid ? value : prev[name]
+    }));
+
+    return;
+  }
+
+  setFormData(prev => ({
+    ...prev,
+    [name]: value
+  }));
+};
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -218,7 +273,6 @@ useEffect(() => {
           {/* 2. FIXED: Passing props to the external component */}
           <EmployerForm prefix="emp1" title="First Employer" formData={formData} handleInputChange={handleInputChange} />
           <EmployerForm prefix="emp2" title="Second Employer" formData={formData} handleInputChange={handleInputChange} />
-          <EmployerForm prefix="emp3" title="Third Employer" formData={formData} handleInputChange={handleInputChange} />
 
           <div className="form-actions">
             <button type="button" className="btn-previous" onClick={onPrevious}>Previous</button>

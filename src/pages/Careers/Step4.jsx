@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 const Step4 = ({ onNext, onPrevious, onBack, goToStep }) => {
   const dispatch = useDispatch();
   const referenceId = localStorage.getItem('applicationReferenceId');
-const { loading, error } = useSelector(state => state.applicationReducer);
+const { loading, error, references: savedData } = useSelector(state => state.applicationReducer);
   const [submitted, setSubmitted] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -30,7 +30,23 @@ const { loading, error } = useSelector(state => state.applicationReducer);
     employer3Worked: '',
     employer3Phone: ''
   });
+useEffect(() => {
+  if (referenceId) {
+    dispatch({
+      type: types.FETCH_REFERENCES_DATA_REQUEST,
+      payload: referenceId
+    });
+  }
+}, [dispatch, referenceId]);
 
+useEffect(() => {
+  if (savedData && Object.keys(savedData).length > 0) {
+    setFormData(prev => ({
+      ...prev,
+      ...savedData
+    }));
+  }
+}, [savedData]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -170,7 +186,7 @@ const handleSave = () => {
         <form onSubmit={handleSubmit}>
 
           {/* Employer Sections 1–3 */}
-          {[1, 2, 3].map(num => (
+          {[1, 2].map(num => (
             <div className="employer-section" key={num}>
               <h2 className="employer-number">{num}</h2>
 
@@ -195,12 +211,7 @@ const handleSave = () => {
                     />
                     <span className="field-label">Last</span>
                   </div>
-                </div>
-              </div>
-
-              <div className="form-section">
-                <label className="section-label">City/State</label>
-                <div className="form-field full-width">
+                                  <div className="form-field">
                   <input
                     type="text"
                     name={`employer${num}City`}
@@ -208,7 +219,9 @@ const handleSave = () => {
                     onChange={handleInputChange}
                   />
                 </div>
+                </div>
               </div>
+
 
               <div className="form-section">
                 <label className="section-label">How do you know them, and for how long?</label>
@@ -222,17 +235,20 @@ const handleSave = () => {
                 </div>
               </div>
 
-              <div className="form-section">
-                <label className="section-label">Phone Number</label>
-                <div className="form-field full-width">
-                  <input
-                    type="tel"
-                    name={`employer${num}Phone`}
-                    value={formData[`employer${num}Phone`]}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
+<div className="form-section">
+  <label className="section-label">Phone Number</label>
+  <div className="form-field full-width">
+    <input
+      type="tel"
+      name={`employer${num}Phone`}
+      value={formData[`employer${num}Phone`]}
+      onChange={handleInputChange}
+      pattern="[0-9]{10}"
+      maxLength={10}
+      required
+    />
+  </div>
+</div>
             </div>
           ))}
 

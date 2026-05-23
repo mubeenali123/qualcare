@@ -1,10 +1,15 @@
 import { useState } from 'react';
 import './ApplicationForm.css';
-import { useDispatch } from "react-redux";
 import * as types from '../../redux/type';
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from 'react';
+
 const ApplicationForm = ({ onBack, onNext, goToStep }) => {
     const dispatch = useDispatch();
-
+  const referenceId = localStorage.getItem('applicationReferenceId');
+  
+  // Get saved data from Redux
+  const savedData = useSelector(state => state.applicationReducer.preEmployment);
   const [formData, setFormData] = useState({
     firstName: '',
     middleName: '',
@@ -24,7 +29,24 @@ const ApplicationForm = ({ onBack, onNext, goToStep }) => {
     startDate: '',
     isOver18: ''
   });
+  useEffect(() => {
+    if (referenceId) {
+      dispatch({
+        type: types.FETCH_PRE_EMPLOYMENT_DATA_REQUEST,
+        payload: referenceId
+      });
+    }
+  }, [dispatch, referenceId]);
 
+  // Update form when saved data is loaded from Redux
+  useEffect(() => {
+    if (savedData && Object.keys(savedData).length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        ...savedData
+      }));
+    }
+  }, [savedData]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -166,7 +188,9 @@ const handleNext = (e) => {
           {/* Address Fields */}
           <div className="form-section">
             <label className="section-label">Address <span className="required">*</span></label>
-            <div className="form-field full-width">
+
+            <div className="address-grid">
+                          <div className="form-field">
               <input
                 type="text"
                 name="streetAddress"
@@ -176,7 +200,6 @@ const handleNext = (e) => {
               />
               <span className="field-label">Street Address</span>
             </div>
-            <div className="address-grid">
               <div className="form-field">
                 <input
                   type="text"
@@ -197,8 +220,7 @@ const handleNext = (e) => {
                 />
                 <span className="field-label">State / Province / Region</span>
               </div>
-            </div>
-            <div className="form-field half-width">
+                          <div className="form-field">
               <input
                 type="text"
                 name="zipCode"
@@ -208,31 +230,61 @@ const handleNext = (e) => {
               />
               <span className="field-label">ZIP / Postal Code</span>
             </div>
+            </div>
+
           </div>
 
           {/* SSN and Phone */}
-          <div className="form-row">
-            <div className="form-field">
-              <label className="section-label">Social Security Number <span className="required">*</span></label>
-              <input
-                type="text"
-                name="ssn"
-                value={formData.ssn}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="form-field">
-              <label className="section-label">Phone Number <span className="required">*</span></label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-          </div>
+<div className="form-row">
+  <div className="form-field">
+    <label className="section-label">
+      Social Security Number <span className="required">*</span>
+    </label>
+
+    <input
+      type="text"
+      name="ssn"
+      value={formData.ssn}
+      onChange={(e) => {
+        let value = e.target.value.replace(/\D/g, "");
+
+        // Format as 333-22-4444
+        if (value.length > 3 && value.length <= 5) {
+          value = `${value.slice(0, 3)}-${value.slice(3)}`;
+        } else if (value.length > 5) {
+          value = `${value.slice(0, 3)}-${value.slice(3, 5)}-${value.slice(5, 9)}`;
+        }
+
+        setFormData({
+          ...formData,
+          ssn: value,
+        });
+      }}
+      maxLength={11}
+      pattern="\d{3}-\d{2}-\d{4}"
+      placeholder="333-22-4444"
+      title="SSN must be in format 333-22-4444"
+      required
+    />
+  </div>
+
+  <div className="form-field">
+    <label className="section-label">
+      Phone Number <span className="required">*</span>
+    </label>
+
+    <input
+      type="tel"
+      name="phone"
+      value={formData.phone}
+      onChange={handleInputChange}
+      pattern="[0-9]{10}"
+      maxLength={10}
+      title="Phone number must be exactly 10 digits"
+      required
+    />
+  </div>
+</div>
 
           {/* Legal Eligibility */}
           <div className="form-section">

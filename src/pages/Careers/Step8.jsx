@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import './ApplicationForm.css';
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from 'react';
+import * as types from '../../redux/type';
 
 const Step8 = ({ onNext, onPrevious, onBack, goToStep }) => {
   const dispatch = useDispatch();
   const referenceId = localStorage.getItem('applicationReferenceId');
+  const savedData = useSelector(state => state.applicationReducer.certification);
 
   const [formData, setFormData] = useState({
     domesticViolence: null,
@@ -34,7 +37,24 @@ const Step8 = ({ onNext, onPrevious, onBack, goToStep }) => {
     professionalLiabilityInsurance: null,
     professionalLiabilityInsuranceExpiry: ''
   });
+  useEffect(() => {
+    if (referenceId) {
+      dispatch({
+        type: types.FETCH_CERTIFICATION_DATA_REQUEST,
+        payload: referenceId
+      });
+    }
+  }, [dispatch, referenceId]);
 
+  // Update form when saved data is loaded from Redux
+  useEffect(() => {
+    if (savedData && Object.keys(savedData).length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        ...savedData
+      }));
+    }
+  }, [savedData]);
   const handleFileChange = (e) => {
     const { name, files } = e.target;
 

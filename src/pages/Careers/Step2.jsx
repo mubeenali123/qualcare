@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 const Step2 = ({ onNext, onPrevious, onBack, goToStep }) => {
   const dispatch = useDispatch();
   const referenceId = localStorage.getItem('applicationReferenceId');
-const { loading, error } = useSelector(state => state.applicationReducer);
+  const { loading, error, education: savedData } = useSelector(state => state.applicationReducer);
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     highSchoolName: '',
@@ -24,7 +24,24 @@ const { loading, error } = useSelector(state => state.applicationReducer);
     currentlyEnrolled: '',
     skills: ''
   });
+  useEffect(() => {
+    if (referenceId) {
+      dispatch({
+        type: types.FETCH_EDUCATION_DATA_REQUEST,
+        payload: referenceId
+      });
+    }
+  }, [dispatch, referenceId]);
 
+  // Update form when saved data is loaded
+  useEffect(() => {
+    if (savedData && Object.keys(savedData).length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        ...savedData
+      }));
+    }
+  }, [savedData]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({

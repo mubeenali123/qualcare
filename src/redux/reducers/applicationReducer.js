@@ -299,6 +299,90 @@ const applicationReducer = (state = initialState, action) => {
         sendingToTablet: false,
         sendToTabletError: action.payload
       };
+      // FETCH PRE-EMPLOYMENT DATA
+    case types.FETCH_PRE_EMPLOYMENT_DATA_REQUEST:
+    case types.FETCH_EDUCATION_DATA_REQUEST:
+    case types.FETCH_AVAILABILITY_DATA_REQUEST:
+    case types.FETCH_REFERENCES_DATA_REQUEST:
+    case types.FETCH_EXPERIENCE_DATA_REQUEST:
+    case types.FETCH_DOCUMENTS_DATA_REQUEST:
+    case types.FETCH_CERTIFICATION_DATA_REQUEST:
+    case types.FETCH_REVIEW_DATA_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null
+      };
+
+    case types.FETCH_PRE_EMPLOYMENT_DATA_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        preEmployment: action.payload
+      };
+
+    case types.FETCH_EDUCATION_DATA_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        education: action.payload
+      };
+
+    case types.FETCH_AVAILABILITY_DATA_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        availability: action.payload
+      };
+
+    case types.FETCH_REFERENCES_DATA_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        references: action.payload
+      };
+
+    case types.FETCH_EXPERIENCE_DATA_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        experience: action.payload
+      };
+
+    case types.FETCH_DOCUMENTS_DATA_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        documents: action.payload
+      };
+
+    case types.FETCH_CERTIFICATION_DATA_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        certification: action.payload
+      };
+
+    case types.FETCH_REVIEW_DATA_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        review: action.payload
+      };
+
+    case types.FETCH_PRE_EMPLOYMENT_DATA_FAILURE:
+    case types.FETCH_EDUCATION_DATA_FAILURE:
+    case types.FETCH_AVAILABILITY_DATA_FAILURE:
+    case types.FETCH_REFERENCES_DATA_FAILURE:
+    case types.FETCH_EXPERIENCE_DATA_FAILURE:
+    case types.FETCH_DOCUMENTS_DATA_FAILURE:
+    case types.FETCH_CERTIFICATION_DATA_FAILURE:
+    case types.FETCH_REVIEW_DATA_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload
+      };
     default:
       return state;
   }

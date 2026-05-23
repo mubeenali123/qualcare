@@ -572,6 +572,157 @@ function* unarchiveApplicantAccount(action) {
     });
   }
 }
+function* fetchPreEmploymentData(action) {
+  try {
+    const referenceId = action.payload || localStorage.getItem('applicationReferenceId');
+    const response = yield call(() =>
+      axios.get(`${base_url}/applications-step-data/${referenceId}/pre_employment`)
+    );
+    
+    yield put({
+      type: types.FETCH_PRE_EMPLOYMENT_DATA_SUCCESS,
+      payload: response.data.data || {}
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_PRE_EMPLOYMENT_DATA_FAILURE,
+      payload: error.response?.data || error.message
+    });
+  }
+}
+
+function* fetchEducationData(action) {
+  try {
+    const referenceId = action.payload || localStorage.getItem('applicationReferenceId');
+    const response = yield call(() =>
+      axios.get(`${base_url}/applications-step-data/${referenceId}/education`)
+    );
+    
+    yield put({
+      type: types.FETCH_EDUCATION_DATA_SUCCESS,
+      payload: response.data.data || {}
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_EDUCATION_DATA_FAILURE,
+      payload: error.response?.data || error.message
+    });
+  }
+}
+
+function* fetchAvailabilityData(action) {
+  try {
+    const referenceId = action.payload || localStorage.getItem('applicationReferenceId');
+    const response = yield call(() =>
+      axios.get(`${base_url}/applications-step-data/${referenceId}/availability`)
+    );
+    
+    yield put({
+      type: types.FETCH_AVAILABILITY_DATA_SUCCESS,
+      payload: response.data.data || {}
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_AVAILABILITY_DATA_FAILURE,
+      payload: error.response?.data || error.message
+    });
+  }
+}
+
+function* fetchReferencesData(action) {
+  try {
+    const referenceId = action.payload || localStorage.getItem('applicationReferenceId');
+    const response = yield call(() =>
+      axios.get(`${base_url}/applications-step-data/${referenceId}/references`)
+    );
+    
+    yield put({
+      type: types.FETCH_REFERENCES_DATA_SUCCESS,
+      payload: response.data.data || {}
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_REFERENCES_DATA_FAILURE,
+      payload: error.response?.data || error.message
+    });
+  }
+}
+
+function* fetchExperienceData(action) {
+  try {
+    const referenceId = action.payload || localStorage.getItem('applicationReferenceId');
+    const response = yield call(() =>
+      axios.get(`${base_url}/applications-step-data/${referenceId}/experience`)
+    );
+    
+    yield put({
+      type: types.FETCH_EXPERIENCE_DATA_SUCCESS,
+      payload: response.data.data || {}
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_EXPERIENCE_DATA_FAILURE,
+      payload: error.response?.data || error.message
+    });
+  }
+}
+
+function* fetchDocumentsData(action) {
+  try {
+    const referenceId = action.payload || localStorage.getItem('applicationReferenceId');
+    const response = yield call(() =>
+      axios.get(`${base_url}/applications-step-data/${referenceId}/documents`)
+    );
+    
+    yield put({
+      type: types.FETCH_DOCUMENTS_DATA_SUCCESS,
+      payload: response.data.data || {}
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_DOCUMENTS_DATA_FAILURE,
+      payload: error.response?.data || error.message
+    });
+  }
+}
+
+function* fetchCertificationData(action) {
+  try {
+    const referenceId = action.payload || localStorage.getItem('applicationReferenceId');
+    const response = yield call(() =>
+      axios.get(`${base_url}/applications-step-data/${referenceId}/certifications`)
+    );
+    
+    yield put({
+      type: types.FETCH_CERTIFICATION_DATA_SUCCESS,
+      payload: response.data.data || {}
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_CERTIFICATION_DATA_FAILURE,
+      payload: error.response?.data || error.message
+    });
+  }
+}
+
+function* fetchReviewData(action) {
+  try {
+    const referenceId = action.payload || localStorage.getItem('applicationReferenceId');
+    const response = yield call(() =>
+      axios.get(`${base_url}/applications-step-data/${referenceId}/review`)
+    );
+    
+    yield put({
+      type: types.FETCH_REVIEW_DATA_SUCCESS,
+      payload: response.data.data || {}
+    });
+  } catch (error) {
+    yield put({
+      type: types.FETCH_REVIEW_DATA_FAILURE,
+      payload: error.response?.data || error.message
+    });
+  }
+}
 // Watcher
 export function* watchApplicationActions() {
   yield takeLatest(types.SUBMIT_APPLICATION_REQUEST, submitApplication);
@@ -596,5 +747,14 @@ export function* watchApplicationActions() {
   yield takeLatest(types.FETCH_FORM_PROGRESS_REQUEST, fetchFormProgress);
   yield takeLatest(types.FETCH_FINAL_FORM_DATA_REQUEST, fetchFinalFormData);
   yield takeLatest(types.SEND_TO_TABLET_REQUEST, sendToTablet);
+
+    yield takeLatest(types.FETCH_PRE_EMPLOYMENT_DATA_REQUEST, fetchPreEmploymentData);
+  yield takeLatest(types.FETCH_EDUCATION_DATA_REQUEST, fetchEducationData);
+  yield takeLatest(types.FETCH_AVAILABILITY_DATA_REQUEST, fetchAvailabilityData);
+  yield takeLatest(types.FETCH_REFERENCES_DATA_REQUEST, fetchReferencesData);
+  yield takeLatest(types.FETCH_EXPERIENCE_DATA_REQUEST, fetchExperienceData);
+  yield takeLatest(types.FETCH_DOCUMENTS_DATA_REQUEST, fetchDocumentsData);
+  yield takeLatest(types.FETCH_CERTIFICATION_DATA_REQUEST, fetchCertificationData);
+  yield takeLatest(types.FETCH_REVIEW_DATA_REQUEST, fetchReviewData);
 
 }
