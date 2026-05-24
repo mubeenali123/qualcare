@@ -1,1 +1,1 @@
-export const base_url = "https://app.qualcarenursing.com/api";
+export const base_url = "https://qualcare.smmtechnologies.com/api";
