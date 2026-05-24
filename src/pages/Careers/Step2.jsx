@@ -170,7 +170,7 @@ useEffect(() => {
 
           <div className="form-section">
             <label className="section-label">City and State <span className="required">*</span></label>
-            <div className="address-grid">
+            <div className="address-grid-2">
               <div className="form-field">
                 <input 
                   type="text" 
