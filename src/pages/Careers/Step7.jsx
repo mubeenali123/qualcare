@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import * as types from '../../redux/type';
 
 const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
+  console.log('updated');
   const today = new Date().toISOString().split("T")[0];
   const { loading, error, review: savedData } = useSelector(state => state.applicationReducer);
   const [submitted, setSubmitted] = useState(false);
@@ -123,10 +124,16 @@ const handleSubmit = (e) => {
   // Prepare FormData for submission
   const submissionData = new FormData();
   submissionData.append("referenceId", referenceId);
-  submissionData.append("step", "review"); // for backend tracking
-  submissionData.append("signatureDate", formData.signatureDate);
-  submissionData.append("agreeStatements", formData.agreeStatements);
-  submissionData.append("signature", dataURLtoFile(signatureData, "signature.png"));
+  submissionData.append("step", "review");
+  
+  // Create data object with signature as base64
+  const reviewData = {
+    signatureDate: formData.signatureDate,
+    agreeStatements: formData.agreeStatements,
+    signature_base64: signatureData
+  };
+  
+  submissionData.append("data", JSON.stringify(reviewData));
 
   // Dispatch action
   dispatch({
@@ -134,9 +141,8 @@ const handleSubmit = (e) => {
     payload: submissionData
   });
 
-   goToStep(9);
-       setSubmitted(true);
-
+  goToStep(9);
+  setSubmitted(true);
 };
 useEffect(() => {
     if (submitted && !loading && !error) {

@@ -143,7 +143,7 @@ const handleSave = () => {
       <header className="header">
   <div className="header-container">
     <div className="logo">
-      <img src="/logo.png" alt="QualCare Logo" />
+      <img src="/logo.png.png" alt="QualCare Logo" />
     </div>
     <button className="home-btn" onClick={onBack}>Home</button>
     <div className="header-right">
