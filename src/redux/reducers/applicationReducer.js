@@ -22,7 +22,10 @@ const initialState = {
   loading: false,
   error: null,
   sendingToTablet: false,
-  sendToTabletError: null
+  sendToTabletError: null,
+  resendEmailLoading: false,
+  resendEmailSuccess: null,
+  resendEmailError: null
 };
 
 const applicationReducer = (state = initialState, action) => {
@@ -299,7 +302,7 @@ const applicationReducer = (state = initialState, action) => {
         sendingToTablet: false,
         sendToTabletError: action.payload
       };
-      // FETCH PRE-EMPLOYMENT DATA
+    // FETCH PRE-EMPLOYMENT DATA
     case types.FETCH_PRE_EMPLOYMENT_DATA_REQUEST:
     case types.FETCH_EDUCATION_DATA_REQUEST:
     case types.FETCH_AVAILABILITY_DATA_REQUEST:
@@ -382,6 +385,27 @@ const applicationReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         error: action.payload
+      };
+    case types.RESEND_EMAIL_REQUEST:
+      return {
+        ...state,
+        resendEmailLoading: true,
+        resendEmailSuccess: null,
+        resendEmailError: null
+      };
+    case types.RESEND_EMAIL_SUCCESS:
+      return {
+        ...state,
+        resendEmailLoading: false,
+        resendEmailSuccess: action.payload.message,
+        resendEmailError: null
+      };
+    case types.RESEND_EMAIL_FAIL:
+      return {
+        ...state,
+        resendEmailLoading: false,
+        resendEmailSuccess: null,
+        resendEmailError: action.payload
       };
     default:
       return state;

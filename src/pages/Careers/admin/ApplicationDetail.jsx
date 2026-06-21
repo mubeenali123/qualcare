@@ -60,6 +60,26 @@ const [finalAppLoading, setFinalAppLoading] = useState(false);
 const statusLogs = useSelector(state => state.applicationReducer?.statusLogs || []);
 const tabletSendSuccess = useSelector(state => state.applicationReducer?.tabletSendSuccess);
 const tabletSendError = useSelector(state => state.applicationReducer?.tabletSendError);
+    const resendEmailLoading = useSelector(state => state.applicationReducer?.resendEmailLoading);
+    const resendEmailSuccess = useSelector(state => state.applicationReducer?.resendEmailSuccess);
+    const resendEmailError = useSelector(state => state.applicationReducer?.resendEmailError);
+        useEffect(() => {
+        if (resendEmailSuccess) {
+            alert('✅ Email resent successfully! Power Automate flow has been triggered.');
+        }
+        if (resendEmailError) {
+            alert('❌ Failed to resend email: ' + resendEmailError);
+        }
+    }, [resendEmailSuccess, resendEmailError]);
+
+    const handleResendEmail = () => {
+        if (window.confirm('📧 Resend approval email to applicant?\n\nThis will trigger the Power Automate flow to send the email again.')) {
+            dispatch({
+                type: types.RESEND_EMAIL_REQUEST,
+                payload: id
+            });
+        }
+    };
 useEffect(() => {
   if (tabletSendSuccess) {
     // Update local state when API succeeds
@@ -341,6 +361,20 @@ const handleSendToTablet = async () => {
       {applicationData?.details?.sent_to_tablet ? 'Sent to Tablet' : 'Send to Tablet'}
     </button>
   )}
+  {applicationData?.details?.status === "approved" && (
+                        <button 
+                            className="btn-resend-email" 
+                            onClick={handleResendEmail}
+                            disabled={resendEmailLoading}
+                        >
+                            {resendEmailLoading ? (
+                                <i className="fas fa-spinner fa-spin"></i>
+                            ) : (
+                                <i className="fas fa-envelope"></i>
+                            )}
+                            {resendEmailLoading ? 'Sending...' : 'Resend Email'}
+                        </button>
+                    )}
 
   {applicationData?.details?.status === "pending" && (
     <>

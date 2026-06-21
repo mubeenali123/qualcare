@@ -723,6 +723,40 @@ function* fetchReviewData(action) {
     });
   }
 }
+function* resendEmail(action) {
+  try {
+    const response = yield call(() =>
+      axios.post(`${base_url}/admin/applications/${action.payload}/resend-email`)
+    );
+
+    yield put({
+      type: types.RESEND_EMAIL_SUCCESS,
+      payload: response.data
+    });
+
+    alert('✅ Email resent successfully! Power Automate flow has been triggered.');
+    
+    // Optionally refresh application data to show updated status logs
+    yield put({
+      type: types.FETCH_APPLICATION_DETAIL_REQUEST,
+      payload: action.payload
+    });
+
+    // Refresh status logs to show the resend action
+    yield put({
+      type: types.FETCH_STATUS_LOGS_REQUEST,
+      payload: action.payload
+    });
+
+  } catch (error) {
+    yield put({
+      type: types.RESEND_EMAIL_FAIL,
+      payload: error.response?.data?.message || 'Failed to resend email'
+    });
+
+    alert('❌ Failed to resend email: ' + (error.response?.data?.message || 'Please try again'));
+  }
+}
 // Watcher
 export function* watchApplicationActions() {
   yield takeLatest(types.SUBMIT_APPLICATION_REQUEST, submitApplication);
@@ -747,6 +781,7 @@ export function* watchApplicationActions() {
   yield takeLatest(types.FETCH_FORM_PROGRESS_REQUEST, fetchFormProgress);
   yield takeLatest(types.FETCH_FINAL_FORM_DATA_REQUEST, fetchFinalFormData);
   yield takeLatest(types.SEND_TO_TABLET_REQUEST, sendToTablet);
+  yield takeLatest(types.RESEND_EMAIL_REQUEST, resendEmail);
 
     yield takeLatest(types.FETCH_PRE_EMPLOYMENT_DATA_REQUEST, fetchPreEmploymentData);
   yield takeLatest(types.FETCH_EDUCATION_DATA_REQUEST, fetchEducationData);
