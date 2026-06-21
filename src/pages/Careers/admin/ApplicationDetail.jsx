@@ -63,14 +63,6 @@ const tabletSendError = useSelector(state => state.applicationReducer?.tabletSen
     const resendEmailLoading = useSelector(state => state.applicationReducer?.resendEmailLoading);
     const resendEmailSuccess = useSelector(state => state.applicationReducer?.resendEmailSuccess);
     const resendEmailError = useSelector(state => state.applicationReducer?.resendEmailError);
-        useEffect(() => {
-        if (resendEmailSuccess) {
-            alert('✅ Email resent successfully! Power Automate flow has been triggered.');
-        }
-        if (resendEmailError) {
-            alert('❌ Failed to resend email: ' + resendEmailError);
-        }
-    }, [resendEmailSuccess, resendEmailError]);
 
     const handleResendEmail = () => {
         if (window.confirm('📧 Resend approval email to applicant?\n\nThis will trigger the Power Automate flow to send the email again.')) {
