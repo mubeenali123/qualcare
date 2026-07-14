@@ -1707,7 +1707,7 @@ const ApplicationDetail = () => {
                             >
                                 Cancel
                             </button>
-                            <button
+                            {/* <button
                                 className="btn-send-revision"
                                 onClick={handleRequestRevision}
                                 disabled={revisionSubmitting || revisionReason.length < 10}
@@ -1723,7 +1723,7 @@ const ApplicationDetail = () => {
                                         Send Revision Request
                                     </>
                                 )}
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 </div>
