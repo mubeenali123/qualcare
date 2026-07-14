@@ -172,7 +172,7 @@ const handleSubmit = (e) => {
           </div>
           <div className="step completed" onClick={() => goToStep(3)}>
             <div className="step-number">✓</div>
-            <span className="step-label">Experience</span>
+            <span className="step-label">Availability</span>
           </div>
           <div className="step completed" onClick={() => goToStep(4)}>
             <div className="step-number">✓</div>
@@ -180,7 +180,7 @@ const handleSubmit = (e) => {
           </div>
           <div className="step completed" onClick={() => goToStep(5)}>
             <div className="step-number">5</div>
-            <span className="step-label">Skills</span>
+            <span className="step-label">Employment History</span>
           </div>
           <div className="step completed" onClick={() => goToStep(6)}>
             <div className="step-number">6</div>

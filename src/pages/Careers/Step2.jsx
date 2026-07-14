@@ -116,7 +116,7 @@ useEffect(() => {
   </div>
   <div className="step" onClick={() => goToStep(3)}>
     <div className="step-number">3</div>
-    <span className="step-label">Experience</span>
+    <span className="step-label">Availability</span>
   </div>
   <div className="step" onClick={() => goToStep(4)}>
     <div className="step-number">4</div>
@@ -124,7 +124,7 @@ useEffect(() => {
   </div>
   <div className="step" onClick={() => goToStep(5)}>
     <div className="step-number">5</div>
-    <span className="step-label">Skills</span>
+    <span className="step-label">Employment History</span>
   </div>
   <div className="step" onClick={() => goToStep(6)}>
     <div className="step-number">6</div>

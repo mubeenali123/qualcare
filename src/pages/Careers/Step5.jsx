@@ -249,7 +249,7 @@ useEffect(() => {
 
       <div className="form-container">
         <div className="progress-steps">
-          {['Pre-Employment', 'Education', 'Experience', 'References', 'Skills', 'Documents', 'Certifications Upload', 'Review'].map((label, idx) => {
+          {['Pre-Employment', 'Education', 'Availability', 'References', 'Employment History', 'Documents', 'Certifications Upload', 'Review'].map((label, idx) => {
             const stepNum = idx + 1;
             const isActive = stepNum === 5;
             const isCompleted = stepNum < 5;
