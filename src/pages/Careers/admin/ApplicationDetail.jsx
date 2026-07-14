@@ -69,40 +69,40 @@ const ApplicationDetail = () => {
     const revisionLoading = useSelector(state => state.applicationReducer?.revisionLoading);
     const revisionSuccess = useSelector(state => state.applicationReducer?.revisionSuccess);
     const revisionError = useSelector(state => state.applicationReducer?.revisionError);
-     const handleRequestRevision = async () => {
-        if (!revisionReason.trim()) {
-            alert('Please provide a reason for the revision request');
-            return;
-        }
+    //  const handleRequestRevision = async () => {
+    //     if (!revisionReason.trim()) {
+    //         alert('Please provide a reason for the revision request');
+    //         return;
+    //     }
         
-        if (revisionReason.trim().length < 10) {
-            alert('Please provide a detailed reason (at least 10 characters)');
-            return;
-        }
+    //     if (revisionReason.trim().length < 10) {
+    //         alert('Please provide a detailed reason (at least 10 characters)');
+    //         return;
+    //     }
         
-        setRevisionSubmitting(true);
+    //     setRevisionSubmitting(true);
         
-        try {
-            await dispatch({
-                type: types.REQUEST_REVISION_REQUEST,
-                payload: {
-                    id: id,
-                    revision_reason: revisionReason
-                }
-            });
+    //     try {
+    //         await dispatch({
+    //             type: types.REQUEST_REVISION_REQUEST,
+    //             payload: {
+    //                 id: id,
+    //                 revision_reason: revisionReason
+    //             }
+    //         });
             
-            setShowRevisionModal(false);
-            setRevisionReason('');
+    //         setShowRevisionModal(false);
+    //         setRevisionReason('');
             
-            // Refresh application details
-            fetchApplicationDetails();
+    //         // Refresh application details
+    //         fetchApplicationDetails();
             
-        } catch (error) {
-            console.error('Error requesting revision:', error);
-        } finally {
-            setRevisionSubmitting(false);
-        }
-    };
+    //     } catch (error) {
+    //         console.error('Error requesting revision:', error);
+    //     } finally {
+    //         setRevisionSubmitting(false);
+    //     }
+    // };
   const handleResendEmail = () => {
     if (window.confirm('📧 Resend approval email to applicant?\n\nThis will trigger the Power Automate flow to send the email again.')) {
       dispatch({
@@ -430,22 +430,22 @@ const ApplicationDetail = () => {
               <button className="btn-reject" onClick={handleReject}>
                 <i className="fas fa-times-circle"></i> Reject
               </button>
-              <button 
+              {/* <button 
                                 className="btn-revision"
                                 onClick={() => setShowRevisionModal(true)}
                             >
                                 <i className="fas fa-edit"></i> Request Revision
-                            </button>
+                            </button> */}
             </>
           )}
- {applicationData?.details?.status === "revision_requested" && (
+ {/* {applicationData?.details?.status === "revision_requested" && (
                         <button 
                             className="btn-revision"
                             onClick={() => setShowRevisionModal(true)}
                         >
                             <i className="fas fa-edit"></i> Update Revision
                         </button>
-                    )}
+                    )} */}
           {applicationData?.details?.status === "approved" && (
             <button className="btn-approve" disabled>
               <i className="fas fa-check-circle"></i> Approved
