@@ -35,8 +35,10 @@ const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
       }));
     }
   }, [savedData]);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const canvasRef = useRef(null);
+const signaturePadRef = useRef(null);
+const [signatureData, setSignatureData] = useState(null);
+const [isDrawing, setIsDrawing] = useState(false);
+const canvasRef = useRef(null);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -46,59 +48,72 @@ const Step7 = ({ onPrevious, onBack, onNext, goToStep }) => {
     });
   };
 
-  // Signature Pad Functions
   const startDrawing = (e) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    
-    let x, y;
-    if (e.type === 'mousedown') {
-      x = e.clientX - rect.left;
-      y = e.clientY - rect.top;
-    } else if (e.type === 'touchstart') {
-      x = e.touches[0].clientX - rect.left;
-      y = e.touches[0].clientY - rect.top;
-    }
-    
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    setIsDrawing(true);
-  };
+  e.preventDefault();
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.getBoundingClientRect();
+  
+  let clientX, clientY;
+  if (e.touches) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+  
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  setIsDrawing(true);
+};
 
-  const draw = (e) => {
-    if (!isDrawing) return;
-    
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    
-    let x, y;
-    if (e.type === 'mousemove') {
-      x = e.clientX - rect.left;
-      y = e.clientY - rect.top;
-    } else if (e.type === 'touchmove') {
-      e.preventDefault();
-      x = e.touches[0].clientX - rect.left;
-      y = e.touches[0].clientY - rect.top;
-    }
-    
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#000';
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  };
+const draw = (e) => {
+  e.preventDefault();
+  if (!isDrawing) return;
+  
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.getBoundingClientRect();
+  
+  let clientX, clientY;
+  if (e.touches) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+  
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#000';
+  ctx.lineTo(x, y);
+  ctx.stroke();
+};
 
-  const stopDrawing = () => {
-    setIsDrawing(false);
-  };
+const stopDrawing = (e) => {
+  e.preventDefault();
+  setIsDrawing(false);
+  // Save the signature data
+  const canvas = canvasRef.current;
+  setSignatureData(canvas.toDataURL('image/png'));
+};
 
-  const clearSignature = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  };
+const clearSignature = () => {
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  setSignatureData(null);
+};
+
 
 const handleSubmit = (e) => {
   e.preventDefault();
@@ -265,24 +280,25 @@ function dataURLtoFile(dataurl, filename) {
           {/* Signature Section */}
           <div className="signature-section">
             <label className="section-label">Signature <span className="required">*</span></label>
-            <div className="signature-pad-container">
-              <canvas
-                ref={canvasRef}
-                width={500}
-                height={200}
-                className="signature-canvas"
-                onMouseDown={startDrawing}
-                onMouseMove={draw}
-                onMouseUp={stopDrawing}
-                onMouseLeave={stopDrawing}
-                onTouchStart={startDrawing}
-                onTouchMove={draw}
-                onTouchEnd={stopDrawing}
-              />
-              <button type="button" className="clear-signature-btn" onClick={clearSignature}>
-                ↻
-              </button>
-            </div>
+<div className="signature-pad-container">
+  <canvas
+    ref={canvasRef}
+    width={500}
+    height={200}
+    className="signature-canvas"
+    style={{ touchAction: 'none' }}
+    onMouseDown={startDrawing}
+    onMouseMove={draw}
+    onMouseUp={stopDrawing}
+    onMouseLeave={stopDrawing}
+    onTouchStart={startDrawing}
+    onTouchMove={draw}
+    onTouchEnd={stopDrawing}
+  />
+  <button type="button" className="clear-signature-btn" onClick={clearSignature}>
+    Clear
+  </button>
+</div>
           </div>
 
           {/* Date */}

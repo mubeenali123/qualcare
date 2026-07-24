@@ -74,7 +74,24 @@ const handleNext = (e) => {
   onNext();
 };
 
+// Add this helper function at the top of each component
+const getMaxDate = () => {
+  const date = new Date();
+  date.setFullYear(date.getFullYear() - 5);
+  return date.toISOString().split('T')[0];
+};
 
+// For date of birth (needs to be at least 18 years ago)
+const getMinDateForDOB = () => {
+  const date = new Date();
+  date.setFullYear(date.getFullYear() - 18);
+  return date.toISOString().split('T')[0];
+};
+
+// For start date (can be today or future)
+const getMinDateForStart = () => {
+  return new Date().toISOString().split('T')[0];
+};
   return (
     <div className="application-page">
       {/* Header */}
@@ -150,40 +167,41 @@ const handleNext = (e) => {
 
         <form onSubmit={handleNext}>
           {/* Name Fields */}
-          <div className="form-section">
-            <label className="section-label">Name <span className="required">*</span></label>
-            <div className="name-grid">
-              <div className="form-field">
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  required
-                />
-                <span className="field-label">First</span>
-              </div>
-              <div className="form-field">
-                <input
-                  type="text"
-                  name="middleName"
-                  value={formData.middleName}
-                  onChange={handleInputChange}
-                />
-                <span className="field-label">Middle</span>
-              </div>
-              <div className="form-field">
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  required
-                />
-                <span className="field-label">Last</span>
-              </div>
-            </div>
-          </div>
+// In ApplicationForm.js - Name Fields section
+<div className="form-section">
+  <label className="section-label">Name <span className="required">*</span></label>
+  <div className="name-grid">
+    <div className="form-field">
+      <input
+        type="text"
+        name="firstName"
+        value={formData.firstName}
+        onChange={handleInputChange}
+        required
+      />
+      <span className="field-label">First <span className="required">*</span></span>
+    </div>
+    <div className="form-field">
+      <input
+        type="text"
+        name="middleName"
+        value={formData.middleName}
+        onChange={handleInputChange}
+      />
+      <span className="field-label">Middle</span>
+    </div>
+    <div className="form-field">
+      <input
+        type="text"
+        name="lastName"
+        value={formData.lastName}
+        onChange={handleInputChange}
+        required
+      />
+      <span className="field-label">Last <span className="required">*</span></span>
+    </div>
+  </div>
+</div>
 
           {/* Address Fields */}
           <div className="form-section">
@@ -221,13 +239,20 @@ const handleNext = (e) => {
                 <span className="field-label">State / Province / Region</span>
               </div>
                           <div className="form-field">
-              <input
-                type="text"
-                name="zipCode"
-                value={formData.zipCode}
-                onChange={handleInputChange}
-                required
-              />
+<input
+  type="text"
+  name="zipCode"
+  value={formData.zipCode}
+  onChange={(e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setFormData({
+      ...formData,
+      zipCode: value
+    });
+  }}
+  pattern="[0-9]*"
+  required
+/>
               <span className="field-label">ZIP / Postal Code</span>
             </div>
             </div>
@@ -344,23 +369,31 @@ const handleNext = (e) => {
           <div className="form-row">
             <div className="form-field">
               <label className="section-label">Wage/Salary Desired <span className="required">*</span></label>
-              <input
-                type="text"
-                name="wageDesired"
-                value={formData.wageDesired}
-                onChange={handleInputChange}
-                required
-              />
+<input
+  type="text"
+  name="wageDesired"
+  value={formData.wageDesired}
+  onChange={(e) => {
+    const value = e.target.value.replace(/[^0-9.]/g, '');
+    setFormData({
+      ...formData,
+      wageDesired: value
+    });
+  }}
+  pattern="[0-9.]*"
+  required
+/>
             </div>
             <div className="form-field">
               <label className="section-label">Date of Birth <span className="required">*</span></label>
-              <input
-                type="date"
-                name="dateOfBirth"
-                value={formData.dateOfBirth}
-                onChange={handleInputChange}
-                required
-              />
+<input
+  type="date"
+  name="dateOfBirth"
+  value={formData.dateOfBirth}
+  onChange={handleInputChange}
+  max={getMinDateForDOB()}
+  required
+/>
             </div>
           </div>
 
@@ -398,13 +431,14 @@ const handleNext = (e) => {
           <div className="form-section">
             <label className="section-label">Date you can begin work? <span className="required">*</span></label>
             <div className="form-field half-width">
-              <input
-                type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={handleInputChange}
-                required
-              />
+<input
+  type="date"
+  name="startDate"
+  value={formData.startDate}
+  onChange={handleInputChange}
+  min={getMinDateForStart()}
+  required
+/>
             </div>
           </div>
 

@@ -82,8 +82,9 @@ useEffect(() => {
       onNext();
     }
   }, [loading, error, submitted]);
+// In Step6.js - Updated FileUpload component
 const FileUpload = React.memo(
-  ({ label, name, expiryName, formData, onFileChange, onExpiryChange, useCamera }) => {
+  ({ label, name, expiryName, formData, onFileChange, onExpiryChange }) => {
     return (
       <div className="file-upload-section">
         <label className="section-label">{label}</label>
@@ -93,8 +94,8 @@ const FileUpload = React.memo(
             type="file"
             name={name}
             onChange={onFileChange}
-            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-            {...(useCamera ? { capture: "environment" } : {})} // Enable camera capture if useCamera is true
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,image/*"
+            // Remove capture attribute and use multiple options
           />
         </div>
 
