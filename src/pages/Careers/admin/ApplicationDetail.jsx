@@ -213,30 +213,63 @@ const ApplicationDetail = () => {
       });
     }
   };
-  const fetchApplicationDetails = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`${base_url}/admin/applications/${id}`);
+const fetchApplicationDetails = async () => {
+  try {
+    setLoading(true);
+    const response = await axios.get(`${base_url}/admin/applications/${id}`);
 
-      // Format the data from backend
-      const formattedData = {
-        details: response.data.details,
-        preEmployment: response.data.steps.pre_employment?.data || {},
-        education: response.data.steps.education?.data || {},
-        availability: response.data.steps.availability?.data || {},
-        references: response.data.steps.references?.data || {},
-        experience: response.data.steps.experience?.data || {},
-        documents: response.data.steps.documents || {},
-        review: response.data.steps.review?.data || {}
-      };
+    // Helper function to parse step data that handles both formats
+    const parseStepData = (stepData) => {
+      if (!stepData) return {};
+      
+      // If it's already an object with the fields we expect, return it
+      if (stepData.signatureDate || stepData.agreeStatements !== undefined) {
+        return stepData;
+      }
+      
+      // If it has a 'data' field that's a string, parse it
+      if (stepData.data && typeof stepData.data === 'string') {
+        try {
+          const parsed = JSON.parse(stepData.data);
+          return parsed;
+        } catch (e) {
+          console.error('Error parsing nested data:', e);
+          return stepData;
+        }
+      }
+      
+      // If it's already a string, parse it
+      if (typeof stepData === 'string') {
+        try {
+          return JSON.parse(stepData);
+        } catch (e) {
+          console.error('Error parsing step data:', e);
+          return {};
+        }
+      }
+      
+      return stepData;
+    };
 
-      setApplicationData(formattedData);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching application:', error);
-      setLoading(false);
-    }
-  };
+    // Format the data from backend
+    const formattedData = {
+      details: response.data.details,
+      preEmployment: response.data.steps.pre_employment?.data || {},
+      education: response.data.steps.education?.data || {},
+      availability: response.data.steps.availability?.data || {},
+      references: response.data.steps.references?.data || {},
+      experience: response.data.steps.experience?.data || {},
+      documents: response.data.steps.documents || {},
+      review: parseStepData(response.data.steps.review?.data || {})
+    };
+
+    setApplicationData(formattedData);
+    setLoading(false);
+  } catch (error) {
+    console.error('Error fetching application:', error);
+    setLoading(false);
+  }
+};
 
   // Update handleFinalApplicationClick
   const handleFinalApplicationClick = (formNumber) => {
@@ -1336,48 +1369,48 @@ const ApplicationDetail = () => {
                 </div>
               </div>
             )}
-            {/* STEP 7 - REVIEW/SIGNATURE */}
-            {activeStep === 7 && (
-              <div className="detail-step">
-                <h1 className="form-title">REVIEW & SIGNATURE</h1>
+{/* STEP 7 - REVIEW/SIGNATURE */}
+{activeStep === 7 && (
+  <div className="detail-step">
+    <h1 className="form-title">REVIEW & SIGNATURE</h1>
 
-                <div className="form-section">
-                  <label className="section-label">Agreement</label>
-                  <div className="agreement-checkbox">
-                    <label className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={applicationData.review?.agreeStatements || false}
-                        readOnly
-                      />
-                      <span><strong>I have read, understand, and agree to the above statements</strong></span>
-                    </label>
-                  </div>
-                </div>
+    <div className="form-section">
+      <label className="section-label">Agreement</label>
+      <div className="agreement-checkbox">
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={applicationData.review?.agreeStatements || false}
+            readOnly
+          />
+          <span><strong>I have read, understand, and agree to the above statements</strong></span>
+        </label>
+      </div>
+    </div>
 
-                <div className="signature-section">
-                  <label className="section-label">Signature</label>
-                  {applicationData.review?.signature ? (
-                    <div className="signature-display">
-                      <img src={applicationData.review.signature} alt="Applicant Signature" />
-                    </div>
-                  ) : (
-                    <p className="field-value text-muted">No signature</p>
-                  )}
-                </div>
+    <div className="signature-section">
+      <label className="section-label">Signature</label>
+      {applicationData.review?.signature_base64 ? (
+        <div className="signature-display">
+          <img src={applicationData.review.signature_base64} alt="Applicant Signature" style={{ maxWidth: '100%', border: '1px solid #ddd', borderRadius: '4px' }} />
+        </div>
+      ) : (
+        <p className="field-value text-muted">No signature</p>
+      )}
+    </div>
 
-                <div className="form-section">
-                  <label className="section-label">Date</label>
-                  <div className="form-field half-width">
-                    <input
-                      type="date"
-                      value={applicationData.review?.signatureDate || ''}
-                      readOnly
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+    <div className="form-section">
+      <label className="section-label">Date</label>
+      <div className="form-field half-width">
+        <input
+          type="date"
+          value={applicationData.review?.signatureDate || ''}
+          readOnly
+        />
+      </div>
+    </div>
+  </div>
+)}
           </div>
 
           {/* Navigation Buttons */}

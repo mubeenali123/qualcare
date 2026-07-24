@@ -167,7 +167,6 @@ const getMinDateForStart = () => {
 
         <form onSubmit={handleNext}>
           {/* Name Fields */}
-// In ApplicationForm.js - Name Fields section
 <div className="form-section">
   <label className="section-label">Name <span className="required">*</span></label>
   <div className="name-grid">
@@ -187,8 +186,9 @@ const getMinDateForStart = () => {
         name="middleName"
         value={formData.middleName}
         onChange={handleInputChange}
+        required
       />
-      <span className="field-label">Middle</span>
+      <span className="field-label">Middle <span className="required">*</span></span>
     </div>
     <div className="form-field">
       <input
