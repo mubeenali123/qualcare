@@ -73,48 +73,48 @@ const Step8 = ({ onNext, onPrevious, onBack, goToStep }) => {
     }));
   };
 
-  const FileUpload = React.memo(
-    ({ label, name, expiryName, formData, onFileChange, onExpiryChange, useCamera }) => {
-      return (
-        <div className="file-upload-section">
-          <label className="section-label">{label}</label>
+const FileUpload = React.memo(
+  ({ label, name, expiryName, formData, onFileChange, onExpiryChange }) => {
+    return (
+      <div className="file-upload-section">
+        <label className="section-label">{label}</label>
 
-          <div className="file-upload-field">
+        <div className="file-upload-field">
+          <input
+            type="file"
+            name={name}
+            onChange={onFileChange}
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,image/*"
+            // Remove capture attribute and use multiple options
+          />
+        </div>
+
+        {formData[name] && (
+          <p className="file-selected">
+            Selected: <strong>{formData[name].name}</strong>
+          </p>
+        )}
+
+        {expiryName && formData[name] && (
+          <div className="form-field half-width">
+            <label className="section-label">
+              Expiration Date <span className="required">*</span>
+            </label>
             <input
-              type="file"
-              name={name}
-              onChange={onFileChange}
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-              {...(useCamera ? { capture: "environment" } : {})}
+              type="date"
+              name={expiryName}
+              value={formData[expiryName]}
+              onChange={onExpiryChange}
+              required
             />
           </div>
+        )}
 
-          {formData[name] && (
-            <p className="file-selected">
-              Selected: <strong>{formData[name].name}</strong>
-            </p>
-          )}
-
-          {expiryName && formData[name] && (
-            <div className="form-field half-width">
-              <label className="section-label">
-                Expiration Date <span className="required">*</span>
-              </label>
-              <input
-                type="date"
-                name={expiryName}
-                value={formData[expiryName]}
-                onChange={onExpiryChange}
-                required
-              />
-            </div>
-          )}
-
-          <span className="file-note">Max. file size: 32 MB.</span>
-        </div>
-      );
-    }
-  );
+        <span className="file-note">Max. file size: 32 MB.</span>
+      </div>
+    );
+  }
+);
 
 const handleSubmit = (e) => {
   e.preventDefault();
