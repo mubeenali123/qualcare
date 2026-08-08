@@ -142,7 +142,6 @@ const EmployerForm = ({ prefix, title, formData, handleInputChange }) => (
       pattern="[0-9]{10}"
       maxLength={10}
       title="Phone number must be exactly 10 digits"
-      required
     />
   </div>
 </div>

@@ -1303,3 +1303,24 @@ nav[aria-label="Top Header"],
     font-size: 14px;
     color: #666;
 }
+
+.file-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.remove-file-btn {
+  border: none;
+  background: transparent;
+  color: #d00;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 2px 8px;
+}
+
+.remove-file-btn:hover {
+  opacity: 0.7;
+}

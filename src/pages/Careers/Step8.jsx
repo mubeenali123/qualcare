@@ -55,14 +55,14 @@ const Step8 = ({ onNext, onPrevious, onBack, goToStep }) => {
       }));
     }
   }, [savedData]);
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
+const handleFileChange = (e) => {
+  const { name, files } = e.target;
 
-    setFormData(prev => ({
-      ...prev,
-      [name]: files[0]
-    }));
-  };
+  setFormData(prev => ({
+    ...prev,
+    [name]: files?.length ? files[0] : null
+  }));
+};
 
   const handleExpiryChange = (e) => {
     const { name, value } = e.target;
@@ -89,11 +89,29 @@ const FileUpload = React.memo(
           />
         </div>
 
-        {formData[name] && (
-          <p className="file-selected">
-            Selected: <strong>{formData[name].name}</strong>
-          </p>
-        )}
+{formData[name] && (
+  <div className="file-selected">
+    <span>
+      Selected: <strong>{formData[name].name}</strong>
+          <button
+      type="button"
+      className="remove-file-btn"
+      onClick={() =>
+        onFileChange({
+          target: {
+            name,
+            files: []
+          }
+        })
+      }
+    >
+      ×
+    </button>
+    </span>
+
+
+  </div>
+)}
 
         {expiryName && formData[name] && (
           <div className="form-field half-width">

@@ -65,7 +65,7 @@ const handleFileChange = (e) => {
 
   setFormData(prev => ({
     ...prev,
-    [name]: files[0]
+    [name]: files?.length ? files[0] : null
   }));
 };
 
@@ -99,11 +99,22 @@ const FileUpload = React.memo(
           />
         </div>
 
-        {formData[name] && (
-          <p className="file-selected">
-            Selected: <strong>{formData[name].name}</strong>
-          </p>
-        )}
+{formData[name] && (
+  <div className="file-selected">
+    <span>
+      Selected: <strong>{formData[name]?.name || formData[name]}</strong>
+          <button
+      type="button"
+      className="remove-file-btn"
+      onClick={() => onFileChange({ target: { name, files: [] } })}
+    >
+      ×
+    </button>
+    </span>
+
+
+  </div>
+)}
 
         {expiryName && formData[name] && (
           <div className="form-field half-width">

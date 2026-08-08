@@ -3,6 +3,8 @@ import './ApplicationForm.css';
 import * as types from '../../redux/type';
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const ApplicationForm = ({ onBack, onNext, goToStep }) => {
     const dispatch = useDispatch();
@@ -186,9 +188,8 @@ const getMinDateForStart = () => {
         name="middleName"
         value={formData.middleName}
         onChange={handleInputChange}
-        required
       />
-      <span className="field-label">Middle <span className="required">*</span></span>
+      <span className="field-label">Middle</span>
     </div>
     <div className="form-field">
       <input
@@ -236,7 +237,7 @@ const getMinDateForStart = () => {
                   onChange={handleInputChange}
                   required
                 />
-                <span className="field-label">State / Province / Region</span>
+                <span className="field-label">State</span>
               </div>
                           <div className="form-field">
 <input
@@ -253,7 +254,7 @@ const getMinDateForStart = () => {
   pattern="[0-9]*"
   required
 />
-              <span className="field-label">ZIP / Postal Code</span>
+              <span className="field-label">ZIP</span>
             </div>
             </div>
 
@@ -386,12 +387,25 @@ const getMinDateForStart = () => {
             </div>
             <div className="form-field">
               <label className="section-label">Date of Birth <span className="required">*</span></label>
-<input
-  type="date"
-  name="dateOfBirth"
-  value={formData.dateOfBirth}
-  onChange={handleInputChange}
-  max={getMinDateForDOB()}
+<DatePicker
+  selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : null}
+  onChange={(date) => {
+    setFormData({
+      ...formData,
+      dateOfBirth: date
+        ? date.toISOString().split('T')[0]
+        : ''
+    });
+  }}
+  maxDate={new Date(getMinDateForDOB())}
+  dateFormat="MM/dd/yyyy"
+  placeholderText="MM/DD/YYYY"
+  showMonthDropdown
+  showYearDropdown
+  dropdownMode="select"
+  scrollableYearDropdown
+  yearDropdownItemNumber={100}
+  className="form-control"
   required
 />
             </div>
