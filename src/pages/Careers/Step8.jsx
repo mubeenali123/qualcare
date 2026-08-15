@@ -118,13 +118,26 @@ const FileUpload = React.memo(
             <label className="section-label">
               Expiration Date <span className="required">*</span>
             </label>
-            <input
-              type="date"
-              name={expiryName}
-              value={formData[expiryName]}
-              onChange={onExpiryChange}
-              required
-            />
+<input
+  type="date"
+  name={expiryName}
+  value={formData[expiryName]}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    // Prevent years longer than 4 digits
+    if (value) {
+      const year = value.split('-')[0];
+
+      if (year.length > 4) {
+        return;
+      }
+    }
+
+    onExpiryChange(e);
+  }}
+  required
+/>
           </div>
         )}
 
