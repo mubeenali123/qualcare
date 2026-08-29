@@ -23,13 +23,20 @@ function* submitApplication(action) {
         referenceId: storedReferenceId,
       };
     }
+    const apiKey = process.env.REACT_APP_UPLOAD_KEY;
 
-    const response = yield call(() =>
+    // ✅ Build headers with API key
+    const headers = {
+      'X-API-Key': apiKey,
+    };
+
+    // Only set Content-Type for JSON requests
+    if (!(payloadToSend instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
+ const response = yield call(() =>
       axios.post(`${base_url}/applications-save`, payloadToSend, {
-        headers:
-          payloadToSend instanceof FormData
-            ? { "Content-Type": "multipart/form-data" }
-            : {},
+        headers: headers,
       })
     );
 
