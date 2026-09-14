@@ -1,0 +1,152 @@
+/* AvailabilitySection.css */
+
+.availability-container {
+  margin-top: 15px;
+  margin-bottom: 30px;
+}
+
+.availability-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px 24px;
+  align-items: start;
+}
+
+/* Base Card */
+.availability-day-card {
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Compact Unchecked State (3 columns) */
+.availability-day-card.is-compact {
+  grid-column: span 1;
+}
+
+/* Expanded Checked State (Full row) */
+.availability-day-card.is-expanded {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 36px;
+  padding: 16px 20px;
+  background-color: #fafbfc;
+  border: 1px solid #edf0f3;
+  border-radius: 8px;
+}
+
+/* Day Title & Checkbox Column */
+.availability-day-info {
+  min-width: 150px;
+  flex-shrink: 0;
+}
+
+.availability-day-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.2px;
+}
+
+/* Checkbox Label */
+.availability-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Checkbox element */
+.availability-checkbox-input {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: #094a87;
+  border-radius: 3px;
+  margin: 0 !important;
+}
+
+/* Status text when checked */
+.availability-status-checked {
+  font-weight: 700;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.availability-check-symbol {
+  font-weight: 900;
+  font-size: 13px;
+}
+
+/* Status text when unchecked */
+.availability-status-unchecked {
+  font-weight: 400;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.availability-square-symbol {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #cbd5e1;
+  border-radius: 1px;
+}
+
+/* Time Pickers Group (From and To) */
+.availability-time-controls {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.availability-time-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.availability-time-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .availability-grid-layout {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .availability-grid-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .availability-day-card.is-expanded {
+    flex-direction: column;
+    gap: 16px;
+    padding: 14px;
+  }
+
+  .availability-time-controls {
+    gap: 16px;
+    width: 100%;
+  }
+
+  .availability-time-block {
+    width: 100%;
+  }
+}
