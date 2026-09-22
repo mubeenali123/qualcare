@@ -31,7 +31,7 @@ export const isValidPhoneNumber = (value) => {
  * PhoneInput Component
  * - Masks input to (XXX) XXX-XXXX format
  * - Strictly supports only integer numbers (0-9), blocks all alphabets
- * - Default placeholder: (666) 667-7777
+ * - Default placeholder: (xxx) xxx-xxxx
  * - Validates 10-digit pattern
  */
 const PhoneInput = ({
@@ -40,14 +40,14 @@ const PhoneInput = ({
   onChange,
   onBlur,
   required = false,
-  placeholder = '(666) 667-7777',
+  placeholder = '(xxx) xxx-xxxx',
   disabled = false,
   readOnly = false,
   className = '',
   id,
   style = {},
   autoComplete = 'tel',
-  title = 'Phone number must be exactly 10 digits in (666) 667-7777 format',
+  title = 'Phone number must be exactly 10 digits in (xxx) xxx-xxxx format',
 }) => {
   const inputRef = useRef(null);
   const [displayValue, setDisplayValue] = useState(() => formatPhoneNumber(value));
@@ -132,7 +132,7 @@ const PhoneInput = ({
   const handleBlur = (e) => {
     const digits = displayValue.replace(/\D/g, '');
     if (digits.length > 0 && digits.length < 10) {
-      const msg = 'Please enter a complete 10-digit phone number: (666) 667-7777';
+      const msg = 'Please enter a complete 10-digit phone number: (xxx) xxx-xxxx';
       setError(msg);
       if (inputRef.current) inputRef.current.setCustomValidity(msg);
     } else if (required && digits.length === 0) {

@@ -148,7 +148,7 @@ const getMinDateForStart = () => {
           </div>
           <div className="step" onClick={() => goToStep(3)}>
             <div className="step-number">3</div>
-            <span className="step-label">Experience</span>
+            <span className="step-label">Availability</span>
           </div>
           <div className="step" onClick={() => goToStep(4)}>
             <div className="step-number">4</div>
@@ -156,25 +156,21 @@ const getMinDateForStart = () => {
           </div>
           <div className="step" onClick={() => goToStep(5)}>
             <div className="step-number">5</div>
-            <span className="step-label">Skills</span>
+            <span className="step-label">Employment History</span>
           </div>
           <div className="step" onClick={() => goToStep(6)}>
             <div className="step-number">6</div>
             <span className="step-label">Documents</span>
           </div>
-                    <div className="step" onClick={() => goToStep(8)}>
-            <div className="step-number">7</div>
-            <span className="step-label">Certification Upload</span>
-          </div>
           <div className="step" onClick={() => goToStep(7)}>
-            <div className="step-number">8</div>
+            <div className="step-number">7</div>
             <span className="step-label">Review</span>
           </div>
         </div>
 
         {/* Progress Bar */}
         <div className="progress-bar">
-          <div className="progress-text">Step 1 of 8</div>
+          <div className="progress-text">Step 1 of 7</div>
           <div className="progress-track">
             <div className="progress-fill" style={{ width: '14.28%' }}></div>
           </div>
@@ -320,6 +316,7 @@ const getMinDateForStart = () => {
       name="phone"
       value={formData.phone}
       onChange={handleInputChange}
+      placeholder="(xxx) xxx-xxxx"
       required
     />
   </div>

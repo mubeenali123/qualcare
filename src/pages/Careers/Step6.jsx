@@ -80,7 +80,7 @@ const handleExpiryChange = (e) => {
 };
 // In Step6.js - Updated FileUpload component
 const FileUpload = React.memo(
-  ({ label, name, expiryName, formData, onFileChange, onExpiryChange }) => {
+  ({ label, name, formData, onFileChange }) => {
     return (
       <div className="file-upload-section">
         <label className="section-label">{label}</label>
@@ -111,20 +111,6 @@ const FileUpload = React.memo(
 
   </div>
 )}
-
-        {expiryName && formData[name] && (
-          <div className="form-field half-width">
-            <label className="section-label">
-              Expiration Date <span className="required">*</span>
-            </label>
-<CustomDatePicker
-  name={expiryName}
-  value={formData[expiryName]}
-  onChange={onExpiryChange}
-  required
-/>
-          </div>
-        )}
 
         <span className="file-note">Max. file size: 32 MB.</span>
       </div>
@@ -159,7 +145,7 @@ const handleSubmit = (e) => {
     });
   }
 
-  goToStep(8);
+  goToStep(7);
 };
 
 const handleSave = () => {
@@ -228,19 +214,15 @@ const handleSave = () => {
     <span className="step-label">References</span>
   </div>
   <div className="step completed" onClick={() => goToStep(5)}>
-    <div className="step-number">5</div>
+    <div className="step-number">✓</div>
     <span className="step-label">Employment History</span>
   </div>
   <div className="step active" onClick={() => goToStep(6)}>
     <div className="step-number">6</div>
     <span className="step-label">Documents</span>
   </div>
-            <div className="step" onClick={() => goToStep(8)}>
-            <div className="step-number">7</div>
-            <span className="step-label">Certifications Upload</span>
-          </div>
   <div className="step" onClick={() => goToStep(7)}>
-    <div className="step-number">8</div>
+    <div className="step-number">7</div>
     <span className="step-label">Review</span>
   </div>
 </div>
@@ -248,7 +230,7 @@ const handleSave = () => {
         <div className="progress-bar">
           <div className="progress-text">Step 6 of 7</div>
           <div className="progress-track">
-            <div className="progress-fill" style={{ width: '71.42%' }}></div>
+            <div className="progress-fill" style={{ width: '85.71%' }}></div>
           </div>
         </div>
         <h1 className="form-title">DOCUMENT UPLOADS</h1>
@@ -257,90 +239,64 @@ const handleSave = () => {
   <FileUpload
     label="Physical Examination (3–6 months)"
     name="physicalExam"
-    expiryName="physicalExamExpiry"
     formData={formData}
     onFileChange={handleFileChange}
-    onExpiryChange={handleExpiryChange}
     useCamera={true}
   />
 
   <FileUpload
     label="CPR Card"
     name="cprCard"
-    expiryName="cprExpiry"
     formData={formData}
     onFileChange={handleFileChange}
-    onExpiryChange={handleExpiryChange}
     useCamera={true}
   />
 
   <FileUpload
     label="Driver’s License"
     name="driversLicense"
-    expiryName="driversLicenseExpiry"
     formData={formData}
     onFileChange={handleFileChange}
-    onExpiryChange={handleExpiryChange}
     useCamera={true}
   />
 
   <FileUpload
     label="Professional License (RN/LPN/CNA)"
     name="professionalLicense"
-    expiryName="professionalLicenseExpiry"
     formData={formData}
     onFileChange={handleFileChange}
-    onExpiryChange={handleExpiryChange}
     useCamera={true}
   />
 
   <FileUpload
     label="Liability Insurance"
     name="liabilityInsurance"
-    expiryName="liabilityInsuranceExpiry"
     formData={formData}
     onFileChange={handleFileChange}
-    onExpiryChange={handleExpiryChange}
     useCamera={true}
   />
 
   <FileUpload
     label="Auto Insurance"
     name="autoInsurance"
-    expiryName="autoInsuranceExpiry"
     formData={formData}
     onFileChange={handleFileChange}
-    onExpiryChange={handleExpiryChange}
     useCamera={true}
   />
 
   <FileUpload
     label="Work Authorization"
     name="workAuthorization"
-    expiryName="workAuthorizationExpiry"
     formData={formData}
     onFileChange={handleFileChange}
-    onExpiryChange={handleExpiryChange}
-    useCamera={true}
-  />
-
-  <FileUpload
-    label="Level 2 Background Screening"
-    name="backgroundScreening"
-    expiryName="backgroundScreeningExpiry"
-    formData={formData}
-    onFileChange={handleFileChange}
-    onExpiryChange={handleExpiryChange}
     useCamera={true}
   />
 
   <FileUpload
     label="Palm Beach County ID Badge (HHA Only)"
     name="palmBeachBadge"
-    expiryName="palmBeachBadgeExpiry"
     formData={formData}
     onFileChange={handleFileChange}
-    onExpiryChange={handleExpiryChange}
     useCamera={true}
   />
 
@@ -353,11 +309,7 @@ const handleSave = () => {
   <FileUpload label="HIPAA Update" name="hipaa" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
   <FileUpload label="OSHA Update" name="osha" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
   <FileUpload label="Self Administered Medication Certificate" name="medicationCertificate" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
-  <FileUpload label="Communicating with Cognitively Impaired Patients" name="communicationTraining" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
-  <FileUpload label="Patient Rights" name="patientRights" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
-  <FileUpload label="Medical Records Documentation" name="medicalRecords" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
   <FileUpload label="Medical Errors Update" name="medicalErrors" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
-  <FileUpload label="Florida Laws & Rules" name="floridaLaws" formData={formData} onFileChange={handleFileChange} useCamera={true}/>
 
   <div className="form-actions">
     <button type="button" className="btn-previous" onClick={onPrevious}>

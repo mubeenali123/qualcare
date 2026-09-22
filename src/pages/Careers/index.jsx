@@ -10,7 +10,6 @@ import Step4 from './Step4';
 import Step5 from './Step5';
 import Step6 from './Step6';
 import Step7 from './Step7';
-import Step8 from './Step8';
 import ThankYou from './ThankYou';
 import { useSelector } from 'react-redux';
 
@@ -38,8 +37,6 @@ const Careers = () => {
       case 7:
         return <Step7 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(6)} onNext={() => setCurrentStep(8)} goToStep={goToStep} />;
       case 8:
-        return <Step8 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(7)} onNext={() => setCurrentStep(9)} goToStep={goToStep} />;
-      case 9:
         return <ThankYou onBack={() => { setShowApplicationForm(false); setCurrentStep(1); }} />;
       default:
         return null;

@@ -247,7 +247,7 @@ const Step5 = ({ onNext, onPrevious, onBack, goToStep }) => {
 
       <div className="form-container">
         <div className="progress-steps">
-          {['Pre-Employment', 'Education', 'Availability', 'References', 'Employment History', 'Documents', 'Certifications Upload', 'Review'].map((label, idx) => {
+          {['Pre-Employment', 'Education', 'Availability', 'References', 'Employment History', 'Documents', 'Review'].map((label, idx) => {
             const stepNum = idx + 1;
             const isActive = stepNum === 5;
             const isCompleted = stepNum < 5;
@@ -261,7 +261,7 @@ const Step5 = ({ onNext, onPrevious, onBack, goToStep }) => {
         </div>
 
         <div className="progress-bar">
-          <div className="progress-text">Step 5 of 8</div>
+          <div className="progress-text">Step 5 of 7</div>
           <div className="progress-track"><div className="progress-fill" style={{ width: '71.42%' }}></div></div>
         </div>
 
