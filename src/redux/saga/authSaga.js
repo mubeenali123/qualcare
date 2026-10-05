@@ -19,7 +19,7 @@ function* adminLogin(action) {
   } catch (error) {
     yield put({
       type: types.ADMIN_LOGIN_FAILURE,
-      payload: error.response?.data?.message || "Login failed."
+      payload: error.response?.data?.message || error.message || "Login failed."
     });
   }
 }

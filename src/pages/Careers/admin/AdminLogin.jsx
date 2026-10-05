@@ -37,13 +37,18 @@ const AdminLogin = () => {
     }
   }, [user, navigate]);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleLogin();
+  };
+
   return (
     <div className="login-page">
       <div className="login-container centered-content mt-5 mb-5">
-        <div className="login-form">
+        <form className="login-form" onSubmit={handleSubmit}>
           <h2 className="text-center mb-4">Login</h2>
 
-          {error && <div className="alert alert-danger">{error}</div>}
+          {error && <div className="alert alert-danger">{typeof error === "string" ? error : JSON.stringify(error)}</div>}
           {successMessage && <div className="alert alert-success">{successMessage}</div>}
 
           <div className="form-field">
@@ -52,7 +57,10 @@ const AdminLogin = () => {
               type="email"
               name="email"
               className="form-control"
+              value={formData.email}
               onChange={handleChange}
+              required
+              autoFocus
             />
           </div>
 
@@ -62,20 +70,21 @@ const AdminLogin = () => {
               type="password"
               name="password"
               className="form-control"
+              value={formData.password}
               onChange={handleChange}
+              required
             />
           </div>
 
           <button
-            type="button"
+            type="submit"
             className="btn-next mt-4"
-            onClick={handleLogin}
             disabled={loading}
           >
             {loading ? "Logging in..." : "Login"}
           </button>
 
-        </div>
+        </form>
       </div>
     </div>
   );
