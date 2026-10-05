@@ -13,6 +13,7 @@ const { loading, error, availability: savedData } = useSelector(state => state.a
   const [submitted, setSubmitted] = useState(false);
 
 const [formData, setFormData] = useState({
+  availableAnytime: false,
   mondayAvailable: false,
   mondayStartTime: '',
   mondayEndTime: '',
@@ -128,6 +129,25 @@ const handleSave = () => {
 
 
 
+  const handleToggleAvailableAnytime = (e) => {
+    const isChecked = e.target.type === 'checkbox' ? e.target.checked : !formData.availableAnytime;
+    const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    const updatedDays = {};
+    if (isChecked) {
+      days.forEach(day => {
+        updatedDays[`${day}Available`] = true;
+        updatedDays[`${day}StartTime`] = '00:00';
+        updatedDays[`${day}EndTime`] = '23:59';
+      });
+    }
+    setFormData(prev => ({
+      ...prev,
+      availableAnytime: isChecked,
+      ...updatedDays,
+      ...(isChecked && !prev.totalHours ? { totalHours: 'Open / Flexible' } : {})
+    }));
+  };
+
   return (
     <div className="application-page">
       {/* Header */}
@@ -197,6 +217,45 @@ const handleSave = () => {
 
         <form onSubmit={handleSubmit}>
           
+          {/* Available Anytime Option */}
+          <div className="available-anytime-container" style={{
+            marginBottom: '20px',
+            padding: '16px 20px',
+            backgroundColor: formData.availableAnytime ? '#eef7ee' : '#f8fafd',
+            border: formData.availableAnytime ? '2px solid #2e7d32' : '1px solid #c7d2e0',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }} onClick={() => handleToggleAvailableAnytime({ target: { type: 'custom' } })}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <input 
+                type="checkbox"
+                id="availableAnytime"
+                name="availableAnytime"
+                checked={Boolean(formData.availableAnytime)}
+                onChange={handleToggleAvailableAnytime}
+                onClick={(e) => e.stopPropagation()}
+                style={{ width: '22px', height: '22px', cursor: 'pointer', accentColor: '#2e7d32' }}
+              />
+              <div>
+                <label htmlFor="availableAnytime" style={{ fontSize: '16px', fontWeight: 'bold', color: '#094a87', cursor: 'pointer', display: 'block', margin: 0 }}>
+                  Available Anytime
+                </label>
+                <span style={{ fontSize: '13px', color: '#555' }}>
+                  Select this option if you are available to work any hours or days (24/7 / Flexible)
+                </span>
+              </div>
+            </div>
+            {formData.availableAnytime && (
+              <span style={{ background: '#2e7d32', color: '#fff', fontSize: '12px', fontWeight: 600, padding: '4px 12px', borderRadius: '12px' }}>
+                All Days Selected
+              </span>
+            )}
+          </div>
+
           {/* Availability Days */}
           {/* Availability Days */}
           <div className="form-section availability-container">

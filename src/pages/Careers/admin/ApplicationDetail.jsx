@@ -27,21 +27,71 @@ const ApplicationDetail = () => {
     setPreviewUrl(officeViewerUrl);
   };
   const { id } = useParams();
-  const handleApprove = () => {
+  const handleApprove = async () => {
     if (window.confirm('Are you sure you want to approve this application?')) {
-      dispatch({
-        type: types.APPROVE_APPLICATION_REQUEST,
-        payload: id
-      });
+      try {
+        setApplicationData((prev) => prev ? ({
+          ...prev,
+          details: {
+            ...prev.details,
+            status: 'approved'
+          }
+        }) : prev);
+        const token = localStorage.getItem('token');
+        await axios.put(`${base_url}/admin/applications/${id}/approve`, {}, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        alert('Application approved successfully!');
+        fetchApplicationDetails();
+      } catch (error) {
+        console.error('Approve error:', error);
+        dispatch({
+          type: types.APPROVE_APPLICATION_REQUEST,
+          payload: id
+        });
+      }
     }
   };
 
-  const handleReject = () => {
+  const handleReapprove = async () => {
+    if (window.confirm('Are you sure you want to re-approve this application? This will re-trigger the approval process and notifications.')) {
+      try {
+        const token = localStorage.getItem('token');
+        await axios.put(`${base_url}/admin/applications/${id}/approve`, {}, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        alert('Application re-approved successfully!');
+        fetchApplicationDetails();
+      } catch (error) {
+        console.error('Re-approve error:', error);
+        alert('Failed to re-approve application.');
+      }
+    }
+  };
+
+  const handleReject = async () => {
     if (window.confirm('Are you sure you want to reject this application?')) {
-      dispatch({
-        type: types.REJECT_APPLICATION_REQUEST,
-        payload: id
-      });
+      try {
+        setApplicationData((prev) => prev ? ({
+          ...prev,
+          details: {
+            ...prev.details,
+            status: 'rejected'
+          }
+        }) : prev);
+        const token = localStorage.getItem('token');
+        await axios.put(`${base_url}/admin/applications/${id}/reject`, {}, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        alert('Application rejected.');
+        fetchApplicationDetails();
+      } catch (error) {
+        console.error('Reject error:', error);
+        dispatch({
+          type: types.REJECT_APPLICATION_REQUEST,
+          payload: id
+        });
+      }
     }
   };
   const dispatch = useDispatch();
@@ -480,9 +530,14 @@ const fetchApplicationDetails = async () => {
                         </button>
                     )} */}
           {applicationData?.details?.status === "approved" && (
-            <button className="btn-approve" disabled>
-              <i className="fas fa-check-circle"></i> Approved
-            </button>
+            <>
+              <button className="btn-approve" disabled style={{ cursor: 'default', opacity: 0.95 }}>
+                <i className="fas fa-check-circle"></i> Approved
+              </button>
+              <button className="btn-reapprove" onClick={handleReapprove} title="Re-approve application and re-trigger notification">
+                <i className="fas fa-sync-alt"></i> Re-Approve
+              </button>
+            </>
           )}
 
           {applicationData?.details?.status === "rejected" && (
@@ -619,7 +674,7 @@ const fetchApplicationDetails = async () => {
                         value={applicationData.preEmployment.state || ''}
                         readOnly
                       />
-                      <span className="field-label">State / Province / Region</span>
+                      <span className="field-label">State</span>
                     </div>
                     <div className="form-field">
                       <input
@@ -790,23 +845,22 @@ const fetchApplicationDetails = async () => {
                 </div>
 
                 <div className="form-section">
-                  <label className="section-label">City and State</label>
                   <div className="address-grid">
                     <div className="form-field">
+                      <label className="section-label" style={{ marginBottom: '6px' }}>City</label>
                       <input
                         type="text"
                         value={applicationData.education.highSchoolCity || ''}
                         readOnly
                       />
-                      <span className="field-label">City</span>
                     </div>
                     <div className="form-field">
+                      <label className="section-label" style={{ marginBottom: '6px' }}>State</label>
                       <input
                         type="text"
                         value={applicationData.education.highSchoolState || ''}
                         readOnly
                       />
-                      <span className="field-label">State / Province / Region</span>
                     </div>
                   </div>
                 </div>
@@ -847,23 +901,22 @@ const fetchApplicationDetails = async () => {
                 </div>
 
                 <div className="form-section">
-                  <label className="section-label">City and State</label>
                   <div className="address-grid">
                     <div className="form-field">
+                      <label className="section-label" style={{ marginBottom: '6px' }}>City</label>
                       <input
                         type="text"
                         value={applicationData.education.collegeCity || ''}
                         readOnly
                       />
-                      <span className="field-label">City</span>
                     </div>
                     <div className="form-field">
+                      <label className="section-label" style={{ marginBottom: '6px' }}>State</label>
                       <input
                         type="text"
                         value={applicationData.education.collegeState || ''}
                         readOnly
                       />
-                      <span className="field-label">State / Province / Region</span>
                     </div>
                   </div>
                 </div>
@@ -958,6 +1011,23 @@ const fetchApplicationDetails = async () => {
             {activeStep === 3 && (
               <div className="detail-step">
                 <h1 className="form-title">YOUR AVAILABILITY FOR WORK</h1>
+
+                {applicationData.availability.availableAnytime && (
+                  <div style={{
+                    marginBottom: '18px',
+                    padding: '12px 18px',
+                    background: '#eef7ee',
+                    border: '1px solid #2e7d32',
+                    borderRadius: '6px',
+                    color: '#1b5e20',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
+                  }}>
+                    <span style={{ fontSize: '18px' }}>✓</span> Available Anytime (24/7 / Flexible Availability Selected)
+                  </div>
+                )}
 
                 <div className="form-section">
                   <div className="availability-grid">
@@ -1176,7 +1246,7 @@ const fetchApplicationDetails = async () => {
                               value={applicationData.experience[`${prefix}State`] || ''}
                               readOnly
                             />
-                            <span className="field-label">State / Province / Region</span>
+                            <span className="field-label">State</span>
                           </div>
                         </div>
                         <div className="form-field half-width" style={{ marginTop: '15px' }}>

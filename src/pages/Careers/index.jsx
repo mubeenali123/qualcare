@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Careers.css';
 import heroBg from './hero-bg.jpg';
 import whyBg from './why-bg.jpg';
@@ -20,22 +20,47 @@ const Careers = () => {
 
   const goToStep = (step) => setCurrentStep(step);
 
+  const handlePreviousStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1);
+    } else {
+      setShowApplicationForm(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showApplicationForm) {
+      window.history.pushState({ careerStep: currentStep }, '');
+      const handlePopState = () => {
+        if (currentStep > 1) {
+          setCurrentStep((prev) => prev - 1);
+        } else {
+          setShowApplicationForm(false);
+        }
+      };
+      window.addEventListener('popstate', handlePopState);
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, [showApplicationForm, currentStep]);
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return <ApplicationForm onBack={() => setShowApplicationForm(false)} onNext={() => setCurrentStep(2)} goToStep={goToStep} />;
       case 2:
-        return <Step2 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(1)} onNext={() => setCurrentStep(3)} goToStep={goToStep} />;
+        return <Step2 onBack={handlePreviousStep} onPrevious={() => setCurrentStep(1)} onNext={() => setCurrentStep(3)} goToStep={goToStep} />;
       case 3:
-        return <Step3 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(2)} onNext={() => setCurrentStep(4)} goToStep={goToStep} />;
+        return <Step3 onBack={handlePreviousStep} onPrevious={() => setCurrentStep(2)} onNext={() => setCurrentStep(4)} goToStep={goToStep} />;
       case 4:
-        return <Step4 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(3)} onNext={() => setCurrentStep(5)} goToStep={goToStep} />;
+        return <Step4 onBack={handlePreviousStep} onPrevious={() => setCurrentStep(3)} onNext={() => setCurrentStep(5)} goToStep={goToStep} />;
       case 5:
-        return <Step5 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(4)} onNext={() => setCurrentStep(6)} goToStep={goToStep} />;
+        return <Step5 onBack={handlePreviousStep} onPrevious={() => setCurrentStep(4)} onNext={() => setCurrentStep(6)} goToStep={goToStep} />;
       case 6:
-        return <Step6 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(5)} onNext={() => setCurrentStep(7)} goToStep={goToStep} />;
+        return <Step6 onBack={handlePreviousStep} onPrevious={() => setCurrentStep(5)} onNext={() => setCurrentStep(7)} goToStep={goToStep} />;
       case 7:
-        return <Step7 onBack={() => setShowApplicationForm(false)} onPrevious={() => setCurrentStep(6)} onNext={() => setCurrentStep(8)} goToStep={goToStep} />;
+        return <Step7 onBack={handlePreviousStep} onPrevious={() => setCurrentStep(6)} onNext={() => setCurrentStep(8)} goToStep={goToStep} />;
       case 8:
         return <ThankYou onBack={() => { setShowApplicationForm(false); setCurrentStep(1); }} />;
       default:

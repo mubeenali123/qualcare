@@ -1,9 +1,27 @@
 import * as types from "../type";
 
+const getInitialUser = () => {
+  try {
+    const raw = localStorage.getItem("authUser");
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+const getInitialApp = () => {
+  try {
+    const raw = localStorage.getItem("authApplication");
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
 const initialState = {
-  user: null,
-  application: null, // Stores specific applicant progress
-  role: null,        // 'admin' or 'applicant'
+  user: getInitialUser(),
+  application: getInitialApp(), // Stores specific applicant progress
+  role: localStorage.getItem("authRole") || null,        // 'admin' or 'applicant'
   // Initialize token from a generic key to support both
   token: localStorage.getItem("authToken") || null,
   referenceId: localStorage.getItem("applicationReferenceId") || null,

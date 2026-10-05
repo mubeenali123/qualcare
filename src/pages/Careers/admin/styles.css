@@ -796,6 +796,7 @@
 }
 
 .btn-approve,
+.btn-reapprove,
 .btn-reject {
   padding: 0.75rem 1.5rem;
   border: none;
@@ -818,6 +819,20 @@
   background: #059669;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-reapprove {
+  background: #ffffff;
+  color: #059669;
+  border: 2px solid #10b981;
+}
+
+.btn-reapprove:hover {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
 .btn-reject {

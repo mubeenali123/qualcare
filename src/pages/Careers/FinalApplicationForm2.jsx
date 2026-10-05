@@ -195,6 +195,17 @@ const [formData, setFormData] = useState({
         window.scrollTo({ top: 0, behavior: "smooth" });
     }, [currentStep]);
 
+    useEffect(() => {
+        window.history.pushState({ finalForm2Step: currentStep }, '');
+        const handlePopState = () => {
+            if (currentStep > 1) {
+                setCurrentStep(prev => Math.max(prev - 1, 1));
+            }
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [currentStep]);
+
 const goToStep = (step) => {
     if (step < 1 || step > steps.length) return;
     // Clear error when manually changing steps

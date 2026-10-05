@@ -1,13 +1,18 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 const UserProtectedRoute = () => {
-  const { user, role } = useSelector(state => state.auth);
+  const { role, token } = useSelector(state => state.auth);
+  const location = useLocation();
 
-  // Check if user exists AND if they have the correct role
-  // This ensures an Admin can't just stumble into the User Profile
-  if (!user || role !== 'applicant') {
+  const storedToken = localStorage.getItem("authToken");
+  const storedRole = localStorage.getItem("authRole");
+
+  const isApplicant = (role === 'applicant' || storedRole === 'applicant') && (token || storedToken);
+
+  if (!isApplicant) {
+    sessionStorage.setItem('redirectAfterLogin', location.pathname + location.search);
     return <Navigate to="/login" replace />;
   }
 

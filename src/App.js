@@ -29,6 +29,11 @@ function App() {
 <Route element={<UserProtectedRoute />}>
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/my-applications" element={<ApplicationsPage />} />
+      <Route path="/applications" element={<ApplicationsPage />} />
+      <Route path="/final-application" element={<ApplicationsPage />} />
+      <Route path="/final-applications" element={<ApplicationsPage />} />
+      <Route path="/next-phase" element={<ApplicationsPage />} />
+      <Route path="/phase-2" element={<ApplicationsPage />} />
       <Route path="/change-password" element={<ChangePasswordPage />} />
       <Route path="/expiration-checklist" element={<ExpirationChecklist />} />
       

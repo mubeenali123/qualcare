@@ -11,8 +11,10 @@ function* adminLogin(action) {
     const response = yield call(() =>
       axios.post(`${base_url}/admin/login`, action.payload)
     );
-    const { token } = response.data;
+    const { token, user } = response.data;
     localStorage.setItem("authToken", token); // Generic key for simplicity
+    localStorage.setItem("authRole", "admin");
+    if (user) localStorage.setItem("authUser", JSON.stringify(user));
     yield put({ type: types.ADMIN_LOGIN_SUCCESS, payload: response.data });
   } catch (error) {
     yield put({
@@ -34,6 +36,8 @@ function* adminLogout() {
     console.error("Admin Logout API failed", error);
   } finally {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("authRole");
+    localStorage.removeItem("authUser");
     yield put({ type: types.ADMIN_LOGOUT_SUCCESS });
   }
 }
@@ -44,11 +48,16 @@ function* userLogin(action) {
     const response = yield call(() =>
       axios.post(`${base_url}/applicant/login`, action.payload)
     );
-    const { token, application } = response.data;
+    const { token, application, user } = response.data;
     localStorage.setItem("authToken", token); // Store under generic key
-        if (application && application.reference_id) {
-      localStorage.setItem("applicationReferenceId", application.reference_id);
-      console.log('Reference ID stored:', application.reference_id);
+    localStorage.setItem("authRole", "applicant");
+    if (user) localStorage.setItem("authUser", JSON.stringify(user));
+    if (application) {
+      localStorage.setItem("authApplication", JSON.stringify(application));
+      if (application.reference_id) {
+        localStorage.setItem("applicationReferenceId", application.reference_id);
+        console.log('Reference ID stored:', application.reference_id);
+      }
     }
     yield put({ type: types.USER_LOGIN_SUCCESS, payload: response.data });
   } catch (error) {
@@ -75,6 +84,9 @@ function* userLogout() {
   } finally {
     // ALWAYS clean up locally
     localStorage.removeItem("authToken");
+    localStorage.removeItem("authRole");
+    localStorage.removeItem("authUser");
+    localStorage.removeItem("authApplication");
     localStorage.removeItem("applicationReferenceId");
     yield put({ type: types.USER_LOGOUT_SUCCESS });
   }

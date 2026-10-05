@@ -97,6 +97,17 @@ const FinalApplicationForm3 = ({ formType = 'final_2' }) => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     }, [currentStep]);
 
+    useEffect(() => {
+        window.history.pushState({ finalForm3Step: currentStep }, '');
+        const handlePopState = () => {
+            if (currentStep > 1) {
+                setCurrentStep(prev => Math.max(prev - 1, 1));
+            }
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [currentStep]);
+
     const goToStep = (step) => {
         if (step < 1 || step > steps.length) return;
         if (error) {

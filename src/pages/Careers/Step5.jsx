@@ -63,7 +63,7 @@ const EmployerForm = ({ prefix, title, formData, handleInputChange }) => (
         </div>
         <div className="form-field">
           <input type="text" name={`${prefix}State`} value={formData[`${prefix}State`] || ''} onChange={handleInputChange} />
-          <span className="field-label">State / Province / Region</span>
+          <span className="field-label">State</span>
         </div>
               <div className="form-field">
         <input type="text" name={`${prefix}Zip`} value={formData[`${prefix}Zip`] || ''} onChange={handleInputChange} />

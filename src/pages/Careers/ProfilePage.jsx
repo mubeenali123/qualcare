@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import ProfileSidebar from './ProfileSidebar';
 
 const ProfilePage = ({ onBack }) => {
+  const navigate = useNavigate();
   // 1. Pull user and application data from Redux
   const { user, application } = useSelector((state) => state.auth);
 
@@ -35,7 +37,7 @@ const ProfilePage = ({ onBack }) => {
           <div className="logo">
             <img src="/logo.png.png" alt="QualCare Logo" />
           </div>
-          <button className="home-btn" onClick={onBack}>Home</button>
+          <button className="home-btn" onClick={onBack || (() => navigate('/'))}>Home</button>
           <div className="header-right">
             <div className="social-icons">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
@@ -64,6 +66,44 @@ const ProfilePage = ({ onBack }) => {
 
             <div className="col-md-9">
               <main className="profile-content-card">
+                {/* Next Phase Onboarding Banner */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #094a87 0%, #0d6efd 100%)',
+                  color: '#ffffff',
+                  padding: '20px 24px',
+                  borderRadius: '10px',
+                  marginBottom: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  boxShadow: '0 4px 14px rgba(9, 74, 135, 0.25)'
+                }}>
+                  <div>
+                    <h4 style={{ margin: '0 0 6px 0', fontWeight: '700', fontSize: '18px', color: '#fff' }}>
+                      📋 Next Phase: Onboarding & Final Applications
+                    </h4>
+                    <p style={{ margin: 0, fontSize: '14px', opacity: 0.95, color: '#e0edff' }}>
+                      Proceed to complete your Phase 2 compliance and registration packages.
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => navigate('/my-applications')}
+                    style={{
+                      background: '#ffffff',
+                      color: '#094a87',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: '6px',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      marginLeft: '15px'
+                    }}
+                  >
+                    Go to Phase 2 &rarr;
+                  </button>
+                </div>
+
                 <h2>Account Details</h2>
                 <hr />
 

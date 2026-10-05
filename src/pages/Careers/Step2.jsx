@@ -176,9 +176,9 @@ const handleSave = () => {
           </div>
 
           <div className="form-section">
-            <label className="section-label">City and State <span className="required">*</span></label>
             <div className="address-grid-2">
               <div className="form-field">
+                <label className="section-label" style={{ marginBottom: '6px' }}>City <span className="required">*</span></label>
                 <input 
                   type="text" 
                   name="highSchoolCity" 
@@ -186,9 +186,9 @@ const handleSave = () => {
                   onChange={handleInputChange} 
                   required 
                 />
-                <span className="field-label">City</span>
               </div>
               <div className="form-field">
+                <label className="section-label" style={{ marginBottom: '6px' }}>State <span className="required">*</span></label>
                 <input 
                   type="text" 
                   name="highSchoolState" 
@@ -196,7 +196,6 @@ const handleSave = () => {
                   onChange={handleInputChange} 
                   required 
                 />
-                <span className="field-label">State / Province / Region</span>
               </div>
             </div>
           </div>
@@ -243,25 +242,24 @@ const handleSave = () => {
           </div>
 
           <div className="form-section">
-            <label className="section-label">City and State</label>
             <div className="address-grid-2">
               <div className="form-field">
+                <label className="section-label" style={{ marginBottom: '6px' }}>City</label>
                 <input 
                   type="text" 
                   name="collegeCity" 
                   value={formData.collegeCity} 
                   onChange={handleInputChange} 
                 />
-                <span className="field-label">City</span>
               </div>
               <div className="form-field">
+                <label className="section-label" style={{ marginBottom: '6px' }}>State</label>
                 <input 
                   type="text" 
                   name="collegeState" 
                   value={formData.collegeState} 
                   onChange={handleInputChange} 
                 />
-                <span className="field-label">State / Province / Region</span>
               </div>
             </div>
           </div>

@@ -204,6 +204,17 @@ const today = new Date().toISOString().split("T")[0];
         window.scrollTo({ top: 0, behavior: "smooth" });
     }, [currentStep]);
 
+    useEffect(() => {
+        window.history.pushState({ finalFormStep: currentStep }, '');
+        const handlePopState = () => {
+            if (currentStep > 1) {
+                setCurrentStep(prev => Math.max(prev - 1, 1));
+            }
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [currentStep]);
+
     const goToStep = (step) => {
         if (step < 1 || step > steps.length) return;
         if (error) {

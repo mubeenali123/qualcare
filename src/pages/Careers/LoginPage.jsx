@@ -1,35 +1,61 @@
-import React, { useState, useEffect } from 'react'; // Added useEffect
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; // Added useNavigate
+import { useNavigate, useLocation } from 'react-router-dom';
 import * as types from "../../redux/type";
 
 const LoginPage = ({ onBack }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize navigation
-  
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+  const refParam = searchParams.get('ref') || searchParams.get('referenceId') || searchParams.get('id') || '';
+  const passParam = searchParams.get('pass') || searchParams.get('password') || '';
+  const redirectParam = searchParams.get('redirect') || searchParams.get('to') || '';
+
   // Pull token and user from auth state
   const { loading, error, token } = useSelector(state => state.auth);
 
   const [formData, setFormData] = useState({
-    referenceId: '',
-    password: ''
+    referenceId: refParam || '',
+    password: passParam || ''
   });
 
+  // Handle URL query parameters from email link (pre-fill & optional auto-login)
+  useEffect(() => {
+    if (refParam || passParam) {
+      setFormData(prev => ({
+        ...prev,
+        referenceId: refParam || prev.referenceId,
+        password: passParam || prev.password
+      }));
+
+      // If both ref and pass are provided in email link, auto-login for 1-click access
+      if (refParam && passParam && !token) {
+        dispatch({
+          type: types.USER_LOGIN_REQUEST,
+          payload: { referenceId: refParam, password: passParam }
+        });
+      }
+    }
+  }, [refParam, passParam, token, dispatch]);
+
   // ✅ REDIRECT LOGIC
-  // This runs whenever the 'token' changes. If login is successful, 
-  // the saga updates the store, the token appears, and this triggers.
+  // If login is successful, navigate to the target Next Phase page or /my-applications
   useEffect(() => {
     if (token) {
-      navigate('/profile');
+      const savedRedirect = sessionStorage.getItem('redirectAfterLogin');
+      sessionStorage.removeItem('redirectAfterLogin');
+      const target = redirectParam || savedRedirect || '/my-applications';
+      navigate(target, { replace: true });
     }
-  }, [token, navigate]);
+  }, [token, navigate, redirectParam]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleLogin = () => {
-    // Basic validation to prevent empty requests
     if (!formData.referenceId || !formData.password) {
       return; 
     }
@@ -47,7 +73,7 @@ const LoginPage = ({ onBack }) => {
           <div className="logo">
             <img src="/logo.png.png" alt="QualCare Logo" />
           </div>
-          <button className="home-btn" onClick={onBack}>Home</button>
+          <button className="home-btn" onClick={onBack || (() => navigate('/'))}>Home</button>
           <div className="header-right">
             <div className="social-icons">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook-f"></i></a>
