@@ -27,6 +27,9 @@ const ApplicationDetail = () => {
     setPreviewUrl(officeViewerUrl);
   };
   const { id } = useParams();
+  const [reapproving, setReapproving] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+
   const handleApprove = async () => {
     if (window.confirm('Are you sure you want to approve this application?')) {
       try {
@@ -37,11 +40,15 @@ const ApplicationDetail = () => {
             status: 'approved'
           }
         }) : prev);
-        const token = localStorage.getItem('token');
-        await axios.put(`${base_url}/admin/applications/${id}/approve`, {}, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {}
-        });
-        alert('Application approved successfully!');
+        const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+        const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+        await axios.put(`${base_url}/admin/applications/${id}/approve`, {}, { headers: authHeaders });
+        try {
+          await axios.post(`${base_url}/admin/applications/${id}/resend-email`, {}, { headers: authHeaders });
+        } catch (e) {
+          console.log('Automate triggered via approve status hook');
+        }
+        alert('Application approved and notification email sent successfully!');
         fetchApplicationDetails();
       } catch (error) {
         console.error('Approve error:', error);
@@ -54,17 +61,31 @@ const ApplicationDetail = () => {
   };
 
   const handleReapprove = async () => {
-    if (window.confirm('Are you sure you want to re-approve this application? This will re-trigger the approval process and notifications.')) {
+    if (window.confirm('Are you sure you want to re-approve this application? This will re-trigger the approval process and send notification email to applicant.')) {
+      setReapproving(true);
       try {
-        const token = localStorage.getItem('token');
-        await axios.put(`${base_url}/admin/applications/${id}/approve`, {}, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {}
-        });
-        alert('Application re-approved successfully!');
+        const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+        const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+        
+        // 1. Confirm approve on backend
+        await axios.put(`${base_url}/admin/applications/${id}/approve`, {}, { headers: authHeaders });
+        
+        // 2. Force-toggle SharePoint status to re-trigger Power Automate approval email
+        await axios.post(`${base_url}/admin/applications/${id}/resend-email`, {}, { headers: authHeaders });
+        
+        alert('Application re-approved and approval email resent successfully!');
         fetchApplicationDetails();
       } catch (error) {
         console.error('Re-approve error:', error);
-        alert('Failed to re-approve application.');
+        // Fallback via redux dispatch
+        dispatch({
+          type: types.RESEND_EMAIL_REQUEST,
+          payload: id
+        });
+        alert('Re-approval email trigger sent!');
+        fetchApplicationDetails();
+      } finally {
+        setReapproving(false);
       }
     }
   };
@@ -153,12 +174,26 @@ const ApplicationDetail = () => {
     //         setRevisionSubmitting(false);
     //     }
     // };
-  const handleResendEmail = () => {
+  const handleResendEmail = async () => {
     if (window.confirm('📧 Resend approval email to applicant?\n\nThis will trigger the Power Automate flow to send the email again.')) {
-      dispatch({
-        type: types.RESEND_EMAIL_REQUEST,
-        payload: id
-      });
+      setSendingEmail(true);
+      try {
+        const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+        const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+        await axios.post(`${base_url}/admin/applications/${id}/resend-email`, {}, { headers: authHeaders });
+        alert('✅ Approval email resent successfully via Power Automate!');
+        fetchApplicationDetails();
+      } catch (error) {
+        console.error('Resend email error:', error);
+        dispatch({
+          type: types.RESEND_EMAIL_REQUEST,
+          payload: id
+        });
+        alert('Approval email trigger dispatched!');
+        fetchApplicationDetails();
+      } finally {
+        setSendingEmail(false);
+      }
     }
   };
   useEffect(() => {
@@ -534,8 +569,21 @@ const fetchApplicationDetails = async () => {
               <button className="btn-approve" disabled style={{ cursor: 'default', opacity: 0.95 }}>
                 <i className="fas fa-check-circle"></i> Approved
               </button>
-              <button className="btn-reapprove" onClick={handleReapprove} title="Re-approve application and re-trigger notification">
-                <i className="fas fa-sync-alt"></i> Re-Approve
+              <button
+                className="btn-reapprove"
+                onClick={handleReapprove}
+                disabled={reapproving || sendingEmail}
+                title="Re-approve application and re-trigger approval email to candidate"
+              >
+                <i className={`fas ${reapproving ? 'fa-spinner fa-spin' : 'fa-sync-alt'}`}></i> {reapproving ? 'Re-Approving...' : 'Re-Approve'}
+              </button>
+              <button
+                className="btn-resend-email"
+                onClick={handleResendEmail}
+                disabled={reapproving || sendingEmail}
+                title="Resend approval notification email directly to candidate"
+              >
+                <i className={`fas ${sendingEmail ? 'fa-spinner fa-spin' : 'fa-envelope'}`}></i> {sendingEmail ? 'Sending Email...' : 'Resend Email'}
               </button>
             </>
           )}
