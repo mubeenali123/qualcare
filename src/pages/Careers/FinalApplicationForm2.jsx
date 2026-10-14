@@ -180,14 +180,37 @@ const [formData, setFormData] = useState({
 
     const [currentStep, setCurrentStep] = useState(1);
     const [isDrawing, setIsDrawing] = useState(false);
+    const canvasRef2 = useRef(null);
+    const canvasRef6 = useRef(null);
+    const canvasRef7 = useRef(null);
+    const canvasRef9 = useRef(null);
+    const canvasRef13 = useRef(null);
+
     const canvasRefs = {
-        2: useRef(null),
-        6: useRef(null),
-        7: useRef(null),
-        9: useRef(null),
-        13: useRef(null),
+        2: canvasRef2,
+        6: canvasRef6,
+        7: canvasRef7,
+        9: canvasRef9,
+        13: canvasRef13,
     };
-    const getActiveCanvasRef = () => canvasRefs[currentStep] || { current: null };
+    const getActiveCanvasRef = useCallback(() => {
+        return canvasRefs[currentStep] || { current: null };
+    }, [currentStep, canvasRef2, canvasRef6, canvasRef7, canvasRef9, canvasRef13]);
+
+    // Get signature as base64
+    const getSignatureData = useCallback(() => {
+        const canvas = getActiveCanvasRef().current;
+        if (!canvas) return null;
+        
+        // Check if canvas is actually drawn on (not blank)
+        const ctx = canvas.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const isBlank = !Array.from(imageData.data).some(value => value !== 0);
+        
+        if (isBlank) return null;
+        
+        return canvas.toDataURL('image/png');
+    }, [getActiveCanvasRef]);
 
 
     const progressWidth = (currentStep / steps.length) * 100;
@@ -315,7 +338,21 @@ const onBack = () => {
     }
     setCurrentStep(prev => Math.max(prev - 1, 1));
 };
-    const startDrawing = () => setIsDrawing(true);
+    const startDrawing = (e) => {
+        setIsDrawing(true);
+        const canvas = getActiveCanvasRef().current;
+        if (!canvas || !e) return;
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : null);
+        const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+        if (clientX !== null && clientY !== null) {
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+    };
     const stopDrawing = () => setIsDrawing(false);
     const draw = (e) => {
         if (!isDrawing) return;
@@ -323,8 +360,11 @@ const onBack = () => {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const rect = canvas.getBoundingClientRect();
-        const x = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
-        const y = e.clientY ? e.clientY - rect.top : e.touches[0].clientY - rect.top;
+        const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : null);
+        const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+        if (clientX === null || clientY === null) return;
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
         ctx.strokeStyle = 'black';
@@ -407,20 +447,7 @@ const onBack = () => {
         }
     }, [currentStep]);
 
-    // Get signature as base64
-    const getSignatureData = useCallback(() => {
-        const canvas = getActiveCanvasRef().current;
-        if (!canvas) return null;
-        
-        // Check if canvas is actually drawn on (not blank)
-        const ctx = canvas.getContext('2d');
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const isBlank = !Array.from(imageData.data).some(value => value !== 0);
-        
-        if (isBlank) return null;
-        
-        return canvas.toDataURL('image/png');
-    }, [currentStep]);
+
     const clearError = () => {
         dispatch({ type: types.CLEAR_FINAL_FORM_ERROR });
     };
